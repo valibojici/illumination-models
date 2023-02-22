@@ -124,6 +124,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui_demo.cpp" />
@@ -132,6 +134,10 @@
     <ClCompile Include="vendor\IMGUI\imgui_impl_opengl3.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui_tables.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui_widgets.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\App.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
