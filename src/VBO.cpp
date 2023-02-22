@@ -2,9 +2,9 @@
 
 VBO::VBO(void* data, unsigned int size)
 {
-	glGenBuffers(1, &m_id);
-	bind();
-	bufferData(data, size);
+	glGenBuffers(1, &m_id); // generate new VBO
+	bind();					// bind this VBO
+	bufferData(data, size); // buffer data to VBO
 }
 
 void VBO::create()
