@@ -21,6 +21,17 @@ void Renderer::init()
 
 	glfwMakeContextCurrent(m_window);
 
+    /****************************
+    *		setup GLEW
+    *****************************/
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+    {
+        /* Problem: glewInit failed, something is seriously wrong. */
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+    }
+
+
 	/****************************
 	*		setup ImGui
 	*****************************/
@@ -37,7 +48,20 @@ void Renderer::init()
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
+    m_shader.load("shaders/shader.vert", "shaders/shader.frag");
+    m_shader.bind();
 
+    std::vector<Vertex> vertices = {
+        Vertex(glm::vec3(-0.5f, -0.5f, 0.0f)),
+        Vertex(glm::vec3(0.5f, -0.5f, 0.0f)),
+        Vertex(glm::vec3(0.0f, 0.5f, 0.0f)),
+    };
+    VBO* vbo = new VBO(vertices);
+    m_vao.create();
+    m_vao.addLayout(VAO::DataType::FLOAT, 3);
+    m_vao.addLayout(VAO::DataType::FLOAT, 2);
+    m_vao.addLayout(VAO::DataType::FLOAT, 3);
+    m_vao.linkVBO(*vbo);
 }
 
 void Renderer::render()
@@ -105,8 +129,13 @@ void Renderer::render()
         int display_w, display_h;
         glfwGetFramebufferSize(m_window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        
+        m_vao.bind();
+        m_shader.setVec3("u_color", { clear_color.x, clear_color.y, clear_color.z });
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Update and Render additional Platform Windows
