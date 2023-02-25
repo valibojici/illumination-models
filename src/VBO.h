@@ -26,7 +26,7 @@ public:
 	VBO(const std::vector<Vertex> vertices);
 	~VBO();
 	void create();
-	void bufferData(void *data, unsigned int size) const;
+	void bufferData(void *data, unsigned int size);
 	void bind() const;
 	void unbind() const;
 };

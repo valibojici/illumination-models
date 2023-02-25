@@ -4,6 +4,9 @@ unsigned int VAO::s_currentBoundVAO = 0;
 
 VAO::~VAO()
 {
+	if (s_currentBoundVAO == m_id) {
+		s_currentBoundVAO = 0;
+	}
 	glDeleteVertexArrays(1, &m_id);
 }
 
