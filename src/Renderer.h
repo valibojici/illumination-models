@@ -10,12 +10,13 @@
 #include "Shader.h"
 #include "VAO.h"
 #include "VBO.h"
+#include "Scene.h"
 
 class Renderer
 {
 public:
 	void init();
-	void render();
+	void render(Scene*& scene);
 	void close();
 private:
 	Shader m_shader;
