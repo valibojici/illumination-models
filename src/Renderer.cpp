@@ -47,21 +47,6 @@ void Renderer::init()
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
-
-    m_shader.load("shaders/shader.vert", "shaders/shader.frag");
-    m_shader.bind();
-
-    std::vector<Vertex> vertices = {
-        Vertex(glm::vec3(-0.5f, -0.5f, 0.0f)),
-        Vertex(glm::vec3(0.5f, -0.5f, 0.0f)),
-        Vertex(glm::vec3(0.0f, 0.5f, 0.0f)),
-    };
-    VBO* vbo = new VBO(vertices);
-    m_vao.create();
-    m_vao.addLayout(VAO::DataType::FLOAT, 3);
-    m_vao.addLayout(VAO::DataType::FLOAT, 2);
-    m_vao.addLayout(VAO::DataType::FLOAT, 3);
-    m_vao.linkVBO(*vbo);
 }
 
 void Renderer::render(Scene*& scene)
