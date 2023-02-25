@@ -15,6 +15,9 @@ VBO::VBO(const std::vector<Vertex> vertices)
 
 VBO::~VBO()
 {
+	if (m_id == s_currentBoundVBO) {
+		s_currentBoundVBO = 0;
+	}
 	glDeleteBuffers(1, &m_id);
 }
 
@@ -41,8 +44,9 @@ void VBO::unbind() const
 	}
 }
 
-void VBO::bufferData(void *data, unsigned int size) const
+void VBO::bufferData(void *data, unsigned int size)
 {
+	create();
 	bind();
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
