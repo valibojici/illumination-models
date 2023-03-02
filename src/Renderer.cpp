@@ -47,6 +47,12 @@ void Renderer::init()
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
+
+    /***************************
+    *  register event callbacks
+    ***************************/
+    EventManager::getInstance().registerCallbacks(m_window);
+    EventManager::getInstance().addHandler(this);
 }
 
 void Renderer::render(Scene*& scene)
@@ -119,4 +125,12 @@ void Renderer::close()
 
     glfwDestroyWindow(m_window);
     glfwTerminate();
+}
+
+
+void Renderer::handleEvent(const Event& e)
+{
+    if (e.type() == Event::Type::WINDOW_RESIZE) {
+        printf("New window size: %d %d \n", e.window.width, e.window.height);
+    }
 }

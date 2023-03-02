@@ -124,6 +124,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\EventManager.cpp" />
     <ClCompile Include="src\SceneMenu.cpp" />
     <ClCompile Include="src\EBO.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -142,6 +143,9 @@
     <ClCompile Include="vendor\IMGUI\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\EventManager.h" />
+    <ClInclude Include="src\EventHandler.h" />
+    <ClInclude Include="src\Event.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneMenu.h" />
     <ClInclude Include="src\EBO.h" />
