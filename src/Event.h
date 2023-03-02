@@ -1,5 +1,7 @@
 #pragma once
-
+/// <summary>
+/// Class representing a GLFW event
+/// </summary>
 class Event {
 public:
 	enum class Type {
@@ -10,24 +12,25 @@ public:
 		KEY_RELEASE,
 		WINDOW_RESIZE
 	};
-
-	union Data {
-		struct {
+	// TODO: read more about tagged unions
+	union {
+		struct{
 			float x;
 			float y;
-		};
+		}mouse;
+
 		struct {
-			float width;
-			float height;
-		};
-		struct{
+			int width;
+			int height;
+		}window;
+
+		struct {
 			int keyCode;
-		};
+		}key;
 	};
 
-	Data data() const { return m_data; }
 	Type type() const { return m_type; }
 private:
-	Data m_data;
+	friend class EventManager; // set as friend so it can have access to this class
 	Type m_type;
 };
