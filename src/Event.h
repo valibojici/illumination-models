@@ -15,8 +15,8 @@ public:
 	// TODO: read more about tagged unions
 	union {
 		struct{
-			float x;
-			float y;
+			double x;
+			double y;
 		}mouse;
 
 		struct {

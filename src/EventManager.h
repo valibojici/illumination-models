@@ -11,6 +11,16 @@ public:
 	static EventManager& getInstance();
 
 	/// <summary>
+	/// Enables dispatching of events to listeners
+	/// </summary>
+	inline void enableDispatch() { m_dispatchEvents = true; }
+
+	/// <summary>
+	/// Disables dispatching of events to listeners
+	/// </summary>
+	inline void disableDispatch() { m_dispatchEvents = false; }
+
+	/// <summary>
 	/// Register GLFW callback to use private methods which create an event.
 	/// </summary>
 	void registerCallbacks(GLFWwindow* window);
@@ -26,6 +36,7 @@ public:
 	void removeHandler(EventHandler* handler);
 private:
 	std::vector<EventHandler*> m_handlers;
+	bool m_dispatchEvents = true;
 	
 	/// <summary>
 	/// Dispatch event to all listeners
