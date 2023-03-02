@@ -18,6 +18,16 @@ void EventManager::addHandler(EventHandler* handler)
 	m_handlers.push_back(handler);
 }
 
+void EventManager::removeHandler(EventHandler* handler)
+{
+	auto pos = std::find(m_handlers.begin(), m_handlers.end(), handler);
+	if (pos == m_handlers.end()) {
+		// handler not found
+		return;
+	}
+	m_handlers.erase(pos);
+}
+
 void EventManager::sendEvent(const Event& e)
 {
 	for (auto& handler : m_handlers) {
