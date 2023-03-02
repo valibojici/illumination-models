@@ -19,6 +19,11 @@ public:
 	/// Register a listener of a type that derives from EventHandler and implements the handleEvent method.
 	/// </summary>
 	void addHandler(EventHandler* handler);
+
+	/// <summary>
+	/// Remove a listener of a type that derives from EventHandler and implements the handleEvent method.
+	/// </summary>
+	void removeHandler(EventHandler* handler);
 private:
 	std::vector<EventHandler*> m_handlers;
 	
