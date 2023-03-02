@@ -11,8 +11,9 @@
 #include "VAO.h"
 #include "VBO.h"
 #include "Scene.h"
+#include "EventManager.h"
 
-class Renderer
+class Renderer : public EventHandler
 {
 public:
 	void init();
@@ -22,6 +23,8 @@ private:
 	Shader m_shader;
 	VAO m_vao;
 	GLFWwindow* m_window = nullptr;
+
+	void handleEvent(const Event& e) override;
 
 	static void glfw_error_callback(int error, const char* description)
 	{
