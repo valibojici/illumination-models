@@ -13,7 +13,7 @@ public:
 	EBO(const std::vector<unsigned int>& indices);
 	~EBO();
 	void create();
-	void bufferData(void* data, unsigned int size) const;
+	void bufferData(void* data, unsigned int size);
 	void bind() const;
 	void unbind() const;
 };
