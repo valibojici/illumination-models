@@ -15,6 +15,9 @@ EBO::EBO(const std::vector<unsigned int>& indices)
 
 EBO::~EBO()
 {
+	if (s_currentBoundEBO == m_id) {
+		s_currentBoundEBO = 0;
+	}
 	glDeleteBuffers(1, &m_id);
 }
 
@@ -41,8 +44,9 @@ void EBO::unbind() const
 	}
 }
 
-void EBO::bufferData(void* data, unsigned int size) const
+void EBO::bufferData(void* data, unsigned int size)
 {
+	create();
 	bind();
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }

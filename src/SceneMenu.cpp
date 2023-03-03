@@ -7,6 +7,11 @@ void SceneMenu::onRenderImGui()
 		m_currentScene = new TriangleScene(m_currentScene);
 		delete temp;
 	}
+	if (ImGui::Button("Simple 3D scene")) {
+		Scene* temp = m_currentScene;
+		m_currentScene = new Simple3dScene(m_currentScene);
+		delete temp;
+	}
 }
 
 void SceneMenu::onRender()
