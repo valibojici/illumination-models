@@ -44,6 +44,9 @@ private:
 	void sendEvent(const Event& e);
 	
 	static void handleResize(GLFWwindow* window, int width, int height);
+	static void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void handleMousePosition(GLFWwindow* window, double xpos, double ypos);
+	static void handleMouseButton(GLFWwindow* window, int button, int action, int mods);
 	
 	// make constructor private for singleton
 	EventManager() = default;
