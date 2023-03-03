@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "TriangleScene.h"
+#include "Simple3dScene.h"
 
 class SceneMenu : public Scene
 {
