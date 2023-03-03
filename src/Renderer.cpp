@@ -31,6 +31,12 @@ void Renderer::init()
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
     }
 
+    /***************************
+    *  register event callbacks
+    ***************************/
+    EventManager::getInstance().registerCallbacks(m_window);
+    EventManager::getInstance().addHandler(this);
+
 
 	/****************************
 	*		setup ImGui
@@ -47,12 +53,6 @@ void Renderer::init()
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
-
-    /***************************
-    *  register event callbacks
-    ***************************/
-    EventManager::getInstance().registerCallbacks(m_window);
-    EventManager::getInstance().addHandler(this);
 }
 
 void Renderer::render(Scene*& scene)
@@ -67,13 +67,6 @@ void Renderer::render(Scene*& scene)
         // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
-        if (io.WantCaptureKeyboard || io.WantCaptureMouse) {
-            EventManager::getInstance().disableDispatch();
-        }
-        else {
-            EventManager::getInstance().enableDispatch();
-        }
-
         int display_w, display_h;
         glfwGetFramebufferSize(m_window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
@@ -82,7 +75,6 @@ void Renderer::render(Scene*& scene)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
 #if 0
        
 
