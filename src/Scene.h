@@ -10,6 +10,7 @@ protected:
 public:
 	Scene(Scene*& scene) : m_currentScene(scene) {}
 	virtual void onRender() {}
+	// TODO: add back button rendering here
 	virtual void onRenderImGui() {}
 	virtual void onUpdate() {}
 	virtual ~Scene() {}
