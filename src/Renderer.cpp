@@ -128,7 +128,24 @@ void Renderer::close()
 
 void Renderer::handleEvent(const Event& e)
 {
-    if (e.type() == Event::Type::WINDOW_RESIZE) {
+    switch (e.type()) {
+    case Event::Type::WINDOW_RESIZE:
         printf("New window size: %d %d \n", e.window.width, e.window.height);
-    }
+        break;
+    case Event::Type::MOUSE_MOVE:
+        printf("Mouse move: %f %f \n", e.mouse.x, e.mouse.x);
+        break;
+    case Event::Type::KEY_PRESS:
+        printf("Key press: %d \n", e.key.keyCode);
+        break;
+    case Event::Type::KEY_RELEASE:
+        printf("Key release: %d \n", e.key.keyCode);
+        break;
+    case Event::Type::MOUSE_BUTTON_PRESS:
+        printf("Mouse button press: %d \n", e.key.keyCode);
+        break;
+    case Event::Type::MOUSE_BUTTON_RELEASE:
+        printf("Mouse button release: %d \n", e.key.keyCode);
+        break;
+    };
 }
