@@ -17,6 +17,7 @@ public:
 		struct{
 			double x;
 			double y;
+			int keyCode;
 		}mouse;
 
 		struct {
