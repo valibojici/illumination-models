@@ -1,5 +1,7 @@
 #include "EventManager.h"
 
+const ImGuiIO* EventManager::s_imguiIO = nullptr;
+
 EventManager& EventManager::getInstance()
 {
 	static EventManager eventManager;
@@ -40,6 +42,10 @@ void EventManager::sendEvent(const Event& e)
 
 void EventManager::handleResize(GLFWwindow* window, int width, int height)
 {
+	if (s_imguiIO->WantCaptureKeyboard || s_imguiIO->WantCaptureMouse) {
+		return;
+	}
+
 	Event e;
 	e.m_type = Event::Type::WINDOW_RESIZE;
 	e.window = { width, height };
@@ -48,6 +54,10 @@ void EventManager::handleResize(GLFWwindow* window, int width, int height)
 
 void EventManager::handleKey(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (s_imguiIO->WantCaptureKeyboard) {
+		return;
+	}
+
 	Event e;
 	if (action == GLFW_PRESS) {
 		e.m_type = Event::Type::KEY_PRESS;
@@ -61,6 +71,9 @@ void EventManager::handleKey(GLFWwindow* window, int key, int scancode, int acti
 
 void EventManager::handleMousePosition(GLFWwindow* window, double xpos, double ypos)
 {
+	if (s_imguiIO->WantCaptureMouse) {
+		return;
+	}
 	Event e;
 	e.m_type = Event::Type::MOUSE_MOVE;
 	e.mouse = { xpos, ypos };
@@ -69,13 +82,18 @@ void EventManager::handleMousePosition(GLFWwindow* window, double xpos, double y
 
 void EventManager::handleMouseButton(GLFWwindow* window, int button, int action, int mods)
 {
+	if (s_imguiIO->WantCaptureMouse) {
+		return;
+	}
+
 	Event e;
 	if (action == GLFW_PRESS) {
-		e.m_type = Event::Type::KEY_PRESS;
+		e.m_type = Event::Type::MOUSE_BUTTON_PRESS;
 	}
 	else if (action == GLFW_RELEASE) {
-		e.m_type = Event::Type::KEY_RELEASE;
+		e.m_type = Event::Type::MOUSE_BUTTON_RELEASE;
 	}
-	e.key = { button };
+	glfwGetCursorPos(window, &e.mouse.x, &e.mouse.y);
+	e.mouse.keyCode = button;
 	getInstance().sendEvent(e);
 }

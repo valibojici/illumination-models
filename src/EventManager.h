@@ -2,6 +2,8 @@
 #include <vector>
 #include "EventHandler.h"
 #include "GLFW/glfw3.h"
+#include "imgui.h"
+
 /// <summary>
 /// Singleton class for registering and dispatching events.
 /// </summary>
@@ -34,9 +36,15 @@ public:
 	/// Remove a listener of a type that derives from EventHandler and implements the handleEvent method.
 	/// </summary>
 	void removeHandler(EventHandler* handler);
+
+	/// <summary>
+	/// Set the ImGui IO object, needed to ignore input if an ImGui need keyboard/mouse input
+	/// </summary>
+	static void setImGuiIO(const ImGuiIO* imguiIO) { s_imguiIO = imguiIO; }
 private:
 	std::vector<EventHandler*> m_handlers;
 	bool m_dispatchEvents = true;
+	static const ImGuiIO* s_imguiIO;
 	
 	/// <summary>
 	/// Dispatch event to all listeners

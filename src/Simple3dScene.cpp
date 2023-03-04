@@ -3,6 +3,7 @@
 Simple3dScene::Simple3dScene(Scene*& scene)
     : Scene(scene)
 {
+    m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     m_shader.load("shaders/shader.vert", "shaders/shader.frag");
     m_shader.bind();
 
@@ -38,27 +39,35 @@ Simple3dScene::Simple3dScene(Scene*& scene)
 
     m_viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     // TODO: get screen size from config class?
-    m_projMatrix = glm::perspective(glm::radians(65.0f), 1280.0f / 720.0f, 0.1f, 10.0f);
+    m_projMatrix = glm::perspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f, 10.0f);
     m_shader.setMat4("u_viewMatrix", m_viewMatrix);
     m_shader.setMat4("u_projMatrix", m_projMatrix);
+
+    EventManager::getInstance().addHandler(&m_camera);
+
+    glEnable(GL_CULL_FACE);
 }
 
 Simple3dScene::~Simple3dScene()
 {
+    glDisable(GL_CULL_FACE);
+    EventManager::getInstance().removeHandler(&m_camera);
 }
 
 void Simple3dScene::onRender()
 {
+    static double time = glfwGetTime();
+    m_camera.update(glfwGetTime() - time);
+    time = glfwGetTime();
+
     m_shader.setMat4("u_modelMatrix", glm::rotate(glm::mat4(1.0f), glm::radians(m_rotationAngle), m_rotationAxis));
+    m_shader.setMat4("u_viewMatrix", m_camera.getMatrix());
     glClear(GL_COLOR_BUFFER_BIT);
-    //glEnable(GL_CULL_FACE);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     m_shader.setVec3("u_color", m_color);
     m_vao.bind();
-    glPointSize(15.0f);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-    //glDrawArrays(GL_QUADS, 0, 8);
 }
 
 void Simple3dScene::onRenderImGui()

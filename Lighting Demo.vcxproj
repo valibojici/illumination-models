@@ -124,6 +124,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Simple3dScene.cpp" />
     <ClCompile Include="src\EventManager.cpp" />
     <ClCompile Include="src\SceneMenu.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="vendor\IMGUI\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Simple3dScene.h" />
     <ClInclude Include="src\EventManager.h" />
     <ClInclude Include="src\EventHandler.h" />
