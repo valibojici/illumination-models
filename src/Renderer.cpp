@@ -58,6 +58,7 @@ void Renderer::init()
 void Renderer::render(Scene*& scene)
 {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    EventManager::setImGuiIO(&io);
 
     while (!glfwWindowShouldClose(m_window))
     {
@@ -128,7 +129,7 @@ void Renderer::close()
 
 void Renderer::handleEvent(const Event& e)
 {
-    switch (e.type()) {
+    /*switch (e.type()) {
     case Event::Type::WINDOW_RESIZE:
         printf("New window size: %d %d \n", e.window.width, e.window.height);
         break;
@@ -147,5 +148,5 @@ void Renderer::handleEvent(const Event& e)
     case Event::Type::MOUSE_BUTTON_RELEASE:
         printf("Mouse button release: %d \n", e.key.keyCode);
         break;
-    };
+    };*/
 }
