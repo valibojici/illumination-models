@@ -12,6 +12,11 @@ void SceneMenu::onRenderImGui()
 		m_currentScene = new Simple3dScene(m_currentScene);
 		delete temp;
 	}
+	if (ImGui::Button("Mesh test scene")) {
+		Scene* temp = m_currentScene;
+		m_currentScene = new MeshTestScene(m_currentScene);
+		delete temp;
+	}
 }
 
 void SceneMenu::onRender()
