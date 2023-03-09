@@ -124,6 +124,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MeshTestScene.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Simple3dScene.cpp" />
     <ClCompile Include="src\EventManager.cpp" />
@@ -145,6 +147,8 @@
     <ClCompile Include="vendor\IMGUI\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\MeshTestScene.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Simple3dScene.h" />
     <ClInclude Include="src\EventManager.h" />
@@ -163,6 +167,8 @@
   <ItemGroup>
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
+    <None Include="shaders\simpleLighting.frag" />
+    <None Include="shaders\simpleLighting.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

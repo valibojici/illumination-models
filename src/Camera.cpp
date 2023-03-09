@@ -174,3 +174,16 @@ void Camera::update(double deltaTime)
 		m_position.x, m_position.y, m_position.z,
 		(m_position + m_direction).x, (m_position + m_direction).y, (m_position + m_direction).z);*/
 }
+
+void Camera::setPosition(const glm::vec3& pos)
+{
+	m_position = pos;
+	m_needsUpdate = true;
+}
+
+void Camera::setTarget(const glm::vec3& target) {
+	m_direction = glm::normalize(target - m_position);
+	m_right = glm::normalize(glm::cross(m_direction, m_UP));
+	m_cameraUp = glm::cross(-m_direction, m_right);
+	m_needsUpdate = true;
+}

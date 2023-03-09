@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "TriangleScene.h"
 #include "Simple3dScene.h"
+#include "MeshTestScene.h"
 
 class SceneMenu : public Scene
 {
