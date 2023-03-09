@@ -78,5 +78,20 @@ public:
 	/// </summary>
 	/// <param name="deltaTime">: time in seconds between frames</param>
 	void update(double deltaTime = 1.0);
+
+	/// <summary>
+	/// Get the camera position vector.
+	/// </summary>
+	inline const glm::vec3& getPosition() const { return m_position; }
+
+	/// <summary>
+	/// Set the camera position vector.
+	/// </summary>
+	void setPosition(const glm::vec3& pos);
+
+	/// <summary>
+	/// Set the camera view target (position+direction)
+	/// </summary>
+	void setTarget(const glm::vec3& target);
 };
 
