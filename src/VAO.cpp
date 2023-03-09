@@ -36,7 +36,7 @@ void VAO::addLayout(DataType dataType, unsigned int count, unsigned int attribDi
 		break;
 	case VAO::DataType::MAT3:
 		// for MAT3 i push 3 vec3  'count' times
-		for (int c = 0; c < count; ++c) {
+		for (unsigned int c = 0; c < count; ++c) {
 			for (int i = 0; i < 3; ++i) {
 				m_layout.push_back({ m_stride, 3, GL_FLOAT, attribDivisor});
 				m_stride += sizeof(float) * 3;
@@ -45,7 +45,7 @@ void VAO::addLayout(DataType dataType, unsigned int count, unsigned int attribDi
 		break;
 	case VAO::DataType::MAT4:
 		// for MAT4 i push 4 vec4  'count' times
-		for (int c = 0; c < count; ++c) {
+		for (unsigned int c = 0; c < count; ++c) {
 			for (int i = 0; i < 4; ++i) {
 				m_layout.push_back({ m_stride, 4, GL_FLOAT, attribDivisor});
 				m_stride += sizeof(float) * 4;
@@ -61,7 +61,7 @@ void VAO::linkVBO(const VBO& vbo)
 {
 	vbo.bind();
 	bind();
-	for (int i = 0; i < m_layout.size(); ++i) {
+	for (unsigned int i = 0; i < m_layout.size(); ++i) {
 		glEnableVertexAttribArray(i);
 		glVertexAttribPointer(
 			i, 

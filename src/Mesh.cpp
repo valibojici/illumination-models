@@ -145,7 +145,7 @@ Mesh *Mesh::getPlane(float width, float height)
 	return new Mesh(vertices, indices);
 }
 
-Mesh *Mesh::getSphere(float radius, float smoothness)
+Mesh *Mesh::getSphere(float radius, int smoothness)
 {
 	// create a sphere using parametric equation
 	const float PI = 3.14159f;
