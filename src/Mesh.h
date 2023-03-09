@@ -39,5 +39,5 @@ public:
 	/// </summary>
 	/// <param name="smoothness">How many meridians and parralels</param>
 	/// <returns></returns>
-	static Mesh *getSphere(float radius, float smoothness = 10);
+	static Mesh *getSphere(float radius, int smoothness = 10);
 };
