@@ -11,9 +11,9 @@ void Renderer::init()
 	}
 
 	// set GLSL version
-	const char* glsl_version = "#version 130";
+	const char* glsl_version = nullptr;
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 	// create window 
     // HACK: dont hardode window size
