@@ -9,9 +9,9 @@
 #include "imgui_impl_opengl3.h"
 #include "Shader.h"
 #include "VAO.h"
-#include "VBO.h"
-#include "Scene.h"
-#include "EventManager.h"
+#include "Buffer/VBO.h"
+#include "Scene/Scene.h"
+#include "Event/EventManager.h"
 
 class Renderer : public EventHandler
 {

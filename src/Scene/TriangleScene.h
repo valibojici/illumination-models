@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "SceneMenu.h"
 #include "Shader.h"
-#include "VBO.h"
+#include "Buffer/VBO.h"
 #include "VAO.h"
 
 class TriangleScene : public Scene

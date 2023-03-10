@@ -1,5 +1,5 @@
 #pragma once
-#include "VBO.h"
+#include "Buffer/VBO.h"
 
 class VAO
 {
