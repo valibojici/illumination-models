@@ -3,6 +3,7 @@
 #include "TriangleScene.h"
 #include "Simple3dScene.h"
 #include "MeshTestScene.h"
+#include "TextureTestScene.h"
 
 class SceneMenu : public Scene
 {
