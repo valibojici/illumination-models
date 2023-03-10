@@ -1,7 +1,7 @@
 #pragma once
 #include "VAO.h"
 #include "Shader.h"
-#include "EBO.h"
+#include "Buffer/EBO.h"
 #include "Texture.h"
 
 class Mesh

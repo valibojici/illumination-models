@@ -1,7 +1,7 @@
 #pragma once
 #include "Renderer.h"
-#include "Scene.h"
-#include "SceneMenu.h"
+#include "Scene/Scene.h"
+#include "Scene/SceneMenu.h"
 
 class App
 {

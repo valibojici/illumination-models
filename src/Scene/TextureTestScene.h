@@ -2,27 +2,25 @@
 #include "Scene.h"
 #include "SceneMenu.h"
 #include "Shader.h"
-#include "VBO.h"
+#include "Buffer/VBO.h"
 #include "VAO.h"
-#include "EBO.h"
+#include "Buffer/EBO.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "GLFW/glfw3.h" // for deltaTime(glfwGetTime) in rendering
 #include "Camera.h"
-#include "EventManager.h" // for registering camera
+#include "Event/EventManager.h" // for registering camera
 #include "Mesh.h"
 
-class MeshTestScene : public Scene
+class TextureTestScene : public Scene
 {
 private:
-	// Mesh* m_mesh = Mesh::getPlane(2.0f, 2.0f);
-	// Mesh* m_mesh = Mesh::getCube(1.0f, 1.0f, 1.0f);
-	Mesh* m_mesh = Mesh::getSphere(1.0f, 50);
-	// Mesh* m_mesh = Mesh::getPlane(2.0f, 2.0f);
+	Mesh* m_mesh = Mesh::getPlane(2.0f, 2.0f);
 	Camera m_camera;
 	Shader m_shader;
 	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
+	Texture* m_texture;
 
 
 	glm::vec3 m_color = { 1.0f, 0.0f, 0.0f };
@@ -34,8 +32,8 @@ private:
 	float m_lightRotationAngle = 0.0f;
 
 public:
-	MeshTestScene(Scene*& scene);
-	~MeshTestScene();
+	TextureTestScene(Scene*& scene);
+	~TextureTestScene();
 	void onRender() override;
 	void onRenderImGui() override;
 };

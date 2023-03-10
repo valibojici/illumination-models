@@ -1,6 +1,6 @@
 #pragma once
-#include "Scene/Scene.h"
-#include "Scene/SceneMenu.h"
+#include "Scene.h"
+#include "SceneMenu.h"
 #include "Shader.h"
 #include "Buffer/VBO.h"
 #include "VAO.h"
