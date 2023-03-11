@@ -5,15 +5,16 @@
 
 class Texture
 {
-private:
-	unsigned int m_id = 0;
-	int m_width = 0;
-	int m_height = 0;
-	int m_nrChannels = 0;
-	
+
 public:
+	enum class Type {
+		DIFFUSE,
+		SPECULAR,
+		NORMAL,
+	};
+
 	Texture() = default;
-	Texture(const std::string& path, bool flipY = true);
+	Texture(const std::string& path, Type type = Type::DIFFUSE, bool flipY = true);
 	
 	// delete copy constructor
 	Texture(const Texture& o) = delete;
@@ -39,4 +40,12 @@ public:
 	/// Activate the texture slot and unbind this texture (bind 0).
 	/// </summary>
 	void unbind(unsigned int slot) const;
+
+	inline Type getType() const { return m_type; }
+private:
+	unsigned int m_id = 0;
+	int m_width = 0;
+	int m_height = 0;
+	int m_nrChannels = 0;
+	Type m_type = Type::DIFFUSE;
 };

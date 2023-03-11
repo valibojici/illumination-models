@@ -16,9 +16,10 @@ TextureTestScene::TextureTestScene(Scene*& scene)
     EventManager::getInstance().addHandler(&m_camera);
     glEnable(GL_CULL_FACE);
 
-    m_texture = new Texture("test.png");
-    m_mesh->setTexture(m_texture);
-    m_texture->bind(0);
+    m_textures.push_back(new Texture("textures/brickwall.png"));
+    m_textures.push_back(new Texture("textures/brickwall.png", Texture::Type::SPECULAR));
+    m_textures.push_back(new Texture("textures/brickwall_normal.png", Texture::Type::NORMAL));
+    m_mesh->setTextures(m_textures);
 }
 
 TextureTestScene::~TextureTestScene()
@@ -26,7 +27,9 @@ TextureTestScene::~TextureTestScene()
     glDisable(GL_CULL_FACE);
     EventManager::getInstance().removeHandler(&m_camera);
     delete m_mesh;
-    delete m_texture;
+    for (auto t : m_textures) {
+        delete t;
+    }
 }
 
 void TextureTestScene::onRender()

@@ -12,24 +12,25 @@ private:
 	EBO *m_ebo = nullptr;
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
-	Texture* m_texture;
-	// TODO: texturi
+	
+	std::vector<Texture*> m_textures;
 public:
 	Mesh(
 		const std::vector<Vertex> &vertices,
-		const std::vector<unsigned int> indices);
+		const std::vector<unsigned int>& indices,
+		const std::vector<Texture*>& textures = {});
 
 	~Mesh();
 
 	/// <summary>
 	/// Draw this mesh using the shader. Shader is assumed to be bound.
 	/// </summary>
-	void draw(const Shader &shader);
+	void draw(Shader &shader);
 
 	/// <summary>
-	/// Set the texture of the mesh (not owning)
+	/// Set the textures of the mesh (not owning)
 	/// </summary>
-	void setTexture(Texture* tex) { m_texture = tex; }
+	void setTextures(const std::vector<Texture*> textures) { m_textures = textures; }
 
 	/// <summary>
 	/// Factory method to get a mesh representing a plane in the xOy plane (centered at origin).

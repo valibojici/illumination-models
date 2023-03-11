@@ -1,7 +1,10 @@
 #include "Mesh.h"
 
-Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> indices)
-	: m_vertices(vertices), m_indices(indices)
+Mesh::Mesh(const std::vector<Vertex> &vertices, 
+	const std::vector<unsigned int>& indices,
+	const std::vector<Texture*>& textures
+)
+	: m_vertices(vertices), m_indices(indices), m_textures(textures)
 {
 	// create vao and bind it
 	m_vao = new VAO();
@@ -9,9 +12,9 @@ Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> 
 	m_vao->bind();
 
 	// set the layout of the VBO
-	m_vao->addLayout(VAO::DataType::FLOAT, 3);
-	m_vao->addLayout(VAO::DataType::FLOAT, 2);
-	m_vao->addLayout(VAO::DataType::FLOAT, 3);
+	m_vao->addLayout(VAO::DataType::FLOAT, 3); // position
+	m_vao->addLayout(VAO::DataType::FLOAT, 2); // texCoord
+	m_vao->addLayout(VAO::DataType::FLOAT, 3); // normal
 
 	// create and link VBO
 	m_vbo = new VBO(vertices);
@@ -29,8 +32,27 @@ Mesh::~Mesh()
 	delete m_vao;
 }
 
-void Mesh::draw(const Shader &shader)
+void Mesh::draw(Shader &shader)
 {
+	for (unsigned int i = 0; i < m_textures.size(); ++i) {
+		// bind this texture
+		m_textures[i]->bind(i);
+		std::string name; // check which type it has
+		switch (m_textures[i]->getType())
+		{
+		case Texture::Type::DIFFUSE:
+			name = "u_DiffuseTex";
+			break;
+		case Texture::Type::SPECULAR:
+			name = "u_SpecularTex";
+			break;
+		case Texture::Type::NORMAL:
+			name = "u_NormalTex";
+			break;
+		}
+		// set the sampler in shader
+		shader.setInt(name, i);
+	}
 	m_vao->bind();
 	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
 }

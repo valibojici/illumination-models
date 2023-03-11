@@ -14,13 +14,13 @@
 class TextureTestScene : public Scene
 {
 private:
-	Mesh* m_mesh = Mesh::getPlane(2.0f, 2.0f);
+	Mesh* m_mesh = Mesh::getPlane(4.0f, 4.0f);
 	Camera m_camera;
 	Shader m_shader;
 	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
-	Texture* m_texture;
+	std::vector<Texture*> m_textures;
 
 
 	glm::vec3 m_color = { 1.0f, 0.0f, 0.0f };

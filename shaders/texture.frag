@@ -16,7 +16,9 @@ uniform float u_specFactor = 1.0f;
 uniform float u_shininess = 32;
 uniform vec3 u_specColor = vec3(1.0f);
 
-uniform sampler2D u_texture;
+uniform sampler2D u_DiffuseTex;
+uniform sampler2D u_SpecularTex;
+uniform sampler2D u_NormalTex;
 
 void main()
 {
@@ -37,7 +39,7 @@ void main()
 
     FragColor = vec4(ambient + diffuse + specular, 1.0f);
 
-    FragColor = texture(u_texture, fs_in.texCoords);
+    FragColor = texture(u_NormalTex, fs_in.texCoords);
     // FragColor = vec4(normal / 2.0f + 0.5f, 1.0f);
     //FragColor = vec4(u_color, 1.0f);
 }
