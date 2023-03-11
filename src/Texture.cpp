@@ -1,7 +1,8 @@
 #include "Texture.h"
 
-Texture::Texture(const std::string& path, bool flipY)
+Texture::Texture(const std::string& path, Type type, bool flipY)
 {
+	m_type = type;
 	create();
 	loadFromFile(path, flipY);
 }
