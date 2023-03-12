@@ -13,9 +13,10 @@ TriangleScene::TriangleScene(Scene*& scene)
     };
     m_vbo.bufferData(vertices.data(), sizeof(Vertex) * vertices.size());
     m_vao.create();
-    m_vao.addLayout(VAO::DataType::FLOAT, 3);
-    m_vao.addLayout(VAO::DataType::FLOAT, 2);
-    m_vao.addLayout(VAO::DataType::FLOAT, 3);
+    m_vao.addLayout(VAO::DataType::FLOAT, 3); // position
+    m_vao.addLayout(VAO::DataType::FLOAT, 2); // texture
+    m_vao.addLayout(VAO::DataType::FLOAT, 3); // normal
+    m_vao.addLayout(VAO::DataType::FLOAT, 3); // tangent
     m_vao.linkVBO(m_vbo);
 }
 

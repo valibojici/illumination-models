@@ -32,9 +32,10 @@ Simple3dScene::Simple3dScene(Scene*& scene)
     m_vbo.bufferData(vertices.data(), sizeof(Vertex) * vertices.size());
     m_ebo.bufferData(indices.data(), sizeof(unsigned int) * indices.size());
 
-    m_vao.addLayout(VAO::DataType::FLOAT, 3);
-    m_vao.addLayout(VAO::DataType::FLOAT, 2);
-    m_vao.addLayout(VAO::DataType::FLOAT, 3);
+    m_vao.addLayout(VAO::DataType::FLOAT, 3); // position
+    m_vao.addLayout(VAO::DataType::FLOAT, 2); // texture
+    m_vao.addLayout(VAO::DataType::FLOAT, 3); // normal
+    m_vao.addLayout(VAO::DataType::FLOAT, 3); // tangent
     m_vao.linkVBO(m_vbo);
 
     m_viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
