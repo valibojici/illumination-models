@@ -7,12 +7,14 @@ struct Vertex {
 	Vertex(
 		const glm::vec3& pos = { 0.0f, 0.0f, 0.0f }, 
 		const glm::vec2& texCoords = { 0.0f, 0.0f },
-		const glm::vec3& normal = {0.0f, 1.0f, 0.0f}
+		const glm::vec3& normal = {0.0f, 1.0f, 0.0f},
+		const glm::vec3& tangent = {1.0f, 0.0f, 0.0f}
 	)
-		: position(pos), texCoords(texCoords), normal(normal) {}
+		: position(pos), texCoords(texCoords), normal(normal), tangent(tangent) {}
 	glm::vec3 position;
 	glm::vec2 texCoords;
 	glm::vec3 normal;
+	glm::vec3 tangent;
 };
 
 class VBO {

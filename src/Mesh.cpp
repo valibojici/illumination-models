@@ -15,6 +15,7 @@ Mesh::Mesh(const std::vector<Vertex> &vertices,
 	m_vao->addLayout(VAO::DataType::FLOAT, 3); // position
 	m_vao->addLayout(VAO::DataType::FLOAT, 2); // texCoord
 	m_vao->addLayout(VAO::DataType::FLOAT, 3); // normal
+	m_vao->addLayout(VAO::DataType::FLOAT, 3); // tangent
 
 	// create and link VBO
 	m_vbo = new VBO(vertices);
@@ -106,6 +107,16 @@ Mesh *Mesh::getCube(float width, float height, float depth)
 		{1.0f, 1.0f},
 		{0.0f, 1.0f}};
 
+	// tangent vectors for a cube
+	const std::vector<glm::vec3> tangentsPerFace = {
+		{1.0f, 0.0f, 0.0f},	 // front => +Ox
+		{-1.0f, 0.0f, 0.0f}, // back  => -Ox
+		{0.0f, 0.0f, 1.0f},  // left  => +Oz
+		{0.0f, 0.0f, -1.0f}, // right => -Oz
+		{1.0f, 0.0f, 0.0f},	 // top => +Ox
+		{1.0f, 0.0f, 0.0f}, // bottom => +Ox
+	};
+
 	// iterate through each face
 	for (int i = 0; i < 6; ++i)
 	{
@@ -114,7 +125,12 @@ Mesh *Mesh::getCube(float width, float height, float depth)
 		{
 			// get the index of this vertex which is part of the current face
 			int vertexIndex = faces[i][j];
-			vertices.push_back(Vertex(positions[vertexIndex], texCoords[j], normalsPerFace[i]));
+			vertices.push_back(Vertex(
+				positions[vertexIndex], 
+				texCoords[j], 
+				normalsPerFace[i],
+				tangentsPerFace[i]
+			));
 		}
 
 		// with every face, 4 vertices are added
@@ -146,18 +162,18 @@ Mesh *Mesh::getPlane(float width, float height)
 		{1.0f, 1.0f},
 		{0.0f, 1.0f},
 	};
-	const std::vector<glm::vec3> normals = {
-		{0.0f, 0.0f, 1.0f},
-		{0.0f, 0.0f, 1.0f},
-		{0.0f, 0.0f, 1.0f},
-		{0.0f, 0.0f, 1.0f},
-	};
+	
+	// normal for xOy plane is +Oz
+	const glm::vec3 normal = { 0.0f, 0.0f, 1.0f }; // +Oz
+
+	// tangent for xOy plane is +Ox
+	const glm::vec3 tangent = { 1.0f, 0.0f, 0.0f }; // +Ox
 
 	// create vertices using the data above
 	std::vector<Vertex> vertices;
 	for (int i = 0; i < 4; ++i)
 	{
-		vertices.push_back(Vertex(positions[i], texCoords[i], normals[i]));
+		vertices.push_back(Vertex(positions[i], texCoords[i], normal, tangent));
 	}
 
 	std::vector<unsigned int> indices = {
