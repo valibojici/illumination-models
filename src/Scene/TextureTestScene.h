@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Event/EventManager.h" // for registering camera
 #include "Mesh.h"
+#include "TextureManager.h"
 
 class TextureTestScene : public Scene
 {
@@ -22,7 +23,6 @@ private:
 	glm::mat4 m_lightModelMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
-	std::vector<Texture*> m_textures;
 
 
 	glm::vec3 m_color = { 1.0f, 0.0f, 0.0f };

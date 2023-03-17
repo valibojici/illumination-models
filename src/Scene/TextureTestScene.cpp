@@ -16,10 +16,12 @@ TextureTestScene::TextureTestScene(Scene*& scene)
     EventManager::getInstance().addHandler(&m_camera);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    m_textures.push_back(new Texture("textures/brickwall.png"));
-    m_textures.push_back(new Texture("textures/brickwall.png", Texture::Type::SPECULAR));
-    m_textures.push_back(new Texture("textures/brickwall_normal.png", Texture::Type::NORMAL));
-    m_mesh->setTextures(m_textures);
+    
+    m_mesh->setTextures({
+      TextureManager::get().getTexture("textures/brickwall.png"),
+      TextureManager::get().getTexture("textures/brickwall.png",Texture::Type::SPECULAR),
+      TextureManager::get().getTexture("textures/brickwall_normal.png",Texture::Type::NORMAL),
+    });
 }
 
 TextureTestScene::~TextureTestScene()
@@ -29,9 +31,6 @@ TextureTestScene::~TextureTestScene()
     EventManager::getInstance().removeHandler(&m_camera);
     delete m_mesh;
     delete m_lightMesh;
-    for (auto t : m_textures) {
-        delete t;
-    }
 }
 
 void TextureTestScene::onRender()
