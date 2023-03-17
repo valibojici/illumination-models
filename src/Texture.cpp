@@ -3,14 +3,18 @@
 Texture::Texture(const std::string& path, Type type, bool flipY)
 {
 	m_type = type;
+	m_name = path;
 	create();
 	loadFromFile(path, flipY);
+
+	printf("Loaded texture %s with type %d\n", m_name.c_str(), m_type);
 }
 
 Texture::~Texture()
 {
 	if (m_id) {
 		glDeleteTextures(1, &m_id);
+		printf("Deleted texture %s with type %d\n", m_name.c_str(), m_type);
 	}
 }
 
