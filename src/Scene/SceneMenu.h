@@ -4,6 +4,7 @@
 #include "Simple3dScene.h"
 #include "MeshTestScene.h"
 #include "TextureTestScene.h"
+#include "ModelTestScene.h"
 
 class SceneMenu : public Scene
 {
