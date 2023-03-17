@@ -13,12 +13,12 @@ private:
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
 	
-	std::vector<Texture*> m_textures;
+	std::vector<std::shared_ptr<Texture> > m_textures;
 public:
 	Mesh(
 		const std::vector<Vertex> &vertices,
 		const std::vector<unsigned int>& indices,
-		const std::vector<Texture*>& textures = {});
+		const std::vector<std::shared_ptr<Texture> >& textures = {});
 
 	~Mesh();
 
@@ -30,7 +30,7 @@ public:
 	/// <summary>
 	/// Set the textures of the mesh (not owning)
 	/// </summary>
-	void setTextures(const std::vector<Texture*> textures) { m_textures = textures; }
+	void setTextures(const std::vector<std::shared_ptr<Texture> > textures) { m_textures = textures; }
 
 	/// <summary>
 	/// Factory method to get a mesh representing a plane in the xOy plane (centered at origin).
