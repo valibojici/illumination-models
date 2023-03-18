@@ -3,8 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-!models/
-
 # User-specific files
 *.rsuser
 *.suo
@@ -352,3 +350,4 @@ MigrationBackup/
 .ionide/
 
 vendor/GLM/glm/out
+!models/**
