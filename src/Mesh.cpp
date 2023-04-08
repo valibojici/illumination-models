@@ -35,27 +35,36 @@ Mesh::~Mesh()
 
 void Mesh::draw(Shader &shader)
 {
+	shader.setBool("u_hasDiffTexture", false);
+	shader.setBool("u_hasSpecTexture", false);
+	shader.setBool("u_hasNormTexture", false);
+
 	for (unsigned int i = 0; i < m_textures.size(); ++i) {
 		// bind this texture
 		m_textures[i]->bind(i);
-		std::string name; // check which type it has
+
 		switch (m_textures[i]->getType())
 		{
 		case Texture::Type::DIFFUSE:
-			name = "u_DiffuseTex";
+			shader.setInt("u_DiffuseTex", i);
+			shader.setBool("u_hasDiffTexture", true);
 			break;
 		case Texture::Type::SPECULAR:
-			name = "u_SpecularTex";
+			shader.setInt("u_SpecularTex", i);
+			shader.setBool("u_hasSpecTexture", true);
 			break;
 		case Texture::Type::NORMAL:
-			name = "u_NormalTex";
+			shader.setInt("u_NormalTex", i);
+			shader.setBool("u_hasNormTexture", true);
 			break;
 		}
-		// set the sampler in shader
-		shader.setInt(name, i);
 	}
 	m_vao->bind();
 	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+	// reset to avoid bugs
+	shader.setBool("u_hasDiffTexture", false);
+	shader.setBool("u_hasSpecTexture", false);
+	shader.setBool("u_hasNormTexture", false);
 }
 
 Mesh *Mesh::getCube(float width, float height, float depth)
@@ -189,8 +198,8 @@ Mesh *Mesh::getSphere(float radius, int smoothness)
 	const float PI = 3.14159f;
 	const float UMIN = 0;
 	const float UMAX = 2 * PI;
-	const float VMIN = -PI / 2;
-	const float VMAX = PI / 2;
+	const float VMIN = 0;
+	const float VMAX = PI;
 	const int MERID = smoothness;
 	const int PARR = smoothness;
 	const float uStep = (UMAX - UMIN) / MERID;
@@ -203,9 +212,10 @@ Mesh *Mesh::getSphere(float radius, int smoothness)
 	auto getCoords = [radius](float u, float v)
 	{
 		return glm::vec3{
-			radius * glm::cos(v) * glm::cos(u),
-			radius * glm::sin(v),
-			-radius * glm::cos(v) * glm::sin(u)};
+			radius * glm::sin(v) * glm::cos(u),
+			radius * glm::cos(v),
+			radius * glm::sin(v) * glm::sin(u),
+		};
 	};
 
 	int currentIndex = 0; // index of the current point on the sphere
@@ -218,8 +228,8 @@ Mesh *Mesh::getSphere(float radius, int smoothness)
 			float u = UMIN + uStep * j;
 			float v = VMIN + vStep * i;
 			glm::vec3 coords = getCoords(u, v);
-
-			vertices.push_back(Vertex(coords, {0.0f, 0.0f}, coords));
+			glm::vec3 tangent = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), coords);
+			vertices.push_back(Vertex(coords, {0.0f, 0.0f}, coords, tangent));
 
 			if (i == PARR)
 			{
