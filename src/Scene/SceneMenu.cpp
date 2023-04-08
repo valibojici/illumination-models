@@ -27,6 +27,11 @@ void SceneMenu::onRenderImGui()
 		m_currentScene = new ModelTestScene(m_currentScene);
 		delete temp;
 	}
+	if (ImGui::Button("Phong test scene")) {
+		Scene* temp = m_currentScene;
+		m_currentScene = new PhongTest(m_currentScene);
+		delete temp;
+	}
 
 }
 
