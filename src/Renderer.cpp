@@ -93,6 +93,10 @@ void Renderer::render(Scene*& scene)
 
         ImGui::Begin("Window");
         scene->onRenderImGui();
+
+        static bool open = true;
+        ImGui::ShowDemoWindow(&open);
+
         ImGui::End();
         ImGui::EndFrame();
         ImGui::Render();

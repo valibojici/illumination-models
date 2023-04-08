@@ -5,6 +5,7 @@
 #include "MeshTestScene.h"
 #include "TextureTestScene.h"
 #include "ModelTestScene.h"
+#include "PhongTest.h"
 
 class SceneMenu : public Scene
 {
