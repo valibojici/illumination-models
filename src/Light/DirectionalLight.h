@@ -15,7 +15,7 @@ public:
 	DirectionalLight(int index, const glm::vec3& direction);
 
 	/// <summary>
-	/// Draw UI in ImGui, sets uniforms on value change.
+	/// Draw UI in ImGui
 	/// </summary>
 	void imGuiRender(Shader& shader) override;
 

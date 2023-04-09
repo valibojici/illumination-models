@@ -20,7 +20,7 @@ public:
 	PointLight(int index, const glm::vec3& position);
 
 	/// <summary>
-	/// Draw UI in ImGui, sets uniforms on value change.
+	/// Draw UI in ImGui
 	/// </summary>
 	void imGuiRender(Shader& shader) override;
 

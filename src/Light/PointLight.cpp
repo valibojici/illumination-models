@@ -16,13 +16,8 @@ void PointLight::imGuiRender(Shader& shader)
 
 		Light::imGuiRender(shader);
 
-		if (ImGui::DragFloat3("Position", &m_position.x, 0.1f, -5.0f, 5.0f)) {
-			shader.setVec4(formatAttribute("position"), m_modelMatrix * glm::vec4(m_position, 1.0f));
-		}
-
-		if (ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic)) {
-			shader.setVec3(formatAttribute("attenuation"), m_attenuation);
-		}
+		ImGui::DragFloat3("Position", &m_position.x, 0.1f, -5.0f, 5.0f);
+		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 	}
 	ImGui::NewLine();
 	ImGui::PopStyleColor();
