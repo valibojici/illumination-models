@@ -32,7 +32,11 @@ void SceneMenu::onRenderImGui()
 		m_currentScene = new PhongTest(m_currentScene);
 		delete temp;
 	}
-
+	if (ImGui::Button("Floor test scene")) {
+		Scene* temp = m_currentScene;
+		m_currentScene = new FloorScene(m_currentScene);
+		delete temp;
+	}
 }
 
 void SceneMenu::onRender()
