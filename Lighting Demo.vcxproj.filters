@@ -114,10 +114,10 @@
     <ClCompile Include="src\Light\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Materials\BlinnMaterial.cpp">
+    <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Scene.cpp">
+    <ClCompile Include="src\Scene\FloorScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -210,6 +210,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Materials\BlinnMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\FloorScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
