@@ -14,40 +14,62 @@ PhongTest::PhongTest(Scene*& scene)
     m_lights.push_back(std::move(std::make_unique<Spotlight>(2, glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f))));
 
     // load shaders
-    m_shader.load("shaders/phong.vert", "shaders/phong.frag");
-    m_shader.bind();
+    m_shaders.resize(2);
+    m_shaders[0].load("shaders/phong.vert", "shaders/phong.frag");
+    m_shaders[1].load("shaders/phong.vert", "shaders/blinn.frag");
 
     // setting uniforms
     // TODO: get screen size from config class?
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f);
-    m_shader.setMat4("u_projMatrix", m_projMatrix);
-    m_shader.setBool("u_gammaCorrect", m_gammaCorrection);
-    m_shader.setInt("u_numLights", 3);
-    for (auto& light : m_lights) {
-        light->setUniforms(m_shader);
+
+    for (auto& shader : m_shaders) {
+        shader.bind();
+        shader.setMat4("u_projMatrix", m_projMatrix);
+        shader.setBool("u_gammaCorrect", m_gammaCorrection);
+        shader.setInt("u_numLights", 3);
+        for (auto& light : m_lights) {
+            light->setUniforms(shader);
+        }
     }
 
-    // set up materials for walls
-    for (unsigned int i = 0; i < m_transforms.size(); ++i) {
-        m_wallMaterials.push_back(std::move(std::make_unique<PhongMaterial>()));
-        switch (i)
-        {
-        case 0: // left wall - red
-            m_wallMaterials[i]->setDiffuseColor({ 0.92f, 0.25f, 0.20f });
-            m_wallMaterials[i]->setAmbientColor({ 0.92f, 0.25f, 0.20f });
-            break;
-        case 2: // right wall - blue
-            m_wallMaterials[i]->setDiffuseColor({ 0.2, 0.51, 0.92 });
-            m_wallMaterials[i]->setAmbientColor({ 0.2, 0.51, 0.92 });
-            break;
-        default:
-            m_wallMaterials[i]->setDiffuseColor({ 0.8f, 0.8f, 0.8f });
-            m_wallMaterials[i]->setAmbientColor({ 0.8f, 0.8f, 0.8f });
-            m_wallMaterials[i]->setAmbientCoefficient(0.001f);
+
+    // set up materials
+    for (int model = 0; model < 2; ++model) {
+        // walls
+        std::vector<std::unique_ptr<Material>> wallMaterials;
+        for (unsigned int i = 0; i < m_transforms.size(); ++i) {
+            auto material = model == 0 ? std::make_unique<PhongMaterial>() : std::make_unique<BlinnMaterial>();
+            switch (i)
+            {
+            case 0: // left wall - red
+                material->setDiffuseColor({ 0.92f, 0.25f, 0.20f });
+                material->setAmbientColor({ 0.92f, 0.25f, 0.20f });
+                break;
+            case 2: // right wall - blue
+                material->setDiffuseColor({ 0.2, 0.51, 0.92 });
+                material->setAmbientColor({ 0.2, 0.51, 0.92 });
+                break;
+            default:
+                material->setDiffuseColor({ 0.8f, 0.8f, 0.8f });
+                material->setAmbientColor({ 0.8f, 0.8f, 0.8f });
+                material->setAmbientCoefficient(0.001f);
+            }
+            // disable specular highlights for walls
+            material->setSpecularCoefficient(0);
+            wallMaterials.push_back(std::move(material));
         }
-        // disable specular highlights for walls
-        m_wallMaterials[i]->setSpecularCoefficient(0);
+        m_wallMaterials.push_back(std::move(wallMaterials));
+
+        // main mesh
+        m_materials.push_back(
+            model == 0 
+            ? std::move(std::make_unique<PhongMaterial>())
+            : std::move(std::make_unique<BlinnMaterial>())
+        );
     }
+
+    // bind current shader
+    m_shaders[m_modelIndex].bind();
 }
 
 PhongTest::~PhongTest()
@@ -66,25 +88,25 @@ void PhongTest::onRender()
     // update camera position and uniforms
     m_camera.update(glfwGetTime() - time);
     time = glfwGetTime();
-    m_shader.setMat4("u_viewMatrix", m_camera.getMatrix());
-    m_shader.setVec3("u_viewPos", m_camera.getPosition());
+    m_shaders[m_modelIndex].setMat4("u_viewMatrix", m_camera.getMatrix());
+    m_shaders[m_modelIndex].setVec3("u_viewPos", m_camera.getPosition());
+    // lights
+    for (auto& light : m_lights) {
+        light->setUniforms(m_shaders[m_modelIndex]);
+        light->draw(m_shaders[m_modelIndex]);
+    }
     
     // draw box
     for (unsigned int i = 0; i < m_transforms.size(); ++i) {
-        m_wallMaterials[i]->setUniforms(m_shader);
-        m_shader.setMat4("u_modelMatrix", m_transforms[i]);
-        m_wall->draw(m_shader);
+        m_wallMaterials[m_modelIndex][i]->setUniforms(m_shaders[m_modelIndex]);
+        m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_transforms[i]);
+        m_wall->draw(m_shaders[m_modelIndex]);
     }
 
     // draw mesh
-    m_material->setUniforms(m_shader);
-    m_shader.setMat4("u_modelMatrix", m_modelMatrix);
-    m_mesh->draw(m_shader);
-    
-    // draw lights
-    for (auto &light : m_lights) {
-        light->draw(m_shader);
-    }
+    m_materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
+    m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_modelMatrix);
+    m_mesh->draw(m_shaders[m_modelIndex]);
 }
 
 void PhongTest::onRenderImGui()
@@ -99,13 +121,18 @@ void PhongTest::onRenderImGui()
 
     // render UI for every light
     for (auto &light : m_lights) {
-        light->imGuiRender(m_shader);
+        light->imGuiRender(m_shaders[m_modelIndex]);
     }
+
+    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0\0")) {
+        m_shaders[m_modelIndex].bind();
+    }
+    ImGui::NewLine();
 
     // render UI for material
     ImGui::PushID(this);
     if (ImGui::CollapsingHeader("Material settings")) {
-        m_material->imGuiRender(m_shader);
+        m_materials[m_modelIndex]->imGuiRender(m_shaders[m_modelIndex]);
     }
     ImGui::PopID();
 
@@ -116,7 +143,7 @@ void PhongTest::onRenderImGui()
     }
 
     if (ImGui::Checkbox("Enable gamma correction", &m_gammaCorrection)) {
-        m_shader.setBool("u_gammaCorrect", m_gammaCorrection);
+        m_shaders[m_modelIndex].setBool("u_gammaCorrect", m_gammaCorrection);
     }
 
     // enable/disable wireframes, for debug
