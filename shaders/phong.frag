@@ -36,6 +36,7 @@ uniform float u_alpha = 32;   // shininess
 uniform float u_ka;           // ambient coefficient
 uniform vec3  u_ia;           // ambient intensity/color
 uniform vec3  u_emission;     // emission
+uniform bool u_modifiedSpecular; // true if specular should NOT be divided by geometry term
 // flags for textures
 uniform bool u_hasDiffTexture = false;
 uniform bool u_hasSpecTexture = false;
@@ -47,7 +48,10 @@ uniform sampler2D u_NormalTex;
 uniform bool  u_gammaCorrect = false; // flag to enable/disable gamma correction
 
 // Phong BRDF function
-vec3 phongBRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
+// version == 0 for Phong
+// version == 1 for Blinn-Phong
+// version == 2 for Phong with normalized specular cos
+vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
 
 // helper function to convert to SRGB from linear (raise to 1/2.2)
 vec3 toSRGB(vec3 color);
@@ -105,7 +109,7 @@ void main()
         
         result += 
             u_lights[i].intensity * lightCol * geometryTerm *       // light amount at this fragment
-            phongBRDF(geometryTerm, lightDir, normal, viewDir) *    // BRDF
+            BRDF(geometryTerm, lightDir, normal, viewDir) *         // BRDF
             lightAttenuation(u_lights[i], fs_in.fragPos) *          // attenuation
             spotlightFactor(u_lights[i], lightDir);                 // spotlightFactor
     }
@@ -120,7 +124,7 @@ void main()
     FragColor = vec4(u_gammaCorrect ? toSRGB(result) : result, 1.0f);
 }
 
-vec3 phongBRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
+vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     // calculate diffuse term
 
     // get the diffuse color from texture and do gamma correction
@@ -129,14 +133,18 @@ vec3 phongBRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     vec3 diffuse = u_kd * diffuseCol;
 
     // calculate specular term
-    // get the reflected direction of the light using the texture normal
+    // get the reflected direction of the light using the (texture) normal
     vec3 reflectDir = reflect(-lightDir, normal);
     // get the angle between the reflection and viewing direction
     float cosPhi = max(0.0f, dot(viewDir, reflectDir));
-    // get the specular coefficient from texture
+    // calculate/ get the specular coefficient (from texture)
     float specFactor = u_hasSpecTexture ? texture(u_SpecularTex, fs_in.texCoords).r : u_ks;
-    float specular = specFactor * pow(cosPhi, u_alpha) / max(0.00001f, geometryTerm);
-
+    
+    float specular = specFactor * pow(cosPhi, u_alpha);
+    if(!u_modifiedSpecular){
+        specular /= max(0.0001f, geometryTerm);
+    }
+    
     return diffuse + specular;
 }
 
