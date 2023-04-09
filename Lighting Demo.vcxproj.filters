@@ -114,6 +114,12 @@
     <ClCompile Include="src\Light\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Materials\BlinnMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h">
@@ -203,6 +209,9 @@
     <ClInclude Include="src\Light\PointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Materials\BlinnMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag" />
@@ -213,5 +222,6 @@
     <None Include="shaders\texture.vert" />
     <None Include="shaders\phong.vert" />
     <None Include="shaders\phong.frag" />
+    <None Include="shaders\blinn.frag" />
   </ItemGroup>
 </Project>
