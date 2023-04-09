@@ -15,9 +15,7 @@ void DirectionalLight::imGuiRender(Shader& shader)
 	if (ImGui::CollapsingHeader(m_name.c_str())) {
 		Light::imGuiRender(shader);
 
-		if (ImGui::DragFloat3("Direction", &m_position.x, 0.1f, -5.0f, 5.0f)) {
-			shader.setVec4(formatAttribute("position"), m_modelMatrix * glm::vec4(m_position, 0.0f));
-		}
+		ImGui::DragFloat3("Direction", &m_position.x, 0.1f, -5.0f, 5.0f);
 	}
 	ImGui::NewLine();
 	ImGui::PopStyleColor();

@@ -8,7 +8,7 @@
 /// </summary>
 class PhongMaterial : public Material
 {
-private:
+protected:
 	// diffuse color, default red
 	glm::vec3 m_diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
@@ -28,6 +28,9 @@ private:
 
 	// shininess
 	float m_alpha = 32.0f;
+
+	// flag to tell the shader to not divide specular by geometry term
+	bool m_modifiedSpecular = false;
 public:
 	void setDiffuseColor(const glm::vec3& color) { m_diffuseColor = color; }
 	void setDiffuseCoefficient(float kd) { m_kd = kd; }
@@ -39,11 +42,11 @@ public:
 	/// <summary>
 	/// Renders UI in ImGui, does not set uniforms
 	/// </summary>
-	void imGuiRender(Shader& shader) override;
+	virtual void imGuiRender(Shader& shader) override;
 
 	/// <summary>
 	/// Sets all material uniforms in shader
 	/// </summary>
-	void setUniforms(Shader& shader) override;
+	virtual void setUniforms(Shader& shader) override;
 };
 

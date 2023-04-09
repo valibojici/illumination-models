@@ -14,5 +14,6 @@ public:
 	virtual void onRenderImGui() {}
 	virtual void onUpdate() {}
 	virtual ~Scene() {}
+	static void helpPoput(const char* text);
 };
 

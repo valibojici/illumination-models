@@ -34,17 +34,9 @@ void Light::imGuiRender(Shader& shader)
 {
 	ImGui::Checkbox("Draw light", &m_draw);
 	ImGui::SameLine();
-	if (ImGui::Checkbox("Enable", &m_enabled)) {
-		shader.setBool(formatAttribute("enabled"), m_enabled);
-	}
-
-	if (ImGui::ColorEdit3("Light Color", &m_color.x)) {
-		shader.setVec3(formatAttribute("color"), m_color);
-	}
-
-	if (ImGui::DragFloat("Light intensity", &m_intensity, 0.01f, 0.0f, 10.0f)) {
-		shader.setFloat(formatAttribute("intensity"), m_intensity);
-	}
+	ImGui::Checkbox("Enable", &m_enabled);
+	ImGui::ColorEdit3("Light Color", &m_color.x);
+	ImGui::DragFloat("Light intensity", &m_intensity, 0.01f, 0.0f, 10.0f);
 }
 
 std::string Light::formatAttribute(const std::string& name)

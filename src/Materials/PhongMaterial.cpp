@@ -1,4 +1,5 @@
 #include "PhongMaterial.h"
+#include "Scene/Scene.h"
 
 void PhongMaterial::imGuiRender(Shader& shader)
 {
@@ -10,6 +11,12 @@ void PhongMaterial::imGuiRender(Shader& shader)
     if (ImGui::DragFloat("Ks", &m_ks, 0.001f, 0.0f, 1.0f)) {
         m_kd = std::min(m_kd, 1 - m_ks);
     }
+
+    ImGui::Checkbox("Do not divide specular by geometry term", &m_modifiedSpecular);
+    ImGui::SameLine();
+    Scene::helpPoput("If the specular term is divided by the geometry term it means\
+ that the geometry term has no impact, this is a problem at grazing\
+ angles but its more realistic because it is a basic fresnel effect");
 
     ImGui::DragFloat("Alpha (shininess)", &m_alpha, 1.0f, 1.0f, 1024.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
     ImGui::DragFloat("Ambient intensity", &m_ka, 0.00005f, 0.0f, 0.5f, "%.5f");
@@ -24,4 +31,5 @@ void PhongMaterial::setUniforms(Shader& shader)
     shader.setFloat("u_alpha", m_alpha);
     shader.setFloat("u_ka", m_ka);
     shader.setVec3("u_ia", m_ia);
+    shader.setBool("u_modifiedSpecular", m_modifiedSpecular);
 }

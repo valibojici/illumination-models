@@ -11,6 +11,7 @@
 #include "Event/EventManager.h" // for registering camera
 #include "Mesh.h"
 #include "Materials/PhongMaterial.h"
+#include "Materials/BlinnMaterial.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
@@ -31,16 +32,20 @@ private:
 		glm::translate(glm::vec3(0.0f, 2.0f, 0.0f))* glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
 		glm::translate(glm::vec3(0.0f, -2.0f, 0.0f))* glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
 	};
-	// materials for each wall (color, diffuse, etc)
-	std::vector<std::unique_ptr<PhongMaterial>> m_wallMaterials;
-	// material for main mesh
-	std::unique_ptr<PhongMaterial> m_material = std::make_unique<PhongMaterial>();
+
+	// which lighting model is used
+	int m_modelIndex = 0;
+
+	// materials for each model for each wall (color, diffuse, etc)
+	std::vector<std::vector<std::unique_ptr<Material>>> m_wallMaterials;
+	// material for each model for main mesh
+	std::vector<std::unique_ptr<Material>> m_materials;
 
 	// all lights in the scene
 	std::vector<std::unique_ptr<Light> > m_lights;
 
 	Camera m_camera;
-	Shader m_shader;
+	std::vector<Shader> m_shaders;
 	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);

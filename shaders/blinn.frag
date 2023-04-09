@@ -47,10 +47,7 @@ uniform sampler2D u_NormalTex;
 
 uniform bool  u_gammaCorrect = false; // flag to enable/disable gamma correction
 
-// Phong BRDF function
-// version == 0 for Phong
-// version == 1 for Blinn-Phong
-// version == 2 for Phong with normalized specular cos
+// blinn BRDF function
 vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
 
 // helper function to convert to SRGB from linear (raise to 1/2.2)
@@ -133,18 +130,18 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     vec3 diffuse = u_kd * diffuseCol;
 
     // calculate specular term
-    // get the reflected direction of the light using the (texture) normal
-    vec3 reflectDir = reflect(-lightDir, normal);
-    // get the angle between the reflection and viewing direction
-    float cosPhi = max(0.0f, dot(viewDir, reflectDir));
+    // get the halfway direction vector between light direction and view direction
+    vec3 halfway = normalize(lightDir + viewDir);
+    // get the angle between the normal and halfway direction
+    float cosPhi = max(0.0f, dot(normal, halfway));
+
     // calculate/ get the specular coefficient (from texture)
     float specFactor = u_hasSpecTexture ? texture(u_SpecularTex, fs_in.texCoords).r : u_ks;
-    
+   
     float specular = specFactor * pow(cosPhi, u_alpha);
     if(!u_modifiedSpecular){
         specular /= max(0.0001f, geometryTerm);
     }
-    
     return diffuse + specular;
 }
 
