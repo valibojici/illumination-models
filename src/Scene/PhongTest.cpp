@@ -55,7 +55,7 @@ PhongTest::PhongTest(Scene*& scene)
                 material->setAmbientCoefficient(0.001f);
             }
             // disable specular highlights for walls
-            material->setSpecularCoefficient(0);
+            material->setSpecularCoefficient(glm::vec3(0.0f));
             wallMaterials.push_back(std::move(material));
         }
         m_wallMaterials.push_back(std::move(wallMaterials));
