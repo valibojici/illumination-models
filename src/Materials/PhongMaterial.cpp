@@ -3,14 +3,19 @@
 
 void PhongMaterial::imGuiRender(Shader& shader)
 {
-    ImGui::ColorEdit3("Diffuse color", &m_diffuseColor.x);
+    ImGui::ColorEdit3("Diffuse color", &m_diffuseColor.x, ImGuiColorEditFlags_Float);
 
-    if (ImGui::DragFloat("Kd", &m_kd, 0.001f, 0.0f, 1.0f)) {
-        m_ks = std::min(m_ks, 1 - m_kd);
+    static bool setAllDiffuse = true;
+    if (ImGui::DragFloat3("Diffuse coefficient", &m_kd[0], 0.001f, 0.0f, 1.0f)) {
+        if(setAllDiffuse) m_kd[1] = m_kd[2] = m_kd[0];
     }
-    if (ImGui::DragFloat("Ks", &m_ks, 0.001f, 0.0f, 1.0f)) {
-        m_kd = std::min(m_kd, 1 - m_ks);
+    ImGui::Checkbox("Set all##diffuse", &setAllDiffuse);
+
+    static bool setAllSpecular = true;
+    if (ImGui::DragFloat3("Specular coefficient", &m_ks[0], 0.001f, 0.0f, 1.0f)) {
+        if(setAllSpecular) m_ks[1] = m_ks[2] = m_ks[0];
     }
+    ImGui::Checkbox("Set all##specular", &setAllSpecular);
 
     ImGui::Checkbox("Do not divide specular by geometry term", &m_modifiedSpecular);
     ImGui::SameLine();
@@ -20,14 +25,14 @@ void PhongMaterial::imGuiRender(Shader& shader)
 
     ImGui::DragFloat("Alpha (shininess)", &m_alpha, 1.0f, 1.0f, 1024.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
     ImGui::DragFloat("Ambient intensity", &m_ka, 0.00005f, 0.0f, 0.5f, "%.5f");
-    ImGui::ColorEdit3("Ambient color", &m_ia.x);
+    ImGui::ColorEdit3("Ambient color", &m_ia.x, ImGuiColorEditFlags_Float);
 }
 
 void PhongMaterial::setUniforms(Shader& shader)
 {
-    shader.setFloat("u_kd", m_kd);
+    shader.setVec3("u_kd", m_kd);
     shader.setVec3("u_diffuseColor", m_diffuseColor);
-    shader.setFloat("u_ks", m_ks);
+    shader.setVec3("u_ks", m_ks);
     shader.setFloat("u_alpha", m_alpha);
     shader.setFloat("u_ka", m_ka);
     shader.setVec3("u_ia", m_ia);

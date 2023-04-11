@@ -29,9 +29,9 @@ uniform vec3  u_lightCol = vec3(1.0f);  // light color
 uniform float u_lightI = 1.0f;          // light intensity (0 to 1)
 
 // Phong material uniforms
-uniform float u_kd;                        // diffuse coefficient
+uniform vec3 u_kd;                        // diffuse coefficient
 uniform vec3  u_diffuseColor = vec3(0.5f); // diffuse color
-uniform float u_ks;           // specular coefficient
+uniform vec3 u_ks;           // specular coefficient
 uniform float u_alpha = 32;   // shininess
 uniform float u_ka;           // ambient coefficient
 uniform vec3  u_ia;           // ambient intensity/color
@@ -138,9 +138,9 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     // get the angle between the reflection and viewing direction
     float cosPhi = max(0.0f, dot(viewDir, reflectDir));
     // calculate/ get the specular coefficient (from texture)
-    float specFactor = u_hasSpecTexture ? texture(u_SpecularTex, fs_in.texCoords).r : u_ks;
+    vec3 specFactor = u_hasSpecTexture ? texture(u_SpecularTex, fs_in.texCoords).rgb : u_ks;
     
-    float specular = specFactor * pow(cosPhi, u_alpha);
+    vec3 specular = specFactor * pow(cosPhi, u_alpha);
     if(!u_modifiedSpecular){
         specular /= max(0.0001f, geometryTerm);
     }

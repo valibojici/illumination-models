@@ -12,13 +12,11 @@ protected:
 	// diffuse color, default red
 	glm::vec3 m_diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
-	// diffuse coefficient, the sum between m_kd and m_ks is <= 1 to
-	// have a basic energy conservation
-	float m_kd = 0.5f;
+	// diffuse coefficient
+	glm::vec3 m_kd = glm::vec3(0.5f);
 
-	// specular coefficient, the sum between m_kd and m_ks is <= 1 to
-	// have a basic energy conservation
-	float m_ks = 0.5f;
+	// specular coefficient
+	glm::vec3 m_ks = glm::vec3(0.5f);
 
 	// ambient coefficient
 	float m_ka = 0.002f;
@@ -33,8 +31,8 @@ protected:
 	bool m_modifiedSpecular = false;
 public:
 	void setDiffuseColor(const glm::vec3& color) { m_diffuseColor = color; }
-	void setDiffuseCoefficient(float kd) { m_kd = kd; }
-	void setSpecularCoefficient(float ks) { m_ks = ks; }
+	void setDiffuseCoefficient(const glm::vec3& kd) { m_kd = kd; }
+	void setSpecularCoefficient(const glm::vec3& ks) { m_ks = ks; }
 	void setAmbientCoefficient(float ka) { m_ka = ka; }
 	void setShininess(float alpha) { m_alpha = alpha; }
 	void setAmbientColor(const glm::vec3& color) { m_ia = color; }
