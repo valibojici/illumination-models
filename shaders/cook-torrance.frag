@@ -154,30 +154,31 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     vec3 diffuse = u_hasDiffTexture ? texture(u_DiffuseTex, fs_in.texCoords).rgb : u_material.albedo;
     diffuse = u_gammaCorrect ? toLinear(diffuse) : diffuse;
 
-    // calculate specular term
     // get the halfway direction vector between light direction and view direction
     vec3 halfway = normalize(lightDir + viewDir);
 
-    // calculate/ get the specular coefficient (from texture)
+    // calculate/ get the specular coefficient (from texture TODO)
     float roughness = u_material.roughness;
 
-
+    // calculate vectors used in calculations
     float NH = dot(normal, halfway);
     float NL = dot(normal, lightDir);
-    float VH = dot(viewDir, halfway); // u
+    float VH = dot(viewDir, halfway);
     float NV = dot(normal, viewDir);
     
+    // we need to calculate F D and G terms
+    // F - Fresnel Term
     vec3 fresnel = F_Schlick(u_material.f0, VH);
+    // D - Slope distribution function
     float slope_distribution;
-    float geometrical_attenuation;
-
-    switch(u_Dindex){
+    switch(u_Dindex){ // chosen from application side
         case 0: slope_distribution = D_Beckmann(NH); break;
         case 1: slope_distribution = D_GGX(NH); break;
         case 2: slope_distribution = D_Phong(NH);
     }
-   
-    switch(u_Gindex){
+    // G - Geometrical attenuation function
+    float geometrical_attenuation;
+    switch(u_Gindex){ // chosen from application side
         case 0: geometrical_attenuation = G_Cook(VH, NH, NV, NL); break;
         case 1: geometrical_attenuation = G2_U_Beckmann(NV, NL); break;
         case 2: geometrical_attenuation = G2_U_GGX(NV, NL); break;
@@ -185,10 +186,13 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
         case 4: geometrical_attenuation = G2_GGX(NV, NL); break;
     }
 
+    // formula is FDG / (4 * NL * NV)
     vec3 specular =  (fresnel * slope_distribution * geometrical_attenuation) / 
                     (4 * max(0.0001f, NL) * max(0.0001f, NV));
     
-    return mix(diffuse, PI * specular, u_material.ratio);
+    specular = specular * PI; // multiply with PI to denormalize
+
+    return mix(diffuse, specular, u_material.ratio); // the result depends on the diffuse/specular ratio
 }
 
 // fresnel term
@@ -256,7 +260,7 @@ float D_Beckmann(float NH){
     float b = pow(u_material.roughness, 2) * pow(NH, 4);
     return a / (PI * b);
 }
-// beckmann with schlick approximation
+// GGX distribution
 float D_GGX(float NH){
     float alpha = u_material.roughness * u_material.roughness;
     return alpha * alpha / (PI * pow((pow(NH, 4) * (alpha * alpha - 1) + 1), 2));
