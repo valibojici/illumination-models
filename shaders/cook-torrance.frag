@@ -43,10 +43,10 @@ uniform int u_Dindex = 0;
 uniform vec3  u_emission;     // emission
 // flags for textures
 uniform bool u_hasDiffTexture = false;
-uniform bool u_hasSpecTexture = false;
+uniform bool u_hasRoughTexture = false;
 uniform bool u_hasNormTexture = false;
 uniform sampler2D u_DiffuseTex;
-uniform sampler2D u_SpecularTex;
+uniform sampler2D u_RoughTex;
 uniform sampler2D u_NormalTex;
 
 uniform bool  u_gammaCorrect = false; // flag to enable/disable gamma correction
@@ -157,9 +157,6 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     // get the halfway direction vector between light direction and view direction
     vec3 halfway = normalize(lightDir + viewDir);
 
-    // calculate/ get the specular coefficient (from texture TODO)
-    float roughness = u_material.roughness;
-
     // calculate vectors used in calculations
     float NH = dot(normal, halfway);
     float NL = dot(normal, lightDir);
@@ -207,7 +204,7 @@ float G_Cook(float VH, float NH, float NV, float NL){
 }
 // smith version
 float G2_U_Beckmann(float NV, float NL){
-    float alpha = u_material.roughness;
+    float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     
     // calculate a for V
     float a_V = NV / (alpha * sqrt(1-NV*NV));
@@ -227,7 +224,7 @@ float G2_U_Beckmann(float NV, float NL){
 }
 
 float G2_Beckmann(float NV, float NL){
-    float alpha = u_material.roughness;
+    float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     float a_V = NV / (alpha * sqrt(1-NV*NV));
     float lambda_V = a_V >= 1.6f ? 0.0f : (1 - 1.259*a_V + 0.396*a_V*a_V) / (3.535*a_V + 2.181 * a_V * a_V);
 
@@ -239,7 +236,7 @@ float G2_Beckmann(float NV, float NL){
 
 // GGX
 float G2_U_GGX(float NV, float NL){
-    float alpha = u_material.roughness;
+    float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     float sq_alpha = alpha * alpha;
     float g_V = 2 * NV / (NV + sqrt(NV*NV + sq_alpha * (1 - NV * NV)));
     float g_L = 2 * NL / (NL + sqrt(NL*NL + sq_alpha * (1 - NL * NL)));
@@ -247,7 +244,7 @@ float G2_U_GGX(float NV, float NL){
 }
 
 float G2_GGX(float NV, float NL){
-    float alpha = u_material.roughness;
+    float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     float sq_alpha = alpha * alpha;
 
     return 2 * NL * NV / (NL * sqrt(sq_alpha + NV * (NV - alpha * NV)) + NV * sqrt(sq_alpha + NL * (NL - alpha * NL)));
@@ -256,19 +253,22 @@ float G2_GGX(float NV, float NL){
 // slope distribution function
 // beckmann version, used in cook-torrance paper
 float D_Beckmann(float NH){
-    float a = exp((NH * NH - 1) / (NH * NH * u_material.roughness * u_material.roughness));
-    float b = pow(u_material.roughness, 2) * pow(NH, 4);
+    float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
+    float a = exp((NH * NH - 1) / (NH * NH * alpha * alpha));
+    float b = pow(alpha, 2) * pow(NH, 4);
     return a / (PI * b);
 }
 // GGX distribution
 float D_GGX(float NH){
-    float alpha = u_material.roughness * u_material.roughness;
+    float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
+    alpha = alpha * alpha;
     return alpha * alpha / (PI * pow((pow(NH, 4) * (alpha * alpha - 1) + 1), 2));
 }
 
 // phong distribution
 float D_Phong(float NH){
-    float alpha = 2 / (u_material.roughness * u_material.roughness) - 2;
+    float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
+    alpha = 2 / (alpha * alpha) - 2;
     return (alpha + 2) / (2 * PI) * pow(NH, alpha);
 }
 

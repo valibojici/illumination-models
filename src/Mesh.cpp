@@ -38,6 +38,7 @@ void Mesh::draw(Shader &shader)
 	shader.setBool("u_hasDiffTexture", false);
 	shader.setBool("u_hasSpecTexture", false);
 	shader.setBool("u_hasNormTexture", false);
+	shader.setBool("u_hasRoughTexture", false);
 
 	for (unsigned int i = 0; i < m_textures.size(); ++i) {
 		// bind this texture
@@ -57,6 +58,10 @@ void Mesh::draw(Shader &shader)
 			shader.setInt("u_NormalTex", i);
 			shader.setBool("u_hasNormTexture", true);
 			break;
+		case Texture::Type::ROUGHNESS:
+			shader.setInt("u_RoughTex", i);
+			shader.setBool("u_hasRoughTexture", true);
+			break;
 		}
 	}
 	m_vao->bind();
@@ -65,6 +70,7 @@ void Mesh::draw(Shader &shader)
 	shader.setBool("u_hasDiffTexture", false);
 	shader.setBool("u_hasSpecTexture", false);
 	shader.setBool("u_hasNormTexture", false);
+	shader.setBool("u_hasRoughTexture", false);
 }
 
 Mesh *Mesh::getCube(float width, float height, float depth)

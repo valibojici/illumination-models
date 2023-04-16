@@ -40,10 +40,12 @@ uniform bool u_modifiedSpecular; // true if specular should NOT be divided by ge
 // flags for textures
 uniform bool u_hasDiffTexture = false;
 uniform bool u_hasSpecTexture = false;
+uniform bool u_hasRoughTexture = false;
 uniform bool u_hasNormTexture = false;
 uniform sampler2D u_DiffuseTex;
 uniform sampler2D u_SpecularTex;
 uniform sampler2D u_NormalTex;
+uniform sampler2D u_RoughTex;
 
 uniform bool  u_gammaCorrect = false; // flag to enable/disable gamma correction
 
@@ -139,8 +141,10 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     float cosPhi = max(0.0f, dot(viewDir, reflectDir));
     // calculate/ get the specular coefficient (from texture)
     vec3 specFactor = u_hasSpecTexture ? texture(u_SpecularTex, fs_in.texCoords).rgb : u_ks;
+    // calculate shininess from the roughness 
+    float alpha = u_hasRoughTexture ? 2 * pow(texture(u_RoughTex, fs_in.texCoords).r, -2) : u_alpha;
     
-    vec3 specular = specFactor * pow(cosPhi, u_alpha);
+    vec3 specular = specFactor * pow(cosPhi, alpha);
     if(!u_modifiedSpecular){
         specular /= max(0.0001f, geometryTerm);
     }

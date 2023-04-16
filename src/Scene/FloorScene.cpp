@@ -13,9 +13,10 @@ FloorScene::FloorScene(Scene*& scene) : Scene(scene)
     m_lights.push_back(std::move(std::make_unique<PointLight>(2, glm::vec3(5.0f, 1.0f, 0.0f))));
 
     // load shaders
-    m_shaders.resize(2);
+    m_shaders.resize(3);
     m_shaders[0].load("shaders/phong.vert", "shaders/phong.frag");
     m_shaders[1].load("shaders/phong.vert", "shaders/blinn.frag");
+    m_shaders[2].load("shaders/phong.vert", "shaders/cook-torrance.frag");
 
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f);
 
@@ -32,12 +33,14 @@ FloorScene::FloorScene(Scene*& scene) : Scene(scene)
     // set up materials
     m_materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     m_materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    m_materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
 
     //set up textures
     std::vector<std::shared_ptr<Texture>> textures = {
         TextureManager::get().getTexture("textures/floor.png", Texture::Type::DIFFUSE),
-        TextureManager::get().getTexture("textures/floor_specular.png", Texture::Type::SPECULAR),
         TextureManager::get().getTexture("textures/floor_normal.png", Texture::Type::NORMAL),
+        TextureManager::get().getTexture("textures/floor_specular.png", Texture::Type::SPECULAR),
+        TextureManager::get().getTexture("textures/floor_roughness.png", Texture::Type::ROUGHNESS),
     };
     m_mesh->setTextures(textures);
 
@@ -93,7 +96,7 @@ void FloorScene::onRenderImGui()
         light->imGuiRender(m_shaders[m_modelIndex]);
     }
 
-    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0\0")) {
+    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0")) {
         m_shaders[m_modelIndex].bind();
     }
     ImGui::NewLine();

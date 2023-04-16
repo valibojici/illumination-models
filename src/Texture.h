@@ -11,6 +11,7 @@ public:
 		DIFFUSE,
 		SPECULAR,
 		NORMAL,
+		ROUGHNESS,
 	};
 
 	Texture() = default;
