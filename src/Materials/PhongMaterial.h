@@ -13,13 +13,13 @@ protected:
 	glm::vec3 m_diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	// diffuse coefficient
-	glm::vec3 m_kd = glm::vec3(0.5f);
+	glm::vec3 m_kd = glm::vec3(1.0f);
 
 	// specular coefficient
 	glm::vec3 m_ks = glm::vec3(0.5f);
 
 	// ambient coefficient
-	float m_ka = 0.002f;
+	float m_ka = 0.001f;
 
 	// ambient color
 	glm::vec3 m_ia = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -30,12 +30,14 @@ protected:
 	// flag to tell the shader to not divide specular by geometry term
 	bool m_modifiedSpecular = false;
 public:
-	void setDiffuseColor(const glm::vec3& color) { m_diffuseColor = color; }
+	void setColor(const glm::vec3& color) override { m_diffuseColor = color; }
+	void setAmbient(const glm::vec3& color) override { m_ia = color; }
+	void disableHighlights() override { m_ks = glm::vec3(0.0f); m_alpha = 1.0f; }
+
 	void setDiffuseCoefficient(const glm::vec3& kd) { m_kd = kd; }
 	void setSpecularCoefficient(const glm::vec3& ks) { m_ks = ks; }
 	void setAmbientCoefficient(float ka) { m_ka = ka; }
 	void setShininess(float alpha) { m_alpha = alpha; }
-	void setAmbientColor(const glm::vec3& color) { m_ia = color; }
 
 	/// <summary>
 	/// Renders UI in ImGui, does not set uniforms

@@ -17,5 +17,9 @@ public:
 	/// </summary>
 	virtual void setUniforms(Shader& shader) = 0;
 	virtual ~Material() {}
+
+	virtual void setColor(const glm::vec3& color) = 0;
+	virtual void setAmbient(const glm::vec3& color) = 0;
+	virtual void disableHighlights() = 0;
 };
 

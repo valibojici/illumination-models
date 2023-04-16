@@ -120,6 +120,9 @@
     <ClCompile Include="src\Scene\FloorScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Materials\CookTorranceMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h">
@@ -215,6 +218,9 @@
     <ClInclude Include="src\Scene\FloorScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Materials\CookTorranceMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag" />
@@ -226,5 +232,6 @@
     <None Include="shaders\phong.vert" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\blinn.frag" />
+    <None Include="shaders\cook-torrance.frag" />
   </ItemGroup>
 </Project>

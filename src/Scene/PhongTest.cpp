@@ -14,9 +14,10 @@ PhongTest::PhongTest(Scene*& scene)
     m_lights.push_back(std::move(std::make_unique<Spotlight>(2, glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f))));
 
     // load shaders
-    m_shaders.resize(2);
+    m_shaders.resize(3);
     m_shaders[0].load("shaders/phong.vert", "shaders/phong.frag");
     m_shaders[1].load("shaders/phong.vert", "shaders/blinn.frag");
+    m_shaders[2].load("shaders/phong.vert", "shaders/cook-torrance.frag");
 
     // setting uniforms
     // TODO: get screen size from config class?
@@ -34,38 +35,59 @@ PhongTest::PhongTest(Scene*& scene)
 
 
     // set up materials
-    for (int model = 0; model < 2; ++model) {
+    for (int model = 0; model < 3; ++model) {
         // walls
         std::vector<std::unique_ptr<Material>> wallMaterials;
         for (unsigned int i = 0; i < m_transforms.size(); ++i) {
-            auto material = model == 0 ? std::make_unique<PhongMaterial>() : std::make_unique<BlinnMaterial>();
+            std::unique_ptr<Material> wallMaterial;
+            switch (model)
+            {
+            case 0:
+                wallMaterial = std::make_unique<PhongMaterial>();
+                break;
+            case 1:
+                wallMaterial = std::make_unique<BlinnMaterial>();
+                break;
+            case 2:
+                wallMaterial = std::make_unique<CookTorranceMaterial>();
+                break;
+            }
+
             switch (i)
             {
             case 0: // left wall - red
-                material->setDiffuseColor({ 0.92f, 0.25f, 0.20f });
-                material->setAmbientColor({ 0.92f, 0.25f, 0.20f });
+                wallMaterial->setColor({ 0.92f, 0.25f, 0.20f });
+                wallMaterial->setAmbient({ 0.92f, 0.25f, 0.20f });
                 break;
             case 2: // right wall - blue
-                material->setDiffuseColor({ 0.2, 0.51, 0.92 });
-                material->setAmbientColor({ 0.2, 0.51, 0.92 });
+                wallMaterial->setColor({ 0.2, 0.51, 0.92 });
+                wallMaterial->setAmbient({ 0.2, 0.51, 0.92 });
                 break;
             default:
-                material->setDiffuseColor({ 0.8f, 0.8f, 0.8f });
-                material->setAmbientColor({ 0.8f, 0.8f, 0.8f });
-                material->setAmbientCoefficient(0.001f);
+                wallMaterial->setColor({ 0.8f, 0.8f, 0.8f });
+                wallMaterial->setAmbient({ 0.8f, 0.8f, 0.8f });
             }
             // disable specular highlights for walls
-            material->setSpecularCoefficient(glm::vec3(0.0f));
-            wallMaterials.push_back(std::move(material));
+            wallMaterial->disableHighlights();
+            wallMaterials.push_back(std::move(wallMaterial));
         }
         m_wallMaterials.push_back(std::move(wallMaterials));
 
         // main mesh
-        m_materials.push_back(
-            model == 0 
-            ? std::move(std::make_unique<PhongMaterial>())
-            : std::move(std::make_unique<BlinnMaterial>())
-        );
+        std::unique_ptr<Material> material;
+        switch (model)
+        {
+        case 0:
+            material = std::make_unique<PhongMaterial>();
+            break;
+        case 1:
+            material = std::make_unique<BlinnMaterial>();
+            break;
+        case 2:
+            material = std::make_unique<CookTorranceMaterial>();
+            break;
+        }
+        m_materials.push_back(std::move(material));
     }
 
     // bind current shader
@@ -124,7 +146,7 @@ void PhongTest::onRenderImGui()
         light->imGuiRender(m_shaders[m_modelIndex]);
     }
 
-    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0\0")) {
+    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0")) {
         m_shaders[m_modelIndex].bind();
     }
     ImGui::NewLine();

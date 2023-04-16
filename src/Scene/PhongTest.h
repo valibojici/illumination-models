@@ -12,6 +12,7 @@
 #include "Mesh.h"
 #include "Materials/PhongMaterial.h"
 #include "Materials/BlinnMaterial.h"
+#include "Materials/CookTorranceMaterial.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
@@ -19,7 +20,7 @@
 class PhongTest : public Scene
 {
 private:
-	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getSphere(1.0f, 50));
+	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getSphere(1.0f, 60));
 
 	// mesh for floor, walls, ceiling
 	std::unique_ptr<Mesh> m_wall = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 4.0f));
