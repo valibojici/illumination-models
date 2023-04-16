@@ -124,6 +124,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Materials\CookTorranceMaterial.cpp" />
     <ClCompile Include="src\Scene\FloorScene.cpp" />
     <ClCompile Include="src\Light\PointLight.cpp" />
     <ClCompile Include="src\Light\Spotlight.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="vendor\STB_IMAGE\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Materials\CookTorranceMaterial.h" />
     <ClInclude Include="src\Scene\FloorScene.h" />
     <ClInclude Include="src\Materials\BlinnMaterial.h" />
     <ClInclude Include="src\Light\PointLight.h" />
@@ -195,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\blinn.frag" />
+    <None Include="shaders\cook-torrance.frag" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\phong.vert" />
     <None Include="shaders\shader.frag" />
