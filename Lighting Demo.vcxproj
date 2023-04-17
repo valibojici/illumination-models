@@ -196,10 +196,14 @@
     <ClInclude Include="vendor\STB_IMAGE\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\base_shader.frag" />
     <None Include="shaders\blinn.frag" />
     <None Include="shaders\cook-torrance.frag" />
+    <None Include="shaders\ct.frag" />
+    <None Include="shaders\footer.partial.frag" />
+    <None Include="shaders\header.partial.frag" />
     <None Include="shaders\phong.frag" />
-    <None Include="shaders\phong.vert" />
+    <None Include="shaders\base_shader.vert" />
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
     <None Include="shaders\simpleLighting.frag" />

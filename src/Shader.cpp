@@ -45,16 +45,9 @@ void Shader::load(const std::string& vertexPath, const std::string& fragmentPath
 
 unsigned int Shader::load(const std::string& path, unsigned int type)
 {
-	std::ifstream file(path);
-	if (!file) {
-		printf("Error file '%s' not loaded", path.c_str());
-		exit(0);
-	}
-	std::stringstream buffer;
-	buffer << file.rdbuf(); // read whole file in buffer
-	std::string shaderCodeString = buffer.str();
-	const char* shaderCode = shaderCodeString.c_str(); // get the whole shader as string
-
+	std::string contents = readFile(path);
+	contents = processInclude(processExtends(contents));
+	const char* shaderCode = contents.c_str(); // get the whole shader as string
 	unsigned int id = glCreateShader(type);
 
 	// compile 
@@ -144,4 +137,79 @@ void Shader::setMat4(const std::string& name, const glm::mat4& val)
 void Shader::setMat3(const std::string& name, const glm::mat3& val)
 {
 	glUniformMatrix3fv(getLocation(name), 1, GL_FALSE, &val[0][0]);
+}
+
+Position extract_name(const std::string& str, size_t offset) {
+	size_t begin = offset;
+	while (str[begin] != '"') begin++;
+	size_t end = begin + 1;
+	while (str[end] != '"') end++;
+	return { begin + 1, end - 1 };
+}
+
+std::string readFile(const std::string& path) {
+	std::stringstream p;
+	p << "shaders/" << path;
+	std::ifstream file(p.str());
+	if (!file) {
+		printf("Error file '%s' not loaded", p.str().c_str());
+		exit(0);
+	}
+	std::stringstream buffer;
+	buffer << file.rdbuf(); // read whole file in buffer
+	return buffer.str();
+}
+
+std::string processExtends(std::string shader) {
+	size_t begin = shader.find("@extends");
+	if (begin == std::string::npos) return shader;
+
+	// extract the <file> from @extends "<file>"
+	Position file_pos = extract_name(shader, 0);
+	std::string file = shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);
+	// load base template shader
+	std::string base_shader = readFile(file);
+
+	std::unordered_map<std::string, std::string> sections;
+	// extract all sections
+	size_t section_pos = shader.find("@section");
+	while (section_pos != std::string::npos) {
+		// extract name of section
+		file_pos = extract_name(shader, section_pos);
+		std::string section_name = shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);
+		size_t section_start = file_pos.end + 2; // skip end quote
+		size_t section_end = shader.find("@endsection", section_start) - 1;
+		// store section content
+		sections[section_name] = shader.substr(section_start, section_end - section_start + 1);
+		// find next section
+		section_pos = shader.find("@section", section_end);
+	}
+
+	// replace sections from template
+	size_t has_pos = base_shader.find("@has");
+	while (has_pos != std::string::npos) {
+		// get the section name
+		file_pos = extract_name(base_shader, has_pos);
+		std::string section_name = base_shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);
+
+		// replace this placeholder with the section from the shader
+		base_shader.replace(has_pos, file_pos.end - has_pos + 2, sections[section_name]);
+		has_pos = base_shader.find("@has");
+	}
+	return base_shader;
+}
+
+std::string processInclude(std::string shader) {
+	size_t pos = shader.find("@include");       // find the index where @include starts
+	while (pos != std::string::npos) {            // while there are includes
+		Position file_pos = extract_name(shader, pos);
+
+		// extract the <file> from @include "<file>"
+		std::string file = shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);
+		// replace <@include "file"> with content
+		shader.replace(pos, file_pos.end - pos + 2, readFile(file));
+
+		pos = shader.find("@include"); // search for another @include
+	}
+	return shader;
 }

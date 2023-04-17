@@ -4,7 +4,7 @@ ModelTestScene::ModelTestScene(Scene*& scene)
     : Scene(scene)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
-    m_shader.load("shaders/texture.vert", "shaders/texture.frag");
+    m_shader.load("texture.vert", "texture.frag");
     m_shader.bind();
 
     // TODO: get screen size from config class?
