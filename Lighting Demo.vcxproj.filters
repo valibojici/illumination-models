@@ -229,9 +229,13 @@
     <None Include="shaders\simpleLighting.vert" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
-    <None Include="shaders\phong.vert" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\blinn.frag" />
     <None Include="shaders\cook-torrance.frag" />
+    <None Include="shaders\header.partial.frag" />
+    <None Include="shaders\footer.partial.frag" />
+    <None Include="shaders\base_shader.frag" />
+    <None Include="shaders\ct.frag" />
+    <None Include="shaders\base_shader.vert" />
   </ItemGroup>
 </Project>
