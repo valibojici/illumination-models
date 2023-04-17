@@ -30,11 +30,11 @@ void PhongMaterial::imGuiRender(Shader& shader)
 
 void PhongMaterial::setUniforms(Shader& shader)
 {
-    shader.setVec3("u_kd", m_kd);
-    shader.setVec3("u_diffuseColor", m_diffuseColor);
-    shader.setVec3("u_ks", m_ks);
-    shader.setFloat("u_alpha", m_alpha);
-    shader.setFloat("u_ka", m_ka);
-    shader.setVec3("u_ia", m_ia);
+    shader.setVec3("u_material.kd", m_kd);
+    shader.setVec3("u_material.diffuseColor", m_diffuseColor);
+    shader.setVec3("u_material.ks", m_ks);
+    shader.setFloat("u_material.alpha", m_alpha);
+    shader.setFloat("u_material.ka", m_ka);
+    shader.setVec3("u_material.ia", m_ia);
     shader.setBool("u_modifiedSpecular", m_modifiedSpecular);
 }
