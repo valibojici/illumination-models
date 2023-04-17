@@ -36,3 +36,11 @@ public:
 	void setMat3(const std::string& name, const glm::mat3& val);
 };
 
+struct Position {
+	size_t start;
+	size_t end;
+};
+std::string readFile(const std::string& path);
+std::string processExtends(std::string shader);
+std::string processInclude(std::string shader);
+Position extractName(const std::string& str, size_t offset);
