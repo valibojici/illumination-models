@@ -14,9 +14,9 @@ FloorScene::FloorScene(Scene*& scene) : Scene(scene)
 
     // load shaders
     m_shaders.resize(3);
-    m_shaders[0].load("shaders/phong.vert", "shaders/phong.frag");
-    m_shaders[1].load("shaders/phong.vert", "shaders/blinn.frag");
-    m_shaders[2].load("shaders/phong.vert", "shaders/cook-torrance.frag");
+    m_shaders[0].load("base_shader.vert", "phong.frag");
+    m_shaders[1].load("base_shader.vert", "blinn.frag");
+    m_shaders[2].load("base_shader.vert", "cook-torrance.frag");
 
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f);
 

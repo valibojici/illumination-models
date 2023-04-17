@@ -4,7 +4,7 @@ Simple3dScene::Simple3dScene(Scene*& scene)
     : Scene(scene)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
-    m_shader.load("shaders/shader.vert", "shaders/shader.frag");
+    m_shader.load("shader.vert", "shader.frag");
     m_shader.bind();
 
     std::vector<Vertex> vertices = {

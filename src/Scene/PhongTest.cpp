@@ -15,9 +15,9 @@ PhongTest::PhongTest(Scene*& scene)
 
     // load shaders
     m_shaders.resize(3);
-    m_shaders[0].load("shaders/phong.vert", "shaders/phong.frag");
-    m_shaders[1].load("shaders/phong.vert", "shaders/blinn.frag");
-    m_shaders[2].load("shaders/phong.vert", "shaders/cook-torrance.frag");
+    m_shaders[0].load("base_shader.vert", "phong.frag");
+    m_shaders[1].load("base_shader.vert", "blinn.frag");
+    m_shaders[2].load("base_shader.vert", "cook-torrance.frag");
 
     // setting uniforms
     // TODO: get screen size from config class?

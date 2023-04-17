@@ -4,7 +4,7 @@ MeshTestScene::MeshTestScene(Scene*& scene)
     : Scene(scene)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
-    m_shader.load("shaders/simpleLighting.vert", "shaders/simpleLighting.frag");
+    m_shader.load("simpleLighting.vert", "simpleLighting.frag");
     m_shader.bind();
  
     m_shader.setVec3("u_color", m_color);
