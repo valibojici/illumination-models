@@ -43,6 +43,7 @@ public:
 	void unbind(unsigned int slot) const;
 
 	inline Type getType() const { return m_type; }
+	inline unsigned int getId() const { return m_id; }
 private:
 	unsigned int m_id = 0;
 	int m_width = 0;

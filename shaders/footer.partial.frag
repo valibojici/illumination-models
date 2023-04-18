@@ -1,7 +1,3 @@
-vec3 toSRGB(vec3 color){
-    return pow(color, vec3(1 / 2.2f));
-}
-
 vec3 toLinear(vec3 color){
     return pow(color, vec3(2.2f));
 }

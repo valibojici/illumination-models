@@ -22,8 +22,12 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     // calculate diffuse term
 
     // get the diffuse color from texture and do gamma correction
-    vec3 diffuseCol = u_hasDiffTexture ? texture(u_DiffuseTex, fs_in.texCoords).rgb : u_material.diffuseColor;
-    diffuseCol = u_gammaCorrect ? toLinear(diffuseCol) : diffuseCol;
+    vec3 diffuseCol;
+    if(u_hasDiffTexture){
+        diffuseCol = texture(u_DiffuseTex, fs_in.texCoords).rgb;
+    } else {
+        diffuseCol = u_gammaCorrect ? toLinear(u_material.diffuseColor) : u_material.diffuseColor;
+    }
     vec3 diffuse = u_material.kd * diffuseCol;
 
     // calculate specular term

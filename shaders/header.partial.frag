@@ -42,9 +42,6 @@ uniform vec3 u_emission;         // emission
 
 vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
 
-// helper function to convert to SRGB from linear (raise to 1/2.2)
-vec3 toSRGB(vec3 color);
-
 // helper function to convert to linear from SRGB (raise to 2.2)
 vec3 toLinear(vec3 color);
 

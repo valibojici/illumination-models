@@ -49,15 +49,21 @@ void Texture::loadFromFile(const std::string& filepath, bool flipY)
 
 	// set data
 	GLenum format = GL_RGB;
-	if (m_nrChannels == 1)
-		format = GL_RED;
-	else if (m_nrChannels == 3)
+	GLenum internalFormat = GL_RGB;
+	switch (m_nrChannels)
+	{
+	case 3:
 		format = GL_RGB;
-	else if (m_nrChannels == 4)
+		internalFormat = m_type == Type::DIFFUSE ? GL_SRGB : GL_RGB;
+		break;
+	case 4:
 		format = GL_RGBA;
+		internalFormat = m_type == Type::DIFFUSE ? GL_SRGB_ALPHA : GL_RGBA;
+	default:
+		format = internalFormat = GL_RED;
+	}
 
-	
-	glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// set parameters for wrapping -> repeat
@@ -79,5 +85,5 @@ void Texture::bind(unsigned int slot) const
 void Texture::unbind(unsigned int slot) const
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, m_id);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
