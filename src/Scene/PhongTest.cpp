@@ -1,7 +1,7 @@
 #include "PhongTest.h"
 
 PhongTest::PhongTest(Scene*& scene)
-    : Scene(scene)
+    : Scene(scene), m_fbo(1280, 720, GL_RGBA16F)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
@@ -18,6 +18,10 @@ PhongTest::PhongTest(Scene*& scene)
     m_shaders[0].load("base_shader.vert", "phong.frag");
     m_shaders[1].load("base_shader.vert", "blinn.frag");
     m_shaders[2].load("base_shader.vert", "cook-torrance.frag");
+    m_postprocessShader.load("postprocess.vert", "postprocess.frag");
+
+    m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_postprocessShader });
+    m_postProcessUI.setUniforms();
 
     // setting uniforms
     // TODO: get screen size from config class?
@@ -26,13 +30,11 @@ PhongTest::PhongTest(Scene*& scene)
     for (auto& shader : m_shaders) {
         shader.bind();
         shader.setMat4("u_projMatrix", m_projMatrix);
-        shader.setBool("u_gammaCorrect", m_gammaCorrection);
         shader.setInt("u_numLights", 3);
         for (auto& light : m_lights) {
             light->setUniforms(shader);
         }
     }
-
 
     // set up materials
     for (int model = 0; model < 3; ++model) {
@@ -89,9 +91,6 @@ PhongTest::PhongTest(Scene*& scene)
         }
         m_materials.push_back(std::move(material));
     }
-
-    // bind current shader
-    m_shaders[m_modelIndex].bind();
 }
 
 PhongTest::~PhongTest()
@@ -104,20 +103,26 @@ PhongTest::~PhongTest()
 void PhongTest::onRender()
 {
     static double time = glfwGetTime();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_fbo.bind();
+    m_shaders[m_modelIndex].bind();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+
     // update camera position and uniforms
     m_camera.update(glfwGetTime() - time);
     time = glfwGetTime();
     m_shaders[m_modelIndex].setMat4("u_viewMatrix", m_camera.getMatrix());
     m_shaders[m_modelIndex].setVec3("u_viewPos", m_camera.getPosition());
+
     // lights
     for (auto& light : m_lights) {
         light->setUniforms(m_shaders[m_modelIndex]);
         light->draw(m_shaders[m_modelIndex]);
     }
-    
+
     // draw box
     for (unsigned int i = 0; i < m_transforms.size(); ++i) {
         m_wallMaterials[m_modelIndex][i]->setUniforms(m_shaders[m_modelIndex]);
@@ -129,6 +134,11 @@ void PhongTest::onRender()
     m_materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
     m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_modelMatrix);
     m_mesh->draw(m_shaders[m_modelIndex]);
+
+    m_fbo.unbind();
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+    m_screenQuadRenderer.render(m_fbo.getColorAttachment(), m_postprocessShader);
 }
 
 void PhongTest::onRenderImGui()
@@ -164,9 +174,7 @@ void PhongTest::onRenderImGui()
         m_camera.setTarget({ 0.0f, 0.0f, 0.0f });
     }
 
-    if (ImGui::Checkbox("Enable gamma correction", &m_gammaCorrection)) {
-        m_shaders[m_modelIndex].setBool("u_gammaCorrect", m_gammaCorrection);
-    }
+    m_postProcessUI.onRenderImGui();
 
     // enable/disable wireframes, for debug
     static bool showWireFrames = false;

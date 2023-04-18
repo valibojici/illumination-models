@@ -16,10 +16,15 @@
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include "Framebuffer.h"
+#include "Postprocess/PostprocessUI.h"
+#include "Postprocess/ScreenQuadRenderer.h"
 
 class PhongTest : public Scene
 {
 private:
+	Framebuffer m_fbo;
+	ScreenQuadRenderer m_screenQuadRenderer;
 	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getSphere(1.0f, 60));
 
 	// mesh for floor, walls, ceiling
@@ -47,12 +52,12 @@ private:
 
 	Camera m_camera;
 	std::vector<Shader> m_shaders;
+	Shader m_postprocessShader;
 	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
 
-	// flag to enable/disable gamma correction
-	bool m_gammaCorrection = true;
+	PostprocessUI m_postProcessUI;
 public:
 	PhongTest(Scene*& scene);
 	~PhongTest();

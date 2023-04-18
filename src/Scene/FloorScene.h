@@ -15,6 +15,9 @@
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
+#include "Postprocess/ScreenQuadRenderer.h"
+#include "Framebuffer.h"
+#include "Postprocess/PostprocessUI.h"
 
 class FloorScene : public Scene
 {
@@ -32,12 +35,14 @@ private:
 
 	Camera m_camera;
 	std::vector<Shader> m_shaders;
+	Shader m_postprocessShader;
+	Framebuffer m_fbo;
+	ScreenQuadRenderer m_screenQuadRenderer;
 	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
-
-	// flag to enable/disable gamma correction
-	bool m_gammaCorrection = true;
+	
+	PostprocessUI m_postProcessUI;
 public:
 	FloorScene(Scene*& scene);
 	~FloorScene();
