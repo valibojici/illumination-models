@@ -45,8 +45,12 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     // calculate diffuse term
 
     // get the diffuse color from texture and do gamma correction
-    vec3 diffuse = u_hasDiffTexture ? texture(u_DiffuseTex, fs_in.texCoords).rgb : u_material.albedo;
-    diffuse = u_gammaCorrect ? toLinear(diffuse) : diffuse;
+    vec3 diffuse;
+    if(u_hasDiffTexture){
+        diffuse = texture(u_DiffuseTex, fs_in.texCoords).rgb;
+    } else {
+        diffuse = u_gammaCorrect ? toLinear(u_material.albedo) : u_material.albedo;
+    }
 
     // get the halfway direction vector between light direction and view direction
     vec3 halfway = normalize(lightDir + viewDir);
