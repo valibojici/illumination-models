@@ -59,7 +59,7 @@ void main()
     result += u_gammaCorrect ? toLinear(u_emission) : u_emission;
     
     // gamma correct the output
-    FragColor = vec4(u_gammaCorrect ? toSRGB(result) : result, 1.0f);
+    FragColor = vec4(result, 1.0f);
 }
 
 @has "BRDF_implementation"
