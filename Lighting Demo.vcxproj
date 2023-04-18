@@ -124,6 +124,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Postprocess\PostprocessUI.cpp" />
+    <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\Materials\CookTorranceMaterial.cpp" />
     <ClCompile Include="src\Scene\FloorScene.cpp" />
     <ClCompile Include="src\Light\PointLight.cpp" />
@@ -162,6 +164,9 @@
     <ClCompile Include="vendor\STB_IMAGE\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Postprocess\PostprocessUI.h" />
+    <ClInclude Include="src\Postprocess\ScreenQuadRenderer.h" />
+    <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="src\Materials\CookTorranceMaterial.h" />
     <ClInclude Include="src\Scene\FloorScene.h" />
     <ClInclude Include="src\Materials\BlinnMaterial.h" />
@@ -204,6 +209,8 @@
     <None Include="shaders\header.partial.frag" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\base_shader.vert" />
+    <None Include="shaders\postprocess.frag" />
+    <None Include="shaders\postprocess.vert" />
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
     <None Include="shaders\simpleLighting.frag" />
