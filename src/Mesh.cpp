@@ -198,83 +198,107 @@ Mesh *Mesh::getPlane(float width, float height)
 	return new Mesh(vertices, indices);
 }
 
-Mesh *Mesh::getSphere(float radius, int smoothness)
+Mesh *Mesh::getSphere(float radius, int subdivisions)
 {
-	// create a sphere using parametric equation
-	const float PI = 3.14159f;
-	const float UMIN = 0;
-	const float UMAX = 2 * PI;
-	const float VMIN = 0;
-	const float VMAX = PI;
-	const int MERID = smoothness;
-	const int PARR = smoothness;
-	const float uStep = (UMAX - UMIN) / MERID;
-	const float vStep = (VMAX - VMIN) / PARR;
-
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
-
-	// for a given langitude and latitude get the sphere coords
-	auto getCoords = [radius](float u, float v)
-	{
-		return glm::vec3{
-			radius * glm::sin(v) * glm::cos(u),
-			radius * glm::cos(v),
-			radius * glm::sin(v) * glm::sin(u),
-		};
+	const float phi = 1.618033988749895f; // golden ratio
+	
+	// helper to get a Vertex at a certain radius from normalized coordinates
+	auto getVertex = [radius](const glm::vec3& coords) {
+		return Vertex(
+			coords * radius,
+			{ 0.0f, 0.0f },
+			coords,
+			glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), coords) // tangent
+		);
 	};
 
-	int currentIndex = 0; // index of the current point on the sphere
+	// order of vertices and indices from https://schneide.blog/2016/07/15/generating-an-icosphere-in-c/
+	std::vector<Vertex> vertices = {
+		getVertex(glm::normalize(glm::vec3(-1.0f, 0.0f, phi))),
+		getVertex(glm::normalize(glm::vec3(1.0f, 0.0f, phi))),
+		getVertex(glm::normalize(glm::vec3(-1.0f, 0.0f, -phi))),
+		getVertex(glm::normalize(glm::vec3(1.0f, 0.0f, -phi))),
 
-	// for every longitude, go from "south pole" to "north pole"
-	for (int j = 0; j < MERID; ++j)
-	{
-		for (int i = 0; i < PARR + 1; ++i)
-		{
-			float u = UMIN + uStep * j;
-			float v = VMIN + vStep * i;
-			glm::vec3 coords = getCoords(u, v);
-			glm::vec3 tangent = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), coords);
-			vertices.push_back(Vertex(coords, {0.0f, 0.0f}, coords, tangent));
+		getVertex(glm::normalize(glm::vec3(0.0f, phi, 1.0f))),
+		getVertex(glm::normalize(glm::vec3(0.0f, phi, -1.0f))),
+		getVertex(glm::normalize(glm::vec3(0.0f, -phi, 1.0f))),
+		getVertex(glm::normalize(glm::vec3(0.0f, -phi, -1.0f))),
 
-			if (i == PARR)
-			{
-				// special case "north pole", ignore and continue
-				currentIndex++;
-				continue;
-			}
+		getVertex(glm::normalize(glm::vec3(phi, 1.0f, 0.0f))),
+		getVertex(glm::normalize(glm::vec3(-phi, 1.0f, 0.0f))),
+		getVertex(glm::normalize(glm::vec3(phi, -1.0f, 0.0f))),
+		getVertex(glm::normalize(glm::vec3(-phi, -1.0f, 0.0f))),
+	};
 
-			// special case "last meridian", need to wrap around to the first
-			if (j == MERID - 1)
-			{
-				indices.push_back(currentIndex);
-				indices.push_back(i);
-				indices.push_back(i + 1);
+	std::vector<unsigned int> indices{
+		0,1,4,   0,4,9,  9,4,5, 4,8,5, 4,1,8,
+		8,1,10,  8,10,3, 5,8,3, 5,3,2, 2,3,7,
+		7,3,10,  7,10,6, 7,6,11, 11,6,0, 0,6,1,
+		6,10,1, 9,11,0, 9,2,11, 9,5,2, 7,11,2
+	};
 
-				indices.push_back(i + 1);
-				indices.push_back(currentIndex + 1);
-				indices.push_back(currentIndex);
-			}
-			else
-			{
-				/*
-					index + 1 ---- index + MERID + 2
-						|				 |
-						|				 |
-					  index   ---- index + MERID + 1
-				*/
+	// used to cache newly created vertices (midpoints)
+	// the same new vertex will be used 2 times so this halves the amount of vertices
+	// key = (index1 | index2 << 32) where vertex[index1], vertex[index2] are the ends of an edge
+	// value = the index of the vertex which is at the middle of vertex[index1], vertex[index2] 
+	std::unordered_map<unsigned long long, unsigned	int> cache;
 
-				// first triangle
-				indices.push_back(currentIndex);
-				indices.push_back(currentIndex + MERID + 1);
-				indices.push_back(currentIndex + MERID + 2);
-				// second triangle
-				indices.push_back(currentIndex + MERID + 2);
-				indices.push_back(currentIndex + 1);
-				indices.push_back(currentIndex);
-			}
-			currentIndex++;
+	// helper to get the middle point between 2 vertices
+	// uses cache, only creates it once
+	auto getMiddle = [&cache, &vertices, &getVertex](unsigned int i1, unsigned int i2) -> unsigned int {
+		// the edge is not oriented, swap i1 i2 to have i1 <= i2
+		if (i1 > i2) {
+			std::swap(i1, i2);
 		}
+		// get the one number representation of this edge
+		unsigned long long key = (1ULL * i1) | ((1ULL * i2) << 32);
+		if (cache.count(key) == 0) {
+			// if the middle of this edge was not created
+			glm::vec3 v1 = vertices[i1].position;
+			glm::vec3 v2 = vertices[i2].position;
+			// get the middle point between v1 and v2 which is on the unit sphere
+			auto a = glm::normalize(v1 + v2);
+			vertices.push_back(getVertex(a));
+			// cache the index of the newly created vertex
+			cache[key] = vertices.size() - 1;
+		}
+		return cache[key];
+	};
+
+	// subdivide each triangle into 4 triangles
+	for (int k = 0; k < subdivisions; ++k) {
+		// vector to hold the newly created vertices
+		std::vector<unsigned int> newIndices;
+		// iterate through each triangle (aka 3 indices at a time)
+		for (unsigned int i = 0; i < indices.size(); i += 3) {
+			// get the indices of this triangle
+			unsigned int i1 = indices[i];
+			unsigned int i2 = indices[i + 1];
+			unsigned int i3 = indices[i + 2];
+			// get the indices of the (newly) created middle vertices
+			unsigned int t1 = getMiddle(i1, i2);
+			unsigned int t2 = getMiddle(i2, i3);
+			unsigned int t3 = getMiddle(i3, i1);
+
+			// replace triangle i1 i2 i3 with 4 triangles
+			/* 
+			         i3
+				 	 /\
+				 t3 /__\t2
+				   /_\/_\
+				 i1  t1  i2
+			*/
+			std::vector<unsigned int> newTriangles{
+				i1, t1, t3,
+				t1, t2, t3,
+				t1, i2, t2,
+				t3, t2, i3
+			};
+			newIndices.insert(newIndices.end(), newTriangles.begin(), newTriangles.end());
+		}
+		// replace the original indices after this subdivision
+		indices = newIndices;
 	}
+
 	return new Mesh(vertices, indices);
 }

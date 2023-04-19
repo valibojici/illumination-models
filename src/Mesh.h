@@ -43,9 +43,9 @@ public:
 	static Mesh *getCube(float width, float height, float depth);
 
 	/// <summary>
-	/// Factory method to get a mesh representing a sphere centered at the origin.
+	/// Factory method to get a mesh representing a sphere centered at the origin from an icosahedron
 	/// </summary>
-	/// <param name="smoothness">How many meridians and parralels</param>
+	/// <param name="subdivisions">How many times to subdivide the icosahedron</param>
 	/// <returns></returns>
-	static Mesh *getSphere(float radius, int smoothness = 10);
+	static Mesh *getSphere(float radius, int subdivisions = 3);
 };
