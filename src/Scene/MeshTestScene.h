@@ -16,7 +16,7 @@ class MeshTestScene : public Scene
 private:
 	// Mesh* m_mesh = Mesh::getPlane(2.0f, 2.0f);
 	// Mesh* m_mesh = Mesh::getCube(1.0f, 1.0f, 1.0f);
-	Mesh* m_mesh = Mesh::getSphere(1.0f, 50);
+	Mesh* m_mesh = Mesh::getSphere(1.0f);
 	// Mesh* m_mesh = Mesh::getPlane(2.0f, 2.0f);
 	Camera m_camera;
 	Shader m_shader;
