@@ -78,6 +78,10 @@ void FloorScene::onRender()
     m_shaders[m_modelIndex].setMat4("u_viewMatrix", m_camera.getMatrix());
     m_shaders[m_modelIndex].setVec3("u_viewPos", m_camera.getPosition());
 
+    if (m_wireframeEnabled) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
+    }
+
     // lights
     for (auto& light : m_lights) {
         light->setUniforms(m_shaders[m_modelIndex]);
@@ -88,6 +92,10 @@ void FloorScene::onRender()
     m_materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
     m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_modelMatrix);
     m_mesh->draw(m_shaders[m_modelIndex]);
+
+    if (m_wireframeEnabled) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 
     m_fbo.unbind();
     glDisable(GL_CULL_FACE);
@@ -132,10 +140,7 @@ void FloorScene::onRenderImGui()
     m_postProcessUI.onRenderImGui();
 
     // enable/disable wireframes, for debug
-    static bool showWireFrames = false;
-    if (ImGui::Checkbox("Show wireframe", &showWireFrames)) {
-        glPolygonMode(GL_FRONT_AND_BACK, showWireFrames ? GL_LINE : GL_FILL);
-    }
+    ImGui::Checkbox("Show wireframe", &m_wireframeEnabled);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }

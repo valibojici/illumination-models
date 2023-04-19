@@ -6,7 +6,7 @@ Light::Light(int index) : m_index(index)
 {
 	// set static variable if it has not been set
 	if (!s_lightMesh) {
-		s_lightMesh = std::unique_ptr<Mesh>(Mesh::getSphere(0.05f, 10));
+		s_lightMesh = std::unique_ptr<Mesh>(Mesh::getSphere(0.05f, 0));
 	}
 }
 

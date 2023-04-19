@@ -43,6 +43,9 @@ private:
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
 	
 	PostprocessUI m_postProcessUI;
+
+	// enable/disable wireframes, for debug
+	bool m_wireframeEnabled = false;
 public:
 	FloorScene(Scene*& scene);
 	~FloorScene();
