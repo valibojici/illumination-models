@@ -25,7 +25,7 @@ class PhongTest : public Scene
 private:
 	Framebuffer m_fbo;
 	ScreenQuadRenderer m_screenQuadRenderer;
-	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getSphere(1.0f, 60));
+	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getSphere(1.0f, 5));
 
 	// mesh for floor, walls, ceiling
 	std::unique_ptr<Mesh> m_wall = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 4.0f));
@@ -58,6 +58,9 @@ private:
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
 
 	PostprocessUI m_postProcessUI;
+
+	// enable/disable wireframes, for debug
+	bool m_wireframeEnabled = false;
 public:
 	PhongTest(Scene*& scene);
 	~PhongTest();
