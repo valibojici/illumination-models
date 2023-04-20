@@ -302,3 +302,89 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 
 	return new Mesh(vertices, indices);
 }
+
+Mesh* Mesh::getCone(float radius, float height, unsigned int sectors, unsigned int stacks)
+{
+	const float PI = 3.14159265359f;
+	const float MAX_V = 2 * PI;
+	const float sectorStep = MAX_V / sectors;
+	const float stackStep = height / stacks;
+	
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+
+	// helper to get a Vertex at a height H and radius R and angle angle
+	auto getVertex = [radius, height](float H, float R, float angle) {
+		glm::vec3 coords(R * glm::sin(angle), H, R * glm::cos(angle));
+		// "height" of the normal is based on the ratio: cone radius / cone height
+		glm::vec3 normal(glm::sin(angle), radius / height, glm::cos(angle));
+
+		return Vertex(
+			coords,
+			{ 0.0f, 0.0f },
+			normal,
+			glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), normal)
+		);
+	};
+	 
+	// iterate through every sector and stack (vertical portion) of the cone
+	for (unsigned int sector = 0; sector < sectors; ++sector) {
+		for (unsigned int stack = 0; stack <= stacks; ++stack) {
+			// get coords
+			float currentHeight = stack * stackStep;
+			float currentAngle = sector * sectorStep;
+			// clamp to a small value so the normal will not point straight up (bugs with lighting)
+			float currentRadius = std::max(0.0001f, 1.0f * (stacks - stack) / stacks * radius);
+			vertices.push_back(getVertex(currentHeight, currentRadius, currentAngle));
+
+			// if we are at the "top" dont add triangles
+			if (stack == stacks) {
+				continue;
+			}
+
+			// get indices of the 2 triangles to be added
+			unsigned int bottomLeft = vertices.size() - 1;
+			unsigned int topLeft = bottomLeft + 1;
+			unsigned int bottomRight = bottomLeft + stacks + 1;
+			unsigned int topRight = bottomLeft + stacks + 2;
+
+			// special case for last sector (for wrapping around)
+			if (sector == sectors - 1) {
+				bottomRight = stack;
+				topRight = stack + 1;
+			}
+
+			std::vector<unsigned int> newIndices {
+				bottomLeft, bottomRight, topLeft,
+				bottomRight, topRight, topLeft
+			};
+
+			indices.insert(indices.end(), newIndices.begin(), newIndices.end());
+		}
+	}
+	// adding the bottom vertex, in the origin (0,0,0)
+	vertices.push_back(Vertex(glm::vec3(0.0f), { 0.0f, 0.0f }, {0.0f, -1.0f, 0.0f}));
+	unsigned int bottomIndex = vertices.size() - 1;
+	// create triangles for the bottom part
+	// iterate through every sector and create a triangle with the neighbour vertex 
+	for (unsigned int sector = 0; sector < sectors; ++sector) {
+		vertices.push_back(Vertex(
+			{ radius * glm::sin(sector * sectorStep), 0.0f, radius * glm::cos(sector * sectorStep) },
+			{ 0.0f, 0.0f }, 
+			{ 0.0f, -1.0f, 0.0f })
+		);
+
+		indices.push_back(bottomIndex);
+		// special case for wrapping around
+		if (sector != sectors - 1) {
+			indices.push_back(bottomIndex + 2 + sector);
+		}
+		else {
+			indices.push_back(bottomIndex + 1);
+		}
+		// current sector
+		indices.push_back(bottomIndex + 1 + sector);
+	}
+
+	return new Mesh(vertices, indices);
+}
