@@ -48,4 +48,14 @@ public:
 	/// <param name="subdivisions">How many times to subdivide the icosahedron</param>
 	/// <returns></returns>
 	static Mesh *getSphere(float radius, int subdivisions = 3);
+
+	/// <summary>
+	/// Factory method to get a mesh representing a cone with the base in the XZ plane centered at origin
+	/// and pointing in positive Y direction
+	/// </summary>
+	/// <param name="radius">: radius of the base</param>
+	/// <param name="height">: height of the cone</param>
+	/// <param name="sectors">: how many sections the circle base is divided in</param>
+	/// <param name="stacks">: how many vertical "slices" (stacks) does the cone have</param>
+	static Mesh* getCone(float radius, float height, unsigned int sectors = 20, unsigned int stacks = 3);
 };
