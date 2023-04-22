@@ -1,7 +1,7 @@
 #include "PhongTest.h"
 
 PhongTest::PhongTest(Scene*& scene)
-    : Scene(scene), m_fbo(1280, 720, GL_RGBA16F)
+    : Scene(scene), m_fbo(1280, 720)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
@@ -91,6 +91,10 @@ PhongTest::PhongTest(Scene*& scene)
         }
         m_materials.push_back(std::move(material));
     }
+
+    m_fbo.addColorAttachament();
+    m_fbo.addDepthAttachment(false);
+    m_fbo.create();
 }
 
 PhongTest::~PhongTest()
@@ -145,7 +149,7 @@ void PhongTest::onRender()
     m_fbo.unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_fbo.getColorAttachment(), m_postprocessShader);
+    m_screenQuadRenderer.render(m_fbo.getColorAttachment(0), m_postprocessShader);
 }
 
 void PhongTest::onRenderImGui()
