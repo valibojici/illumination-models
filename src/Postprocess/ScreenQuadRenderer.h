@@ -31,10 +31,11 @@ public:
 	/// </summary>
 	/// <param name="texture">: texture which should be drawn (will be bound to slot 0)</param>
 	/// <param name="shader">: shader that reads the texture</param>
-	void render(const Texture* texture, Shader& shader) {
+	void render(unsigned int texture, Shader& shader) {
 		m_vao.bind();
 		shader.bind();
-		texture->bind(0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
 		shader.setInt("u_texture", 0);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
