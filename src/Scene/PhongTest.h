@@ -23,7 +23,8 @@
 class PhongTest : public Scene
 {
 private:
-	Framebuffer m_fbo;
+	Framebuffer m_hdrFBO;
+	Framebuffer m_shadowFBO;
 	ScreenQuadRenderer m_screenQuadRenderer;
 	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getSphere(1.0f, 5));
 
@@ -53,6 +54,8 @@ private:
 	Camera m_camera;
 	std::vector<Shader> m_shaders;
 	Shader m_postprocessShader;
+	Shader m_shadowShader;
+	
 	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
@@ -61,6 +64,11 @@ private:
 
 	// enable/disable wireframes, for debug
 	bool m_wireframeEnabled = false;
+
+	/// <summary>
+	/// Helper method to setup the light space matrices used in shadowmapping
+	/// </summary>
+	void setLightSpaceMatrices();
 public:
 	PhongTest(Scene*& scene);
 	~PhongTest();

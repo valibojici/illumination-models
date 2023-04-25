@@ -106,37 +106,49 @@ void Shader::unbind() const
 
 void Shader::setFloat(const std::string& name, float val)
 {
+	bind();
 	glUniform1f(getLocation(name), val);
 }
 
 void Shader::setInt(const std::string& name, int val)
 {
+	bind();
 	glUniform1i(getLocation(name), val);
 }
 
 void Shader::setBool(const std::string& name, bool val)
 {
+	bind();
 	setInt(name, val ? 1 : 0);
 }
 
 void Shader::setVec4(const std::string& name, const glm::vec4& val)
 {
+	bind();
 	glUniform4fv(getLocation(name), 1, &val[0]);
 }
 
 void Shader::setVec3(const std::string& name, const glm::vec3& val)
 {
+	bind();
 	glUniform3fv(getLocation(name), 1, &val[0]);
 }
 
 void Shader::setMat4(const std::string& name, const glm::mat4& val)
 {
+	bind();
 	glUniformMatrix4fv(getLocation(name), 1, GL_FALSE, &val[0][0]);
 }
 
 void Shader::setMat3(const std::string& name, const glm::mat3& val)
 {
+	bind();
 	glUniformMatrix3fv(getLocation(name), 1, GL_FALSE, &val[0][0]);
+}
+
+void Shader::setIntArray(const std::string& name, unsigned int count, int* data) {
+	bind();
+	glUniform1iv(getLocation(name), count, data);
 }
 
 Position extract_name(const std::string& str, size_t offset) {

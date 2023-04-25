@@ -34,6 +34,7 @@ public:
 	void setVec3(const std::string& name, const glm::vec3& val);
 	void setMat4(const std::string& name, const glm::mat4& val);
 	void setMat3(const std::string& name, const glm::mat3& val);
+	void setIntArray(const std::string& name, unsigned int count, int* data);
 };
 
 struct Position {

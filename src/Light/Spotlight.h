@@ -47,5 +47,9 @@ public:
 	/// Sets all uniforms for this light (at m_index)
 	/// </summary>
 	void setUniforms(Shader& shader) override;
+
+	float getCutoff() const { return m_cutOff; }
+	float getOuterCutoff() const { return m_outerCutOff; }
+	glm::vec3 getTarget() const { return m_target; }
 };
 

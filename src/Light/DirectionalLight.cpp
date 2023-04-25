@@ -32,4 +32,6 @@ void DirectionalLight::setUniforms(Shader& shader)
 	shader.setVec3(formatAttribute("target"), glm::vec3(0.0f));
 	shader.setFloat(formatAttribute("cutOff"), glm::cos(glm::radians(0.0f)));
 	shader.setFloat(formatAttribute("outerCutOff"), glm::cos(glm::radians(0.0f)));
+	shader.setBool(formatAttribute("shadow"), m_shadow);
+	shader.setMat4(formatAttribute("lightSpaceMatrix"), m_lightSpaceMatrix);
 }

@@ -28,3 +28,29 @@ vec3 indirectLighting(){
     ia = u_gammaCorrect ? toLinear(ia) : ia;
     return ia * u_material.ka;
 }
+
+float getShadow(int index){
+    if(u_lights[index].shadow == false) return 1.0f;
+
+    vec3 fragPosLightSpace = fs_in.fragPosLightSpace[index].xyz / fs_in.fragPosLightSpace[index].w;
+    vec3 fragPosLightTexCoords = fragPosLightSpace * 0.5 + 0.5;
+
+    float shadowMapDepth;
+    switch(index){
+        case 0: shadowMapDepth = texture(u_shadowTex[0], fragPosLightTexCoords.xy).r; break;
+        case 1: shadowMapDepth = texture(u_shadowTex[1], fragPosLightTexCoords.xy).r; break;
+        case 2: shadowMapDepth = texture(u_shadowTex[2], fragPosLightTexCoords.xy).r; break;
+        case 3: shadowMapDepth = texture(u_shadowTex[3], fragPosLightTexCoords.xy).r; break;
+        case 4: shadowMapDepth = texture(u_shadowTex[4], fragPosLightTexCoords.xy).r; break;
+    }
+    
+    float bias = 0.005f;
+    // add some bias to the depth from the shadowmap texture
+    bool in_shadow = fragPosLightSpace.z > shadowMapDepth + bias ? true : false;
+    
+    if(fragPosLightSpace.z > 1.0f) { // if outside the far plane => no shadow
+        in_shadow = false;
+    }
+   
+    return in_shadow == true ? 0.0f : 1.0f;
+}

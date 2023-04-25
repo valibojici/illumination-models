@@ -1,7 +1,7 @@
 #include "PhongTest.h"
 
 PhongTest::PhongTest(Scene*& scene)
-    : Scene(scene), m_fbo(1280, 720, GL_RGBA16F)
+    : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(2000, 2000)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
@@ -19,6 +19,7 @@ PhongTest::PhongTest(Scene*& scene)
     m_shaders[1].load("base_shader.vert", "blinn.frag");
     m_shaders[2].load("base_shader.vert", "cook-torrance.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
+    m_shadowShader.load("shadowmap.vert", "shadowmap.frag");
 
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_postprocessShader });
     m_postProcessUI.setUniforms();
@@ -40,7 +41,7 @@ PhongTest::PhongTest(Scene*& scene)
     for (int model = 0; model < 3; ++model) {
         // walls
         std::vector<std::unique_ptr<Material>> wallMaterials;
-        for (unsigned int i = 0; i < m_transforms.size(); ++i) {
+        for (size_t i = 0; i < m_transforms.size(); ++i) {
             std::unique_ptr<Material> wallMaterial;
             switch (model)
             {
@@ -91,6 +92,35 @@ PhongTest::PhongTest(Scene*& scene)
         }
         m_materials.push_back(std::move(material));
     }
+
+    // set up HDR framebuffer
+    m_hdrFBO.addColorAttachament(true, GL_RGBA16F);
+    m_hdrFBO.addDepthAttachment(false);
+    m_hdrFBO.create();
+
+    // set up shadow related variables
+
+    // no shadow for point lights
+    m_lights[1]->setShadow(true);
+    m_lights[2]->setShadow(true);
+    
+    // for every light that casts shadow create a depth buffer
+    for (size_t i = 0; i < m_lights.size(); ++i) {
+        if (!m_lights[i]->getShadow())continue;
+        unsigned int id = m_shadowFBO.addDepthAttachment();
+        // set the depth maps starting from slot 8 
+        glActiveTexture(GL_TEXTURE8 + i);
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
+
+    // 5 lights maximum
+    int shadowTextures[5] = { 8, 9, 10, 11, 12 }; 
+    for (auto& shader : m_shaders) {
+        // for each shader set the samplers to 8, 9, 10, 11, 12 for shadow maps
+        shader.setIntArray("u_shadowTex", 5, shadowTextures);
+    }
+    
+    m_shadowFBO.create(); // create the shadow framebuffer
 }
 
 PhongTest::~PhongTest()
@@ -100,40 +130,111 @@ PhongTest::~PhongTest()
     EventManager::getInstance().removeHandler(&m_camera);
 }
 
+void PhongTest::setLightSpaceMatrices()
+{
+    // the matrices depend on the scene
+
+    // directional light
+    m_lights[1]->setLightSpaceMatrix(
+        glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 6.0f) *
+        glm::lookAt(
+            2.5f * glm::normalize(m_lights[1]->getPosition()), // "place" the light on a sphere with radius 2.5
+            glm::vec3(0.0f), // looking at origin
+            glm::vec3(0.0f, 0.0f, 1.0f)) // up vector is towards the screen
+    );
+
+    // spotlight
+    m_lights[2]->setLightSpaceMatrix(
+        glm::perspective(
+            glm::radians(2.0f * dynamic_cast<Spotlight*>(m_lights[2].get())->getOuterCutoff()), // multiply by 2 so the scene is in view
+            1.0f,
+            0.5f,
+            12.0f) *
+        glm::lookAt(
+            m_lights[2]->getPosition(),
+            dynamic_cast<Spotlight*>(m_lights[2].get())->getTarget(),
+            glm::vec3(0.0f, 0.0f, 1.0f))
+    );
+}
+
+
 void PhongTest::onRender()
 {
     static double time = glfwGetTime();
-
-    m_fbo.bind();
-    m_shaders[m_modelIndex].bind();
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-
     // update camera position and uniforms
     m_camera.update(glfwGetTime() - time);
     time = glfwGetTime();
+    m_shaders[m_modelIndex].bind();
     m_shaders[m_modelIndex].setMat4("u_viewMatrix", m_camera.getMatrix());
     m_shaders[m_modelIndex].setVec3("u_viewPos", m_camera.getPosition());
+
+    /******************
+    * SHADOW PASS
+    ******************/
+
+    // setup viewport and framebuffer
+    glViewport(0, 0, 2000, 2000);
+    m_shadowFBO.bind();
+    // enable depth testing and face culling
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    m_shadowShader.bind();
+    
+    setLightSpaceMatrices();
+
+    for (size_t i = 0, shadowTextureIndex = 0; i < m_lights.size(); ++i) {
+        if (!m_lights[i]->getShadow()) continue;
+        // activate the depth attachment for this light
+        m_shadowFBO.activateDepthAttachment(shadowTextureIndex);
+        shadowTextureIndex++;
+
+        m_shadowShader.setMat4("u_lightSpaceMatrix", m_lights[i]->getLightSpaceMatrix());
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        // draw mesh
+        glCullFace(GL_BACK);
+        m_shadowShader.setMat4("u_modelMatrix", m_modelMatrix);
+        m_mesh->draw(m_shadowShader);
+
+        glCullFace(GL_BACK);
+        // draw box
+        for (size_t j = 0; j < m_transforms.size(); ++j) {
+            m_shadowShader.setMat4("u_modelMatrix", m_transforms[j]);
+            m_wall->draw(m_shadowShader);
+        }
+    }
+
+    /******************
+    * LIGHTING PASS
+    ******************/
+    glViewport(0, 0, 1280, 720);
+    m_hdrFBO.bind();
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glCullFace(GL_BACK);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_shaders[m_modelIndex].bind();
+    
 
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
     // lights
-    for (auto& light : m_lights) {
-        light->setUniforms(m_shaders[m_modelIndex]);
-        light->draw(m_shaders[m_modelIndex]);
+    for (size_t i = 0; i < m_lights.size(); ++i) {
+        m_lights[i]->setUniforms(m_shaders[m_modelIndex]);
+        m_lights[i]->draw(m_shaders[m_modelIndex]);
     }
 
     // draw box
-    for (unsigned int i = 0; i < m_transforms.size(); ++i) {
+    for (size_t i = 0; i < m_transforms.size(); ++i) {
         m_wallMaterials[m_modelIndex][i]->setUniforms(m_shaders[m_modelIndex]);
         m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_transforms[i]);
         m_wall->draw(m_shaders[m_modelIndex]);
     }
 
     // draw mesh
+    m_shaders[m_modelIndex].bind();
     m_materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
     m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_modelMatrix);
     m_mesh->draw(m_shaders[m_modelIndex]);
@@ -142,10 +243,10 @@ void PhongTest::onRender()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    m_fbo.unbind();
+    m_hdrFBO.unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_fbo.getColorAttachment(), m_postprocessShader);
+    m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
 }
 
 void PhongTest::onRenderImGui()

@@ -24,8 +24,12 @@ void Spotlight::imGuiRender(Shader& shader)
 		* the cut off and outer cut off are stored in degrees 
 		* but the shader expects cos values
 		*/
-		ImGui::DragFloat("Cut off", &m_cutOff, 0.1f, 0.0f, std::min(m_outerCutOff, 90.0f), "%.1f deg");
-		ImGui::DragFloat("Outer cut off", &m_outerCutOff, 0.1f, m_cutOff, 90.0f, "%.1f deg");
+		if (ImGui::DragFloat("Cut off", &m_cutOff, 0.1f, 0.1f, 90.0f, "%.1f deg")) {
+			m_outerCutOff = std::max(m_outerCutOff, m_cutOff);
+		}
+		if (ImGui::DragFloat("Outer cut off", &m_outerCutOff, 0.1f, 0.1f, 90.0f, "%.1f deg")) {
+			m_cutOff = std::min(m_cutOff, m_outerCutOff);
+		}
 		// slider is logaritmic for greater control
 		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 	}
@@ -44,4 +48,6 @@ void Spotlight::setUniforms(Shader& shader)
 	shader.setVec3(formatAttribute("target"), m_target);
 	shader.setFloat(formatAttribute("cutOff"), glm::cos(glm::radians(m_cutOff))); // shader uses cos values
 	shader.setFloat(formatAttribute("outerCutOff"), glm::cos(glm::radians(m_outerCutOff))); // shader uses cos values
+	shader.setBool(formatAttribute("shadow"), m_shadow);
+	shader.setMat4(formatAttribute("lightSpaceMatrix"), m_lightSpaceMatrix);
 }

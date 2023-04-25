@@ -36,6 +36,9 @@ protected:
 	// flag to "turn off/on" light
 	bool m_enabled = true;
 
+	bool m_shadow = false;
+	glm::mat4 m_lightSpaceMatrix = glm::mat4(1.0f);
+
 	/// <summary>
 	/// Helper function to get the name of attribute as a uniform name
 	/// e.g. formatAttribute("position") == "u_lights[m_index].position"
@@ -51,6 +54,20 @@ public:
 
 	// name of light displayed in UI: "<type> #<m_index>"
 	std::string m_name;
+
+	/// <summary>
+	/// Set if the light is casting shadow
+	/// </summary>
+	void setShadow(bool value) { m_shadow = true; }
+
+	bool getShadow() const { return m_shadow; }
+
+	/// <summary>
+	/// Matrix used for shadowmapping, maps positions to light space coordinates
+	/// </summary>
+	/// <param name="mat">: product of projection and view matrix</param>
+	void setLightSpaceMatrix(const glm::mat4& mat) { m_lightSpaceMatrix = mat; }
+	glm::mat4 getLightSpaceMatrix() const { return m_lightSpaceMatrix; }
 
 	/// <summary>
 	/// Abstract method that sets all uniforms for this light (at m_index)
