@@ -44,8 +44,8 @@ void main()
 
         // gamma correct the light color
         vec3 lightCol = u_gammaCorrect ? toLinear(u_lights[i].color) : u_lights[i].color;
-        
-        result += 
+
+        result += getShadow(i) *
             u_lights[i].intensity * lightCol * geometryTerm *       // light amount at this fragment
             BRDF(geometryTerm, lightDir, normal, viewDir) *         // BRDF
             lightAttenuation(u_lights[i], fs_in.fragPos) *          // attenuation
