@@ -213,6 +213,9 @@
     <None Include="shaders\postprocess.vert" />
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
+    <None Include="shaders\shadowmap-view.frag" />
+    <None Include="shaders\shadowmap.frag" />
+    <None Include="shaders\shadowmap.vert" />
     <None Include="shaders\simpleLighting.frag" />
     <None Include="shaders\simpleLighting.vert" />
     <None Include="shaders\texture.frag" />
