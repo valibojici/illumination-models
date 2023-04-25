@@ -44,12 +44,13 @@ float getShadow(int index){
         case 4: shadowMapDepth = texture(u_shadowTex[4], fragPosLightTexCoords.xy).r; break;
     }
     
-    bool in_shadow = fragPosLightSpace.z > shadowMapDepth + 0.005f ? true : false;
+    float bias = 0.005f;
+    // add some bias to the depth from the shadowmap texture
+    bool in_shadow = fragPosLightSpace.z > shadowMapDepth + bias ? true : false;
     
-    if(fragPosLightSpace.z > 1.0f) {
+    if(fragPosLightSpace.z > 1.0f) { // if outside the far plane => no shadow
         in_shadow = false;
     }
-    //return shadowMapDepth;
+   
     return in_shadow == true ? 0.0f : 1.0f;
-
 }
