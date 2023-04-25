@@ -1,4 +1,5 @@
 #version 330 core
+const int MAX_LIGHTS = 5;
 const float PI = 3.14159265359;
 const float SQRT_PI = 1.77245385091;
 
@@ -9,6 +10,7 @@ in VERTEX_TO_FRAGMENT{
     vec3 normal;
     vec2 texCoords;
     mat3 TBN;
+    vec4 fragPosLightSpace[MAX_LIGHTS];
 }fs_in;
 
 struct Light{
@@ -20,11 +22,13 @@ struct Light{
    vec3 target;         // for spotlight
    float cutOff;        // cos value ---> 1 if not spotlight
    float outerCutOff;   // cos value
+   bool shadow;         // if casting shadow
+   mat4 lightSpaceMatrix;
 };
 
 uniform vec3 u_viewPos;                 // viewer position in world space
 uniform int u_numLights;                // number of lights
-uniform Light u_lights[8]; 
+uniform Light u_lights[MAX_LIGHTS]; 
 
 uniform bool  u_gammaCorrect = false; // flag to enable/disable gamma correction
 
@@ -37,6 +41,8 @@ uniform sampler2D u_DiffuseTex;
 uniform sampler2D u_SpecularTex;
 uniform sampler2D u_NormalTex;
 uniform sampler2D u_RoughTex;
+
+uniform sampler2D u_shadowTex[MAX_LIGHTS];
 
 uniform vec3 u_emission;         // emission
 
@@ -53,3 +59,6 @@ float spotlightFactor(Light light, vec3 lightDir);
 
 // helper function to calculate indirect lighting (ambient)
 vec3 indirectLighting();
+
+// helper function to calculate shadow factor (0 = in shadow)
+float getShadow(int index);
