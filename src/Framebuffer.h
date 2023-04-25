@@ -24,7 +24,7 @@ private:
 	bool m_created = false;
 
 	std::vector<Attachment> m_colorAttachments;
-	Attachment m_depthAttachment;
+	std::vector<Attachment> m_depthAttachments;
 public:
 	Framebuffer(unsigned int width, unsigned int height) : m_width(width), m_height(height) {}
 	
@@ -40,7 +40,7 @@ public:
 	/// </summary>
 	/// <param name="isTexture">: true if attachment is 2D texture</param>
 	/// <param name="internalFormat">: default is GL_DEPTH_COMPONENT</param>
-	void addDepthAttachment(bool isTexture = true, unsigned int internalFormat = GL_DEPTH_COMPONENT);
+	unsigned int addDepthAttachment(bool isTexture = true, unsigned int internalFormat = GL_DEPTH_COMPONENT);
 	
 	/// <summary>
 	/// create framebuffer and link the added attachments
@@ -59,6 +59,11 @@ public:
 	/// <summary>
 	/// Get the id of the depthAttachment
 	/// </summary>
-	unsigned int getDepthAttachment() const { return m_depthAttachment.id; }
+	unsigned int getDepthAttachment(int slot) const { return m_depthAttachments[slot].id; }
+
+	/// <summary>
+	/// Link the depthAttachment at position "slot" to the framebuffer
+	/// </summary>
+	void activateDepthAttachment(int slot);
 };
 
