@@ -34,4 +34,5 @@ void DirectionalLight::setUniforms(Shader& shader)
 	shader.setFloat(formatAttribute("outerCutOff"), glm::cos(glm::radians(0.0f)));
 	shader.setBool(formatAttribute("shadow"), m_shadow);
 	shader.setMat4(formatAttribute("lightSpaceMatrix"), m_lightSpaceMatrix);
+	shader.setInt(formatAttribute("shadowMap"), m_shadowTextureSlot);
 }

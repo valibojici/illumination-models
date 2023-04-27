@@ -50,4 +50,5 @@ void Spotlight::setUniforms(Shader& shader)
 	shader.setFloat(formatAttribute("outerCutOff"), glm::cos(glm::radians(m_outerCutOff))); // shader uses cos values
 	shader.setBool(formatAttribute("shadow"), m_shadow);
 	shader.setMat4(formatAttribute("lightSpaceMatrix"), m_lightSpaceMatrix);
+	shader.setInt(formatAttribute("shadowMap"), m_shadowTextureSlot);
 }

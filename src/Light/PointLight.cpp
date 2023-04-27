@@ -34,4 +34,5 @@ void PointLight::setUniforms(Shader& shader)
 	shader.setVec3(formatAttribute("target"), glm::vec3(0.0f));
 	shader.setFloat(formatAttribute("cutOff"), glm::cos(glm::radians(0.0f)));
 	shader.setFloat(formatAttribute("outerCutOff"), glm::cos(glm::radians(0.0f)));
+	shader.setInt(formatAttribute("shadowMap"), m_shadowTextureSlot);
 }
