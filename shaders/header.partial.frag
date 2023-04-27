@@ -24,6 +24,7 @@ struct Light{
    float outerCutOff;   // cos value
    bool shadow;         // if casting shadow
    mat4 lightSpaceMatrix;
+   sampler2D shadowMap;
 };
 
 uniform vec3 u_viewPos;                 // viewer position in world space
@@ -41,8 +42,6 @@ uniform sampler2D u_DiffuseTex;
 uniform sampler2D u_SpecularTex;
 uniform sampler2D u_NormalTex;
 uniform sampler2D u_RoughTex;
-
-uniform sampler2D u_shadowTex[MAX_LIGHTS];
 
 uniform vec3 u_emission;         // emission
 

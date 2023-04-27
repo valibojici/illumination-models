@@ -32,6 +32,7 @@ struct Light{
    float outerCutOff;   // cos value
    bool shadow;         // if casting shadow
    mat4 lightSpaceMatrix;
+   sampler2D shadowMap;
 };
 
 uniform Light u_lights[MAX_LIGHTS]; 

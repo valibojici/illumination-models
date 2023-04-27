@@ -37,11 +37,11 @@ float getShadow(int index){
 
     float shadowMapDepth;
     switch(index){
-        case 0: shadowMapDepth = texture(u_shadowTex[0], fragPosLightTexCoords.xy).r; break;
-        case 1: shadowMapDepth = texture(u_shadowTex[1], fragPosLightTexCoords.xy).r; break;
-        case 2: shadowMapDepth = texture(u_shadowTex[2], fragPosLightTexCoords.xy).r; break;
-        case 3: shadowMapDepth = texture(u_shadowTex[3], fragPosLightTexCoords.xy).r; break;
-        case 4: shadowMapDepth = texture(u_shadowTex[4], fragPosLightTexCoords.xy).r; break;
+        case 0: shadowMapDepth = texture(u_lights[0].shadowMap, fragPosLightTexCoords.xy).r; break;
+        case 1: shadowMapDepth = texture(u_lights[1].shadowMap, fragPosLightTexCoords.xy).r; break;
+        case 2: shadowMapDepth = texture(u_lights[2].shadowMap, fragPosLightTexCoords.xy).r; break;
+        case 3: shadowMapDepth = texture(u_lights[3].shadowMap, fragPosLightTexCoords.xy).r; break;
+        case 4: shadowMapDepth = texture(u_lights[4].shadowMap, fragPosLightTexCoords.xy).r; break;
     }
     
     float bias = 0.005f;
