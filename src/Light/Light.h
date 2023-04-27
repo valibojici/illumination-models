@@ -63,6 +63,13 @@ public:
 	bool getShadow() const { return m_shadow; }
 
 	/// <summary>
+	/// Slot of the texture depth map (0-16)
+	/// </summary>
+	unsigned int m_shadowTextureSlot = 0;
+	unsigned int getShadowTextureSlot() const { return m_shadowTextureSlot; }
+	void setShadowTextureSlot(unsigned int slot) { m_shadowTextureSlot = slot; }
+
+	/// <summary>
 	/// Matrix used for shadowmapping, maps positions to light space coordinates
 	/// </summary>
 	/// <param name="mat">: product of projection and view matrix</param>
