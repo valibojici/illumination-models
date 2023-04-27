@@ -111,13 +111,7 @@ PhongTest::PhongTest(Scene*& scene)
         // set the depth maps starting from slot 8 
         glActiveTexture(GL_TEXTURE8 + i);
         glBindTexture(GL_TEXTURE_2D, id);
-    }
-
-    // 5 lights maximum
-    int shadowTextures[5] = { 8, 9, 10, 11, 12 }; 
-    for (auto& shader : m_shaders) {
-        // for each shader set the samplers to 8, 9, 10, 11, 12 for shadow maps
-        shader.setIntArray("u_shadowTex", 5, shadowTextures);
+        m_lights[i]->setShadowTextureSlot(8 + i);
     }
     
     m_shadowFBO.create(); // create the shadow framebuffer
