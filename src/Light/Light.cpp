@@ -41,6 +41,8 @@ void Light::imGuiRender(Shader& shader)
 	ImGui::Checkbox("Draw light", &m_draw);
 	ImGui::SameLine();
 	ImGui::Checkbox("Enable", &m_enabled);
+	ImGui::SameLine();
+	ImGui::Checkbox("Shadows", &m_shadow);
 	ImGui::ColorEdit3("Light Color", &m_color.x, ImGuiColorEditFlags_Float);
 	ImGui::DragFloat("Light intensity", &m_intensity, 0.01f, 0.0f, 10.0f);
 }
