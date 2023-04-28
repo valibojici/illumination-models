@@ -35,7 +35,7 @@ void main()
         vec3 lightDir = normalize(u_lights[i].position.xyz - fs_in.fragPos);    
         
         // check if light is directional
-        if(u_lights[i].position.w == 0){
+        if(u_lights[i].type == 0){
             lightDir = normalize(u_lights[i].position.xyz); // the direction is the light "position"
         }
         
