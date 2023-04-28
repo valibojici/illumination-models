@@ -15,6 +15,11 @@ public:
 	DirectionalLight(int index, const glm::vec3& direction);
 
 	/// <summary>
+	/// Calculate the light space matrix using the member parameters
+	/// </summary>
+	void calculateLightSpaceMatrix() override;
+
+	/// <summary>
 	/// Draw UI in ImGui
 	/// </summary>
 	void imGuiRender(Shader& shader) override;

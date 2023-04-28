@@ -2,6 +2,7 @@
 
 DirectionalLight::DirectionalLight(int index, const glm::vec3& direction) : Light(index)
 {
+	m_type = Type::DIRECTIONAL;
 	std::stringstream ss;
 	ss << "Directional light #" << index;
 	m_name = ss.str();
@@ -15,7 +16,9 @@ void DirectionalLight::imGuiRender(Shader& shader)
 	if (ImGui::CollapsingHeader(m_name.c_str())) {
 		Light::imGuiRender(shader);
 
-		ImGui::DragFloat3("Direction", &m_position.x, 0.1f, -5.0f, 5.0f);
+		if (ImGui::DragFloat3("Direction", &m_position.x, 0.1f, -5.0f, 5.0f)) {
+			calculateLightSpaceMatrix();
+		}
 	}
 	ImGui::NewLine();
 	ImGui::PopStyleColor();
@@ -33,6 +36,23 @@ void DirectionalLight::setUniforms(Shader& shader)
 	shader.setFloat(formatAttribute("cutOff"), glm::cos(glm::radians(0.0f)));
 	shader.setFloat(formatAttribute("outerCutOff"), glm::cos(glm::radians(0.0f)));
 	shader.setBool(formatAttribute("shadow"), m_shadow);
-	shader.setMat4(formatAttribute("lightSpaceMatrix"), m_lightSpaceMatrix);
+	shader.setMat4(formatAttribute("lightSpaceMatrix"), m_lightSpaceMatrix[0]);
 	shader.setInt(formatAttribute("shadowMap"), m_shadowTextureSlot);
+	shader.setFloat(formatAttribute("farPlane"), m_parameters.far_plane);
+	shader.setInt(formatAttribute("type"), 0);
+}
+
+void DirectionalLight::calculateLightSpaceMatrix()
+{
+	m_lightSpaceMatrix[0] = glm::ortho(
+		m_parameters.minx,
+		m_parameters.maxx,
+		m_parameters.miny,
+		m_parameters.maxy,
+		m_parameters.near_plane,
+		m_parameters.far_plane) *
+		glm::lookAt(
+			m_parameters.directionalLightScale * glm::normalize(m_position), // "place" the light on a sphere with radius 2.5
+			glm::vec3(0.0f), // looking at origin
+			m_parameters.UP); // up vector is towards t
 }
