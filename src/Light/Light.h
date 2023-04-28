@@ -53,6 +53,9 @@ protected:
 	/// type of light
 	Type m_type;
 
+	// flag if the light position has been updated, used to render the scene for shadowmapping
+	bool m_shadowNeedsRender = true;
+
 	// parameters for shadowmapping (view and projection matrices)
 	ViewProjectionParameters m_parameters;
 
@@ -107,6 +110,16 @@ public:
 	std::string m_name;
 
 	Type getType() const { return m_type; }
+
+	/// <summary>
+	/// Return flag to check if re rendering the scene for shadow mapping is necessary
+	/// </summary>
+	bool getShadowNeedsRender() const { return m_shadowNeedsRender; }
+
+	/// <summary>
+	/// Resets shadowNeedsRender flag (call after rendering scene)
+	/// </summary>
+	void resetShadowNeedsRender() { m_shadowNeedsRender = false; }
 
 	/// <summary>
 	/// Set if the light is casting shadow
