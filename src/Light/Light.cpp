@@ -10,6 +10,12 @@ Light::Light(int index) : m_index(index)
 	}
 }
 
+void Light::setViewProjectionParameters(const ViewProjectionParameters& param)
+{
+	m_parameters = param;
+	calculateLightSpaceMatrix();
+}
+
 void Light::setPosition(const glm::vec3& pos)
 {
 	m_position = pos;
