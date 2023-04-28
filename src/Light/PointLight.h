@@ -19,6 +19,8 @@ public:
 	/// <param name="position">: position of the light</param>
 	PointLight(int index, const glm::vec3& position);
 
+	void calculateLightSpaceMatrix() override;
+
 	/// <summary>
 	/// Draw UI in ImGui
 	/// </summary>
