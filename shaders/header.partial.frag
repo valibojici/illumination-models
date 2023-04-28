@@ -14,6 +14,7 @@ in VERTEX_TO_FRAGMENT{
 }fs_in;
 
 struct Light{
+   int type; // 0 == directional | 1 == spotlight | 2 == pointlight
    vec4 position;       // w == 0 for directional
    float intensity;     // 0 to 1
    vec3 color;
@@ -24,7 +25,9 @@ struct Light{
    float outerCutOff;   // cos value
    bool shadow;         // if casting shadow
    mat4 lightSpaceMatrix;
+   float farPlane;
    sampler2D shadowMap;
+   samplerCube shadowMapCube;
 };
 
 uniform vec3 u_viewPos;                 // viewer position in world space
