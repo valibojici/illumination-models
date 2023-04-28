@@ -22,16 +22,20 @@ out VERTEX_TO_FRAGMENT{
 }vs_out;
 
 struct Light{
-   vec4 position;       // w == 0 for directional
+   int type; // 0 == directional | 1 == spotlight | 2 == pointlight
+   vec4 position;       
    float intensity;     // 0 to 1
    vec3 color;
    bool enabled;
    vec3 attenuation;    // constant, linear, quadratic
    vec3 target;         // for spotlight
-   float cutOff;        // cos value ---> 1 if not spotlight
+   float cutOff;        
    float outerCutOff;   // cos value
    bool shadow;         // if casting shadow
    mat4 lightSpaceMatrix;
+   float farPlane;
+   sampler2D shadowMap;
+   samplerCube shadowMapCube;
 };
 
 uniform Light u_lights[MAX_LIGHTS]; 

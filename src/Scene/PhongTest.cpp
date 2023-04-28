@@ -19,7 +19,7 @@ PhongTest::PhongTest(Scene*& scene)
     m_shaders[1].load("base_shader.vert", "blinn.frag");
     m_shaders[2].load("base_shader.vert", "cook-torrance.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
-    m_shadowShader.load("shadowmap.vert", "shadowmap.frag");
+    m_shadowShader.load("shadowmap_v2.vert", "shadowmap_v2.frag");
 
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_postprocessShader });
     m_postProcessUI.setUniforms();
@@ -94,33 +94,47 @@ PhongTest::PhongTest(Scene*& scene)
     }
 
     // set up HDR framebuffer
-    m_hdrFBO.addColorAttachament(true, GL_RGBA16F);
-    m_hdrFBO.addDepthAttachment(false);
+    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
+    m_hdrFBO.addDepthAttachment(GL_RENDERBUFFER);
     m_hdrFBO.create();
 
     // set up shadow related variables
-
-    // no shadow for point lights
     m_lights[1]->setShadow(true);
     m_lights[2]->setShadow(true);
+    m_lights[0]->setShadow(true);
     
     // for every light that casts shadow create a depth buffer
     for (size_t i = 0; i < m_lights.size(); ++i) {
         if (!m_lights[i]->getShadow())continue;
-        unsigned int id = m_shadowFBO.addDepthAttachment();
-        // set the depth maps starting from slot 8 
-        glActiveTexture(GL_TEXTURE8 + i);
-        glBindTexture(GL_TEXTURE_2D, id);
-    }
-
-    // 5 lights maximum
-    int shadowTextures[5] = { 8, 9, 10, 11, 12 }; 
-    for (auto& shader : m_shaders) {
-        // for each shader set the samplers to 8, 9, 10, 11, 12 for shadow maps
-        shader.setIntArray("u_shadowTex", 5, shadowTextures);
+        
+        // create cube map for point light
+        if (m_lights[i]->getType() == Light::Type::POINT) {
+            unsigned int id = m_shadowFBO.addDepthAttachment(GL_TEXTURE_CUBE_MAP);
+            // set the depth maps starting from slot 8 
+            glActiveTexture(GL_TEXTURE8 + i);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+        }
+        else {
+            unsigned int id = m_shadowFBO.addDepthAttachment(GL_TEXTURE_2D);
+            // set the depth maps starting from slot 8 
+            glActiveTexture(GL_TEXTURE8 + i);
+            glBindTexture(GL_TEXTURE_2D, id);
+        }
+        m_lights[i]->setShadowTextureSlot(8 + i);
     }
     
     m_shadowFBO.create(); // create the shadow framebuffer
+
+
+    Light::ViewProjectionParameters vpParameters_directional;
+    vpParameters_directional.directional(-4, 4, -4, 4, 0.1f, 12.0f, 2.5f, { 0.0f, 0.0f, 1.0f });
+    Light::ViewProjectionParameters vpParameters_spotlight;
+    vpParameters_spotlight.spotlight(1.0f, 1.0f, 12.0f, { 0.0f, 0.0f, 1.0f });
+    Light::ViewProjectionParameters vpParameters_point;
+    vpParameters_point.point(1.0f, 0.1f, 12.0f);
+    m_lights[0]->setViewProjectionParameters(vpParameters_point);
+    m_lights[1]->setViewProjectionParameters(vpParameters_directional);
+    m_lights[2]->setViewProjectionParameters(vpParameters_spotlight);
 }
 
 PhongTest::~PhongTest()
@@ -129,34 +143,6 @@ PhongTest::~PhongTest()
     glDisable(GL_DEPTH_TEST);
     EventManager::getInstance().removeHandler(&m_camera);
 }
-
-void PhongTest::setLightSpaceMatrices()
-{
-    // the matrices depend on the scene
-
-    // directional light
-    m_lights[1]->setLightSpaceMatrix(
-        glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 6.0f) *
-        glm::lookAt(
-            2.5f * glm::normalize(m_lights[1]->getPosition()), // "place" the light on a sphere with radius 2.5
-            glm::vec3(0.0f), // looking at origin
-            glm::vec3(0.0f, 0.0f, 1.0f)) // up vector is towards the screen
-    );
-
-    // spotlight
-    m_lights[2]->setLightSpaceMatrix(
-        glm::perspective(
-            glm::radians(2.0f * dynamic_cast<Spotlight*>(m_lights[2].get())->getOuterCutoff()), // multiply by 2 so the scene is in view
-            1.0f,
-            0.5f,
-            12.0f) *
-        glm::lookAt(
-            m_lights[2]->getPosition(),
-            dynamic_cast<Spotlight*>(m_lights[2].get())->getTarget(),
-            glm::vec3(0.0f, 0.0f, 1.0f))
-    );
-}
-
 
 void PhongTest::onRender()
 {
@@ -179,18 +165,8 @@ void PhongTest::onRender()
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     m_shadowShader.bind();
-    
-    setLightSpaceMatrices();
 
-    for (size_t i = 0, shadowTextureIndex = 0; i < m_lights.size(); ++i) {
-        if (!m_lights[i]->getShadow()) continue;
-        // activate the depth attachment for this light
-        m_shadowFBO.activateDepthAttachment(shadowTextureIndex);
-        shadowTextureIndex++;
-
-        m_shadowShader.setMat4("u_lightSpaceMatrix", m_lights[i]->getLightSpaceMatrix());
-        glClear(GL_DEPTH_BUFFER_BIT);
-
+    auto renderSceneShadowPass = [this]() {
         // draw mesh
         glCullFace(GL_BACK);
         m_shadowShader.setMat4("u_modelMatrix", m_modelMatrix);
@@ -202,6 +178,35 @@ void PhongTest::onRender()
             m_shadowShader.setMat4("u_modelMatrix", m_transforms[j]);
             m_wall->draw(m_shadowShader);
         }
+    };
+
+    for (size_t i = 0, shadowTextureIndex = 0; i < m_lights.size(); ++i) {
+        // if light has no shadows then pass
+        if (!m_lights[i]->getShadow()) continue;
+
+        // set far plane and light position for this light (used to write distance from light to fragment in texture)
+        m_shadowShader.setVec3("u_lightPos", m_lights[i]->getPosition());
+        m_shadowShader.setFloat("u_farPlane", m_lights[i]->getFarPlane());
+
+
+        // if it is point light render scene for each face
+        if (m_lights[i]->getType() == Light::Type::POINT) { 
+            for (int faceIndex = 0; faceIndex < 6; ++faceIndex) {
+                m_shadowShader.setMat4("u_lightSpaceMatrix", m_lights[i]->getLightSpaceMatrix()[faceIndex]);        
+                m_shadowFBO.activateDepthAttachment(shadowTextureIndex, GL_TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex);
+                glClear(GL_DEPTH_BUFFER_BIT);
+                renderSceneShadowPass();
+            }
+        }
+        else {
+            m_shadowShader.setMat4("u_lightSpaceMatrix", m_lights[i]->getLightSpaceMatrix()[0]);
+            // activate the depth attachment for this light
+            m_shadowFBO.activateDepthAttachment(shadowTextureIndex);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            renderSceneShadowPass();
+        }
+
+        shadowTextureIndex++;
     }
 
     /******************

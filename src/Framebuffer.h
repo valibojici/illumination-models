@@ -11,7 +11,7 @@ class Framebuffer
 {
 public:
 	struct Attachment{
-		bool isTexture = false;
+		unsigned int type = GL_RENDERBUFFER;
 		unsigned int id = 0;
 	};
 
@@ -31,16 +31,16 @@ public:
 	/// <summary>
 	/// Add a color attachment texture/renderbuffer. Multiple can be added
 	/// </summary>
-	/// <param name="isTexture">: true if attachment is 2D texture</param>
+	/// <param name="type">: GL_RENDERBUFFER or GL_TEXTURE_2D</param>
 	/// <param name="internalFormat">: default is GL_RGB</param>
-	void addColorAttachament(bool isTexture = true, unsigned int internalFormat = GL_RGB);
+	void addColorAttachament(unsigned int type = GL_RENDERBUFFER, unsigned int internalFormat = GL_RGB);
 	
 	/// <summary>
 	/// Add a depth attachment texture/renderbuffer
 	/// </summary>
-	/// <param name="isTexture">: true if attachment is 2D texture</param>
+	/// <param name="type">: GL_TEXTURE_2D, GL_RENDERBUFFER or GL_TEXTURE_CUBE_MAP</param>
 	/// <param name="internalFormat">: default is GL_DEPTH_COMPONENT</param>
-	unsigned int addDepthAttachment(bool isTexture = true, unsigned int internalFormat = GL_DEPTH_COMPONENT);
+	unsigned int addDepthAttachment(unsigned int type = GL_TEXTURE_2D, unsigned int internalFormat = GL_DEPTH_COMPONENT);
 	
 	/// <summary>
 	/// create framebuffer and link the added attachments
@@ -64,6 +64,7 @@ public:
 	/// <summary>
 	/// Link the depthAttachment at position "slot" to the framebuffer
 	/// </summary>
-	void activateDepthAttachment(int slot);
+	/// <param name="target">: texture target, GL_TEXTURE_2D or GL_TEXTURE_CUBE_MAP_direction</param>
+	void activateDepthAttachment(int slot, unsigned int target = GL_TEXTURE_2D);
 };
 

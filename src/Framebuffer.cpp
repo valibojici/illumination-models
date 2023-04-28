@@ -1,10 +1,10 @@
 #include "Framebuffer.h"
 
-void Framebuffer::addColorAttachament(bool isTexture, unsigned int internalFormat)
+void Framebuffer::addColorAttachament(unsigned int type, unsigned int internalFormat)
 {
 	Attachment colorAttachment;
-	colorAttachment.isTexture = isTexture;
-	if (isTexture) {
+	colorAttachment.type = type;
+	if (type == GL_TEXTURE_2D) {
 		// create and bind texture id
 		glGenTextures(1, &colorAttachment.id);
 		glActiveTexture(GL_TEXTURE0);
@@ -24,23 +24,34 @@ void Framebuffer::addColorAttachament(bool isTexture, unsigned int internalForma
 	m_colorAttachments.push_back(colorAttachment);
 }
 
-unsigned int Framebuffer::addDepthAttachment(bool isTexture, unsigned int internalFormat)
+unsigned int Framebuffer::addDepthAttachment(unsigned int type, unsigned int internalFormat)
 {
 	Attachment depthAttachment;
-	depthAttachment.isTexture = isTexture;
-	if (isTexture) {
+	depthAttachment.type = type;
+	if (type == GL_TEXTURE_2D || type == GL_TEXTURE_CUBE_MAP) {
 		// create and bind texture id
 		glGenTextures(1, &depthAttachment.id);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, depthAttachment.id);
+		glBindTexture(type, depthAttachment.id);
 		// create texture and parameters
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (type == GL_TEXTURE_2D) {
+			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		}
+		else {
+			// allocate space for each face of the cubemap
+			for (int i = 0; i < 6; ++i) {
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+			}
+		}
+		glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (type == GL_TEXTURE_CUBE_MAP) {
+			glTexParameteri(type, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		}
 		// unbind
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(type, 0);
 	}
 	else {
 		// create renderbuffer
@@ -72,7 +83,7 @@ void Framebuffer::create()
 	}
 
 	for (size_t i = 0; i < m_colorAttachments.size(); ++i) {
-		if (m_colorAttachments[i].isTexture) {
+		if (m_colorAttachments[i].type == GL_TEXTURE_2D) {
 			// activate slot and bind this texture
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_colorAttachments[i].id);
@@ -89,24 +100,8 @@ void Framebuffer::create()
 		}
 	}
 	
-	for (auto& depthAttachment : m_depthAttachments) {
-		if (depthAttachment.isTexture) {
-			// activate slot and bind this texture
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, depthAttachment.id);
-			// link texture to fbo
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthAttachment.id, 0);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		else {
-			// bind renderbuffer
-			glBindRenderbuffer(GL_RENDERBUFFER, depthAttachment.id);
-			// link renderbuffer to fbo
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthAttachment.id);
-			glBindRenderbuffer(GL_RENDERBUFFER, 0);
-		}
-	}
-
+	activateDepthAttachment(0, m_depthAttachments[0].type == GL_TEXTURE_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		printf("ERROR Framebuffer not complete.");
 		exit(0);
@@ -119,7 +114,7 @@ Framebuffer::~Framebuffer()
 {
 	// delete color attachments
 	for (auto& colorAttachment : m_colorAttachments) {
-		if (colorAttachment.isTexture) {
+		if (colorAttachment.type != GL_RENDERBUFFER) {
 			glDeleteTextures(1, &colorAttachment.id);
 		}
 		else {
@@ -129,7 +124,7 @@ Framebuffer::~Framebuffer()
 
 	// delete depth attachments
 	for (auto& depthAttachments : m_depthAttachments) {
-		if (depthAttachments.isTexture) {
+		if (depthAttachments.type != GL_RENDERBUFFER) {
 			glDeleteTextures(1, &depthAttachments.id);
 		}
 		else {
@@ -139,15 +134,17 @@ Framebuffer::~Framebuffer()
 	glDeleteFramebuffers(1, &m_id);
 }
 
-void Framebuffer::activateDepthAttachment(int slot)
+void Framebuffer::activateDepthAttachment(int slot, unsigned int target)
 {
-	if (m_depthAttachments[slot].isTexture) {
+	if (slot >= m_depthAttachments.size()) return;
+
+	if (m_depthAttachments[slot].type == GL_TEXTURE_2D || m_depthAttachments[slot].type == GL_TEXTURE_CUBE_MAP) {
 		// activate slot and bind this texture
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_depthAttachments[slot].id);
+		glBindTexture(m_depthAttachments[slot].type, m_depthAttachments[slot].id);
 		// link texture to fbo
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachments[slot].id, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, m_depthAttachments[slot].id, 0);
+		glBindTexture(m_depthAttachments[slot].type, 0);
 	}
 	else {
 		// bind renderbuffer

@@ -2,10 +2,53 @@
 
 PointLight::PointLight(int index, const glm::vec3& position) : Light(index)
 {
+	m_type = Type::POINT;
 	std::stringstream ss;
 	ss << "Point light #" << index;
 	m_name = ss.str();
 	m_position = position;
+}
+
+void PointLight::calculateLightSpaceMatrix()
+{
+	/* order is
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	*/
+	const std::vector<glm::vec3> up_directions{
+		{0.0f, -1.0f, 0.0f}, // positive x -> right
+		{0.0f, -1.0f, 0.0f}, // negative x -> left
+		{0.0f, 0.0f, 1.0f}, // positive y -> up
+		{0.0f, 0.0f, -1.0f}, // negative y -> down
+		{0.0f, -1.0f, 0.0f}, // positive z -> BACK
+		{0.0f, -1.0f, 0.0f}, // negative z -> FRONT
+	};
+
+	const std::vector<glm::vec3> look_directions{
+		{1.0f, 0.0f, 0.0f},
+		{-1.0f, 0.0f, 0.0f},
+		{0.0f, 1.0f, 0.0f},
+		{0.0f, -1.0f, 0.0f},
+		{0.0f, 0.0f, 1.0f},
+		{0.0f, 0.0f, -1.0f}
+	};
+	
+	m_lightSpaceMatrix.clear();
+	// go through every face
+	for (int i = 0; i < 6; ++i) {
+		m_lightSpaceMatrix.push_back(
+			glm::perspective(
+				glm::radians(m_parameters.fov), 
+				m_parameters.aspect, 
+				m_parameters.near_plane, 
+				m_parameters.far_plane) *
+			glm::lookAt(m_position, m_position + look_directions[i], up_directions[i])
+		);
+	}
 }
 
 void PointLight::imGuiRender(Shader& shader)
@@ -16,7 +59,9 @@ void PointLight::imGuiRender(Shader& shader)
 
 		Light::imGuiRender(shader);
 
-		ImGui::DragFloat3("Position", &m_position.x, 0.1f, -5.0f, 5.0f);
+		if (ImGui::DragFloat3("Position", &m_position.x, 0.1f, -5.0f, 5.0f)) {
+			calculateLightSpaceMatrix();
+		}
 		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 	}
 	ImGui::NewLine();
@@ -34,4 +79,8 @@ void PointLight::setUniforms(Shader& shader)
 	shader.setVec3(formatAttribute("target"), glm::vec3(0.0f));
 	shader.setFloat(formatAttribute("cutOff"), glm::cos(glm::radians(0.0f)));
 	shader.setFloat(formatAttribute("outerCutOff"), glm::cos(glm::radians(0.0f)));
+	shader.setInt(formatAttribute("shadowMapCube"), m_shadowTextureSlot);
+	shader.setBool(formatAttribute("shadow"), m_shadow);
+	shader.setFloat(formatAttribute("farPlane"), m_parameters.far_plane);
+	shader.setInt(formatAttribute("type"), 2);
 }

@@ -216,6 +216,8 @@
     <None Include="shaders\shadowmap-view.frag" />
     <None Include="shaders\shadowmap.frag" />
     <None Include="shaders\shadowmap.vert" />
+    <None Include="shaders\shadowmap_v2.frag" />
+    <None Include="shaders\shadowmap_v2.vert" />
     <None Include="shaders\simpleLighting.frag" />
     <None Include="shaders\simpleLighting.vert" />
     <None Include="shaders\texture.frag" />

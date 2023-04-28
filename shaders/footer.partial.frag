@@ -12,7 +12,7 @@ float lightAttenuation(Light light, vec3 fragPos){
 }
 
 float spotlightFactor(Light light, vec3 lightDir){
-    if(light.position.w == 0 || light.cutOff == 1){
+    if(light.type != 1){
         return 1;
     }
     // get the spotlight direction: from the light to the target
@@ -32,23 +32,40 @@ vec3 indirectLighting(){
 float getShadow(int index){
     if(u_lights[index].shadow == false) return 1.0f;
 
-    vec3 fragPosLightSpace = fs_in.fragPosLightSpace[index].xyz / fs_in.fragPosLightSpace[index].w;
-    vec3 fragPosLightTexCoords = fragPosLightSpace * 0.5 + 0.5;
-
     float shadowMapDepth;
-    switch(index){
-        case 0: shadowMapDepth = texture(u_shadowTex[0], fragPosLightTexCoords.xy).r; break;
-        case 1: shadowMapDepth = texture(u_shadowTex[1], fragPosLightTexCoords.xy).r; break;
-        case 2: shadowMapDepth = texture(u_shadowTex[2], fragPosLightTexCoords.xy).r; break;
-        case 3: shadowMapDepth = texture(u_shadowTex[3], fragPosLightTexCoords.xy).r; break;
-        case 4: shadowMapDepth = texture(u_shadowTex[4], fragPosLightTexCoords.xy).r; break;
+
+    // if light is pointlight sample cubemap
+    if(u_lights[index].type == 2){
+        vec3 lightToFrag = fs_in.fragPos - u_lights[index].position.xyz;
+        switch(index){
+            case 0: shadowMapDepth = texture(u_lights[0].shadowMapCube, lightToFrag).r; break;
+            case 1: shadowMapDepth = texture(u_lights[1].shadowMapCube, lightToFrag).r; break;
+            case 2: shadowMapDepth = texture(u_lights[2].shadowMapCube, lightToFrag).r; break;
+            case 3: shadowMapDepth = texture(u_lights[3].shadowMapCube, lightToFrag).r; break;
+            case 4: shadowMapDepth = texture(u_lights[4].shadowMapCube, lightToFrag).r; break;
+        }
     }
-    
-    float bias = 0.005f;
+    else {
+        vec3 fragPosLightSpace = fs_in.fragPosLightSpace[index].xyz / fs_in.fragPosLightSpace[index].w;
+        vec3 fragPosLightTexCoords = fragPosLightSpace * 0.5 + 0.5;
+        switch(index){
+            case 0: shadowMapDepth = texture(u_lights[0].shadowMap, fragPosLightTexCoords.xy).r; break;
+            case 1: shadowMapDepth = texture(u_lights[1].shadowMap, fragPosLightTexCoords.xy).r; break;
+            case 2: shadowMapDepth = texture(u_lights[2].shadowMap, fragPosLightTexCoords.xy).r; break;
+            case 3: shadowMapDepth = texture(u_lights[3].shadowMap, fragPosLightTexCoords.xy).r; break;
+            case 4: shadowMapDepth = texture(u_lights[4].shadowMap, fragPosLightTexCoords.xy).r; break;
+        }
+    }
+    vec3 currentDist = fs_in.fragPos.xyz - u_lights[index].position.xyz;
+
+    // use squared distance instead of distance to avoid square root
+    // so we have a*a / farplane * farplane instead of sqrt(a*a) / farplane
+    float currentDepth = dot(currentDist, currentDist) / pow(u_lights[index].farPlane, 2);
+    float bias = 0.001f;
     // add some bias to the depth from the shadowmap texture
-    bool in_shadow = fragPosLightSpace.z > shadowMapDepth + bias ? true : false;
+    bool in_shadow = currentDepth > shadowMapDepth + bias ? true : false;
     
-    if(fragPosLightSpace.z > 1.0f) { // if outside the far plane => no shadow
+    if(currentDepth > 1) { // if outside the far plane => no shadow
         in_shadow = false;
     }
    
