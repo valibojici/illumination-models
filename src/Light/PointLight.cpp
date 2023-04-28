@@ -61,6 +61,7 @@ void PointLight::imGuiRender(Shader& shader)
 
 		if (ImGui::DragFloat3("Position", &m_position.x, 0.1f, -5.0f, 5.0f)) {
 			calculateLightSpaceMatrix();
+			m_shadowNeedsRender = true;
 		}
 		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 	}

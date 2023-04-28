@@ -183,6 +183,11 @@ void PhongTest::onRender()
     for (size_t i = 0, shadowTextureIndex = 0; i < m_lights.size(); ++i) {
         // if light has no shadows then pass
         if (!m_lights[i]->getShadow()) continue;
+        // if light doesnt need shadow update, then pass but increment shadowTextureIndex
+        if (!m_lights[i]->getShadowNeedsRender()) {
+            shadowTextureIndex++;
+            continue;
+        }
 
         // set far plane and light position for this light (used to write distance from light to fragment in texture)
         m_shadowShader.setVec3("u_lightPos", m_lights[i]->getPosition());
@@ -206,6 +211,7 @@ void PhongTest::onRender()
             renderSceneShadowPass();
         }
 
+        m_lights[i]->resetShadowNeedsRender();
         shadowTextureIndex++;
     }
 

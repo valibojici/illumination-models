@@ -18,6 +18,7 @@ void DirectionalLight::imGuiRender(Shader& shader)
 
 		if (ImGui::DragFloat3("Direction", &m_position.x, 0.1f, -5.0f, 5.0f)) {
 			calculateLightSpaceMatrix();
+			m_shadowNeedsRender = true;
 		}
 	}
 	ImGui::NewLine();
