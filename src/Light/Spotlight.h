@@ -48,6 +48,11 @@ public:
 	/// </summary>
 	void setUniforms(Shader& shader) override;
 
+	/// <summary>
+	/// Calculate the light space matrix using the member parameters
+	/// </summary>
+	void calculateLightSpaceMatrix() override;
+
 	float getCutoff() const { return m_cutOff; }
 	float getOuterCutoff() const { return m_outerCutOff; }
 	glm::vec3 getTarget() const { return m_target; }
