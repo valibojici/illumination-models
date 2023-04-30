@@ -105,8 +105,6 @@ PhongTest::PhongTest(Scene*& scene)
     
     // for every light that casts shadow create a depth buffer
     for (size_t i = 0; i < m_lights.size(); ++i) {
-        if (!m_lights[i]->getShadow())continue;
-        
         // create cube map for point light
         if (m_lights[i]->getType() == Light::Type::POINT) {
             unsigned int id = m_shadowFBO.addDepthAttachment(GL_TEXTURE_CUBE_MAP);
@@ -181,10 +179,9 @@ void PhongTest::onRender()
     };
 
     for (size_t i = 0, shadowTextureIndex = 0; i < m_lights.size(); ++i) {
-        // if light has no shadows then pass
-        if (!m_lights[i]->getShadow()) continue;
+        // if light has no shadows then pass or
         // if light doesnt need shadow update, then pass but increment shadowTextureIndex
-        if (!m_lights[i]->getShadowNeedsRender()) {
+        if (!m_lights[i]->getShadow() || !m_lights[i]->getShadowNeedsRender()){
             shadowTextureIndex++;
             continue;
         }
