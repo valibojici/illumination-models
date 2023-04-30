@@ -154,19 +154,19 @@ float D_Beckmann(float NH){
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     float a = exp((NH * NH - 1) / (NH * NH * alpha * alpha));
     float b = pow(alpha, 2) * pow(NH, 4);
-    return a / (PI * b);
+    return a / b;
 }
 // GGX distribution
 float D_GGX(float NH){
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     alpha = alpha * alpha;
-    return alpha * alpha / (PI * pow((pow(NH, 4) * (alpha * alpha - 1) + 1), 2));
+    return alpha * alpha / (pow((pow(NH, 4) * (alpha * alpha - 1) + 1), 2));
 }
 
 // phong distribution
 float D_Phong(float NH){
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     alpha = 2 / (alpha * alpha) - 2;
-    return (alpha + 2) / (2 * PI) * pow(NH, alpha);
+    return (alpha + 2) / 2 * pow(NH, alpha);
 }
 @endsection
