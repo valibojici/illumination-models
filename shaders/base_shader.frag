@@ -12,7 +12,7 @@
 
 void main()
 {
-    vec3 normal = fs_in.normal;
+    vec3 normal = normalize(fs_in.normal);
     // view direction: from fragment to viewer position
     vec3 viewDir = normalize(u_viewPos - fs_in.fragPos);
 
@@ -40,7 +40,7 @@ void main()
         }
         
         // calculate geometryTerm using light direction and the actual surface normal
-        float geometryTerm = max(0.0f, dot(fs_in.normal, lightDir));
+        float geometryTerm = max(0.0f, dot(normal, lightDir));
 
         // gamma correct the light color
         vec3 lightCol = u_gammaCorrect ? toLinear(u_lights[i].color) : u_lights[i].color;
