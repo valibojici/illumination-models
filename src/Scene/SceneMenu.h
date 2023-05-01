@@ -1,12 +1,8 @@
 #pragma once
 #include "Scene.h"
-#include "TriangleScene.h"
-#include "Simple3dScene.h"
-#include "MeshTestScene.h"
-#include "TextureTestScene.h"
 #include "ModelTestScene.h"
-#include "PhongTest.h"
-#include "FloorScene.h"
+#include "Box.h"
+#include "Floor.h"
 
 class SceneMenu : public Scene
 {

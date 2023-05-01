@@ -19,7 +19,7 @@ protected:
 	glm::vec3 m_ks = glm::vec3(0.5f);
 
 	// ambient coefficient
-	float m_ka = 0.001f;
+	float m_ka = 0.005f;
 
 	// ambient color
 	glm::vec3 m_ia = glm::vec3(1.0f, 0.0f, 0.0f);

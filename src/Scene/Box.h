@@ -20,13 +20,21 @@
 #include "Postprocess/PostprocessUI.h"
 #include "Postprocess/ScreenQuadRenderer.h"
 
-class PhongTest : public Scene
+class Box : public Scene
 {
 private:
+	struct MaterialMesh {
+		std::vector<std::unique_ptr<Material>> materials;
+		glm::mat4 modelMatrix;
+		std::unique_ptr<Mesh> mesh;
+		std::string name;
+	};
+
 	Framebuffer m_hdrFBO;
 	Framebuffer m_shadowFBO;
 	ScreenQuadRenderer m_screenQuadRenderer;
-	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getSphere(1.0f, 5));
+	std::vector<MaterialMesh> m_meshes;
+	std::vector<MaterialMesh> m_wallMeshes;
 
 	// mesh for floor, walls, ceiling
 	std::unique_ptr<Mesh> m_wall = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 4.0f));
@@ -56,7 +64,7 @@ private:
 	Shader m_postprocessShader;
 	Shader m_shadowShader;
 	
-	glm::mat4 m_modelMatrix = glm::translate(glm::vec3(0.0f, -1.0f, 0.0f));
+	std::vector<glm::mat4> m_modelMatrix;
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
 
@@ -65,8 +73,8 @@ private:
 	// enable/disable wireframes, for debug
 	bool m_wireframeEnabled = false;
 public:
-	PhongTest(Scene*& scene);
-	~PhongTest();
+	Box(Scene*& scene);
+	~Box();
 	void onRender() override;
 	void onRenderImGui() override;
 };

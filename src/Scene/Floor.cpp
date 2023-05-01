@@ -1,6 +1,6 @@
-#include "FloorScene.h"
+#include "Floor.h"
 
-FloorScene::FloorScene(Scene*& scene) : Scene(scene), m_fbo(1280, 720)
+Floor::Floor(Scene*& scene) : Scene(scene), m_fbo(1280, 720)
 {
     m_camera = Camera({ 0.0f, 1.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
@@ -53,19 +53,19 @@ FloorScene::FloorScene(Scene*& scene) : Scene(scene), m_fbo(1280, 720)
     // bind current shader
     m_shaders[m_modelIndex].bind();
 
-    m_fbo.addColorAttachament();
-    m_fbo.addDepthAttachment(false);
+    m_fbo.addColorAttachament(GL_TEXTURE_2D, GL_RGB);
+    m_fbo.addDepthAttachment(GL_TEXTURE_2D);
     m_fbo.create();
 }
 
-FloorScene::~FloorScene()
+Floor::~Floor()
 {
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     EventManager::getInstance().removeHandler(&m_camera);
 }
 
-void FloorScene::onRender()
+void Floor::onRender()
 {
     static double time = glfwGetTime();
     
@@ -108,7 +108,7 @@ void FloorScene::onRender()
     m_screenQuadRenderer.render(m_fbo.getColorAttachment(0), m_postprocessShader);
 }
 
-void FloorScene::onRenderImGui()
+void Floor::onRenderImGui()
 {
     // back button
     if (ImGui::Button("Back")) {
