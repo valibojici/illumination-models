@@ -87,7 +87,8 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     
     specular = specular * PI; // multiply with PI to denormalize
 
-    return mix(diffuse, specular, u_material.ratio); // the result depends on the diffuse/specular ratio
+    float ratio = u_hasMetallicTexture ? texture(u_MetallicTex, fs_in.texCoords).r : u_material.ratio;
+    return mix(diffuse, specular, ratio); // the result depends on the diffuse/specular ratio
 }
 
 // fresnel term
