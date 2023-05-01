@@ -75,18 +75,6 @@
     <ClCompile Include="src\Scene\SceneMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Simple3dScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\TriangleScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\TextureTestScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\MeshTestScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\ModelTestScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,9 +82,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TextureManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\PhongTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Materials\PhongMaterial.cpp">
@@ -117,9 +102,6 @@
     <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\FloorScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Materials\CookTorranceMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -127,6 +109,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Postprocess\PostprocessUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Floor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\FloorScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -176,18 +167,6 @@
     <ClInclude Include="src\Scene\SceneMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Simple3dScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\TriangleScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\TextureTestScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\MeshTestScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scene\ModelTestScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -195,9 +174,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\TextureManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\PhongTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Materials\Material.h">
@@ -221,9 +197,6 @@
     <ClInclude Include="src\Materials\BlinnMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\FloorScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Materials\CookTorranceMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -236,14 +209,17 @@
     <ClInclude Include="src\Postprocess\ScreenQuadRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\Box.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Floor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\FloorScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shader.frag" />
-    <None Include="shaders\shader.vert" />
-    <None Include="shaders\simpleLighting.frag" />
-    <None Include="shaders\simpleLighting.vert" />
-    <None Include="shaders\texture.frag" />
-    <None Include="shaders\texture.vert" />
     <None Include="shaders\phong.frag" />
     <None Include="shaders\blinn.frag" />
     <None Include="shaders\cook-torrance.frag" />
