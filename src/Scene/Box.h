@@ -19,6 +19,7 @@
 #include "Framebuffer.h"
 #include "Postprocess/PostprocessUI.h"
 #include "Postprocess/ScreenQuadRenderer.h"
+#include "Model.h"
 
 class Box : public Scene
 {
@@ -29,6 +30,8 @@ private:
 		std::unique_ptr<Mesh> mesh;
 		std::string name;
 	};
+
+	Model m_model;
 
 	Framebuffer m_hdrFBO;
 	Framebuffer m_shadowFBO;
