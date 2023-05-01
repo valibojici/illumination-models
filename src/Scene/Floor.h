@@ -12,6 +12,7 @@
 #include "Mesh.h"
 #include "Materials/PhongMaterial.h"
 #include "Materials/BlinnMaterial.h"
+#include "Materials/CookTorranceMaterial.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
@@ -19,7 +20,7 @@
 #include "Framebuffer.h"
 #include "Postprocess/PostprocessUI.h"
 
-class FloorScene : public Scene
+class Floor : public Scene
 {
 private:
 	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getPlane(12.0f, 12.0f));
@@ -47,8 +48,8 @@ private:
 	// enable/disable wireframes, for debug
 	bool m_wireframeEnabled = false;
 public:
-	FloorScene(Scene*& scene);
-	~FloorScene();
+	Floor(Scene*& scene);
+	~Floor();
 	void onRender() override;
 	void onRenderImGui() override;
 };

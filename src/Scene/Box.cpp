@@ -1,6 +1,6 @@
-#include "PhongTest.h"
+#include "Box.h"
 
-PhongTest::PhongTest(Scene*& scene)
+Box::Box(Scene*& scene)
     : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(2000, 2000)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
@@ -23,7 +23,6 @@ PhongTest::PhongTest(Scene*& scene)
 
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_postprocessShader });
     m_postProcessUI.setUniforms();
-
     // setting uniforms
     // TODO: get screen size from config class?
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f);
@@ -37,61 +36,79 @@ PhongTest::PhongTest(Scene*& scene)
         }
     }
 
-    // set up materials
-    for (int model = 0; model < 3; ++model) {
-        // walls
-        std::vector<std::unique_ptr<Material>> wallMaterials;
-        for (size_t i = 0; i < m_transforms.size(); ++i) {
-            std::unique_ptr<Material> wallMaterial;
-            switch (model)
-            {
-            case 0:
-                wallMaterial = std::make_unique<PhongMaterial>();
-                break;
-            case 1:
-                wallMaterial = std::make_unique<BlinnMaterial>();
-                break;
-            case 2:
-                wallMaterial = std::make_unique<CookTorranceMaterial>();
-                break;
-            }
-
+    // setup meshes
+    std::vector<glm::mat4> wall_transforms{
+        glm::translate(glm::vec3(-2.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+        glm::translate(glm::vec3(0.0f, 0.0f, -2.0f)),
+        glm::translate(glm::vec3(2.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+        glm::translate(glm::vec3(0.0f, 2.0f, 0.0f)) * glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
+        glm::translate(glm::vec3(0.0f, -2.0f, 0.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
+    };
+    for (size_t i = 0; i < wall_transforms.size(); ++i) {
+        MaterialMesh m;
+        m.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+        m.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+        m.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+        for (auto& material : m.materials) {
+            material->disableHighlights();
             switch (i)
             {
             case 0: // left wall - red
-                wallMaterial->setColor({ 0.92f, 0.25f, 0.20f });
-                wallMaterial->setAmbient({ 0.92f, 0.25f, 0.20f });
+                material->setColor({ 0.92f, 0.25f, 0.20f });
+                material->setAmbient({ 0.92f, 0.25f, 0.20f });
                 break;
             case 2: // right wall - blue
-                wallMaterial->setColor({ 0.2, 0.51, 0.92 });
-                wallMaterial->setAmbient({ 0.2, 0.51, 0.92 });
+                material->setColor({ 0.2, 0.51, 0.92 });
+                material->setAmbient({ 0.2, 0.51, 0.92 });
                 break;
             default:
-                wallMaterial->setColor({ 0.8f, 0.8f, 0.8f });
-                wallMaterial->setAmbient({ 0.8f, 0.8f, 0.8f });
+                material->setColor({ 0.8f, 0.8f, 0.8f });
+                material->setAmbient({ 0.8f, 0.8f, 0.8f });
             }
-            // disable specular highlights for walls
-            wallMaterial->disableHighlights();
-            wallMaterials.push_back(std::move(wallMaterial));
         }
-        m_wallMaterials.push_back(std::move(wallMaterials));
-
-        // main mesh
-        std::unique_ptr<Material> material;
-        switch (model)
-        {
-        case 0:
-            material = std::make_unique<PhongMaterial>();
-            break;
-        case 1:
-            material = std::make_unique<BlinnMaterial>();
-            break;
-        case 2:
-            material = std::make_unique<CookTorranceMaterial>();
-            break;
-        }
-        m_materials.push_back(std::move(material));
+        m.modelMatrix = wall_transforms[i];
+        m.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 4.0f));
+        m_wallMeshes.push_back(std::move(m));
     }
+
+    MaterialMesh sphere;
+    sphere.modelMatrix = glm::translate(glm::vec3(0.75f, -1.25f, 0.75f));
+    sphere.mesh = std::unique_ptr<Mesh>(Mesh::getSphere(0.75f, 5));
+    sphere.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+    sphere.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    sphere.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    for (auto& material : sphere.materials) {
+        material->setColor({ 1.0f, 0.0f, 0.0f });
+        material->setAmbient({ 1.0f, 0.0f, 0.0f });
+    }
+    sphere.name = "Sphere";
+    m_meshes.push_back(std::move(sphere));
+
+    MaterialMesh cone;
+    cone.modelMatrix = glm::translate(glm::vec3(-0.75f, -0.5f, -0.75f));
+    cone.mesh = std::unique_ptr<Mesh>(Mesh::getCone(0.75, 2.0f, 60));
+    cone.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+    cone.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    cone.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    for (auto& material : cone.materials) {
+        material->setColor({ 0.0f, 1.0f, 0.0f });
+        material->setAmbient({ 0.0f, 1.0f, 0.0f });
+    }
+    cone.name = "Cone";
+    m_meshes.push_back(std::move(cone));
+
+    MaterialMesh cube;
+    cube.modelMatrix = glm::translate(glm::vec3(-0.75f, -1.25f, -0.75f)) * glm::rotate(glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    cube.mesh = std::unique_ptr<Mesh>(Mesh::getCube(1.5f, 1.5f, 1.5f));
+    cube.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+    cube.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    cube.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    for (auto& material : cube.materials) {
+        material->setColor({ 1.0f, 1.0f, 0.0f });
+        material->setAmbient({ 1.0f, 1.0f, 0.0f });
+    }
+    cube.name = "Cube";
+    m_meshes.push_back(std::move(cube));
 
     // set up HDR framebuffer
     m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
@@ -135,14 +152,14 @@ PhongTest::PhongTest(Scene*& scene)
     m_lights[2]->setViewProjectionParameters(vpParameters_spotlight);
 }
 
-PhongTest::~PhongTest()
+Box::~Box()
 {
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     EventManager::getInstance().removeHandler(&m_camera);
 }
 
-void PhongTest::onRender()
+void Box::onRender()
 {
     static double time = glfwGetTime();
     // update camera position and uniforms
@@ -167,14 +184,16 @@ void PhongTest::onRender()
     auto renderSceneShadowPass = [this]() {
         // draw mesh
         glCullFace(GL_BACK);
-        m_shadowShader.setMat4("u_modelMatrix", m_modelMatrix);
-        m_mesh->draw(m_shadowShader);
+        for (const auto& mesh : m_meshes) {
+            m_shadowShader.setMat4("u_modelMatrix", mesh.modelMatrix);
+            mesh.mesh->draw(m_shadowShader);
+        }
 
         glCullFace(GL_BACK);
         // draw box
-        for (size_t j = 0; j < m_transforms.size(); ++j) {
-            m_shadowShader.setMat4("u_modelMatrix", m_transforms[j]);
-            m_wall->draw(m_shadowShader);
+        for (const auto& wall : m_wallMeshes) {
+            m_shadowShader.setMat4("u_modelMatrix", wall.modelMatrix);
+            wall.mesh->draw(m_shadowShader);
         }
     };
 
@@ -235,17 +254,18 @@ void PhongTest::onRender()
     }
 
     // draw box
-    for (size_t i = 0; i < m_transforms.size(); ++i) {
-        m_wallMaterials[m_modelIndex][i]->setUniforms(m_shaders[m_modelIndex]);
-        m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_transforms[i]);
-        m_wall->draw(m_shaders[m_modelIndex]);
+    for (const auto& wall : m_wallMeshes) {
+        wall.materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
+        m_shaders[m_modelIndex].setMat4("u_modelMatrix", wall.modelMatrix);
+        wall.mesh->draw(m_shaders[m_modelIndex]);
     }
 
-    // draw mesh
-    m_shaders[m_modelIndex].bind();
-    m_materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
-    m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_modelMatrix);
-    m_mesh->draw(m_shaders[m_modelIndex]);
+    // draw meshes
+    for (const auto& mesh : m_meshes) {
+        mesh.materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
+        m_shaders[m_modelIndex].setMat4("u_modelMatrix", mesh.modelMatrix);
+        mesh.mesh->draw(m_shaders[m_modelIndex]);
+    }
 
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -257,7 +277,7 @@ void PhongTest::onRender()
     m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
 }
 
-void PhongTest::onRenderImGui()
+void Box::onRenderImGui()
 {
     // back button
     if (ImGui::Button("Back")) {
@@ -277,12 +297,14 @@ void PhongTest::onRenderImGui()
     }
     ImGui::NewLine();
 
-    // render UI for material
-    ImGui::PushID(this);
-    if (ImGui::CollapsingHeader("Material settings")) {
-        m_materials[m_modelIndex]->imGuiRender(m_shaders[m_modelIndex]);
+    // render UI for materials
+    for (auto& mesh : m_meshes) {
+        ImGui::PushID(mesh.materials[m_modelIndex].get());
+        if (ImGui::CollapsingHeader(mesh.name.c_str())) {
+            mesh.materials[m_modelIndex]->imGuiRender(m_shaders[m_modelIndex]);
+        }
+        ImGui::PopID();
     }
-    ImGui::PopID();
 
     // button to reset camera position and orientation
     if (ImGui::Button("Reset camera")) {
