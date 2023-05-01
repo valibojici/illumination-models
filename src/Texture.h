@@ -2,6 +2,8 @@
 #include <string>
 #include "stb_image.h"
 #include "GL/glew.h"
+#include <stdexcept>
+#include <sstream>
 
 class Texture
 {
@@ -12,6 +14,7 @@ public:
 		SPECULAR,
 		NORMAL,
 		ROUGHNESS,
+		METALLIC,
 	};
 
 	Texture() = default;
