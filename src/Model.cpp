@@ -70,7 +70,7 @@ std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 
 
 	// 1 material has all textures used
-	const unsigned int TYPE_COUNT = 3;
+	const unsigned int TYPE_COUNT = 5;
 	struct {
 		aiTextureType assimpType;
 		Texture::Type type;
@@ -78,6 +78,8 @@ std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 		{aiTextureType_DIFFUSE, Texture::Type::DIFFUSE},
 		{aiTextureType_SPECULAR, Texture::Type::SPECULAR},
 		{aiTextureType_NORMALS, Texture::Type::NORMAL},
+		{aiTextureType_METALNESS, Texture::Type::METALLIC},
+		{aiTextureType_DIFFUSE_ROUGHNESS, Texture::Type::ROUGHNESS }
 	};
 
 	// iterate through all texture types used
@@ -97,6 +99,30 @@ std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 		}
 
 	}
+	// if no textures are loaded assume we have to load manually
+	if (textures.size() == 0) {
+		for (unsigned int i = 0; i < TYPE_COUNT; ++i) {
+			std::string file;
+			switch (texTypes[i].assimpType)
+			{
+				/*case aiTextureType_DIFFUSE: file = "diffuse.png"; break;
+				case aiTextureType_SPECULAR: file = "specular.png"; break;*/
+				case aiTextureType_NORMALS: file = "normal.png"; break;
+				/*case aiTextureType_METALNESS: file = "metallic.png"; break;
+				case aiTextureType_DIFFUSE_ROUGHNESS: file = "roughness.png"; break;*/
+			}
+
+			// load texture with textureManager (handles caching)
+			try {
+				textures.push_back(
+					TextureManager::get().getTexture(assetDirectory + file.c_str(), texTypes[i].type)
+				);
+			}
+			catch (std::exception& e) {
+				printf("[ERROR] %s\n", e.what());
+			}
+		}
+	}
 	return std::make_shared<Mesh>(vertices, indices, textures);
 }
 
@@ -108,7 +134,7 @@ void Model::load(const std::string& path)
 		aiProcess_Triangulate |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_GenNormals |
-		aiProcess_CalcTangentSpace | 
+		aiProcess_CalcTangentSpace |
 		aiProcess_FlipUVs
 	);
 
