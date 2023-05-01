@@ -2,39 +2,19 @@
 
 void SceneMenu::onRenderImGui()
 {
-	if (ImGui::Button("Test scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new TriangleScene(m_currentScene);
-		delete temp;
-	}
-	if (ImGui::Button("Simple 3D scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new Simple3dScene(m_currentScene);
-		delete temp;
-	}
-	if (ImGui::Button("Mesh test scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new MeshTestScene(m_currentScene);
-		delete temp;
-	}
-	if (ImGui::Button("Texture test scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new TextureTestScene(m_currentScene);
-		delete temp;
-	}
 	if (ImGui::Button("Model test scene")) {
 		Scene* temp = m_currentScene;
 		m_currentScene = new ModelTestScene(m_currentScene);
 		delete temp;
 	}
-	if (ImGui::Button("Phong test scene")) {
+	if (ImGui::Button("Floor scene")) {
 		Scene* temp = m_currentScene;
-		m_currentScene = new PhongTest(m_currentScene);
+		m_currentScene = new Floor(m_currentScene);
 		delete temp;
 	}
-	if (ImGui::Button("Floor test scene")) {
+	if (ImGui::Button("Box room scene")) {
 		Scene* temp = m_currentScene;
-		m_currentScene = new FloorScene(m_currentScene);
+		m_currentScene = new Box(m_currentScene);
 		delete temp;
 	}
 }
