@@ -19,6 +19,7 @@
 #include "Framebuffer.h"
 #include "Postprocess/PostprocessUI.h"
 #include "Postprocess/ScreenQuadRenderer.h"
+#include "Model.h"
 
 class Box : public Scene
 {

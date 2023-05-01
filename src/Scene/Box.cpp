@@ -1,7 +1,7 @@
 #include "Box.h"
 
 Box::Box(Scene*& scene)
-    : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(2000, 2000)
+    : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(4096, 4096)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
@@ -174,7 +174,7 @@ void Box::onRender()
     ******************/
 
     // setup viewport and framebuffer
-    glViewport(0, 0, 2000, 2000);
+    glViewport(0, 0, 4096, 4096);
     m_shadowFBO.bind();
     // enable depth testing and face culling
     glEnable(GL_CULL_FACE);

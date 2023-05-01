@@ -36,8 +36,9 @@ void Texture::loadFromFile(const std::string& filepath, bool flipY)
 	// check if image is loaded
 	if (!data)
 	{
-		printf("Failed to load %s", filepath.c_str());
-		exit(0);
+		std::stringstream ss;
+		ss << "Failed to load file " << filepath.c_str();
+		throw std::runtime_error(ss.str().c_str());
 	}
 
 	if (m_id == 0) {
@@ -59,6 +60,7 @@ void Texture::loadFromFile(const std::string& filepath, bool flipY)
 	case 4:
 		format = GL_RGBA;
 		internalFormat = m_type == Type::DIFFUSE ? GL_SRGB_ALPHA : GL_RGBA;
+		break;
 	default:
 		format = internalFormat = GL_RED;
 	}
