@@ -117,9 +117,6 @@
     <ClCompile Include="src\Scene\Floor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\FloorScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h">
@@ -213,9 +210,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Floor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\FloorScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
