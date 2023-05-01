@@ -60,6 +60,7 @@ void Texture::loadFromFile(const std::string& filepath, bool flipY)
 	case 4:
 		format = GL_RGBA;
 		internalFormat = m_type == Type::DIFFUSE ? GL_SRGB_ALPHA : GL_RGBA;
+		break;
 	default:
 		format = internalFormat = GL_RED;
 	}
