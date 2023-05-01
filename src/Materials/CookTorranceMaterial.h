@@ -30,7 +30,7 @@ private:
 	// ambient color
 	glm::vec3 m_ia = glm::vec3(1.0f, 0.0f, 0.0f);
 	// ambient coefficient
-	float m_ka = 0.001f;
+	float m_ka = 0.005f;
 public:
 	/// <summary>
 	/// Renders UI and does NOT set uniforms on value change
