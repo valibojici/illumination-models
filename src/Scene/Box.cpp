@@ -1,7 +1,7 @@
 #include "Box.h"
 
 Box::Box(Scene*& scene)
-    : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(2000, 2000)
+    : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(4096, 4096)
 {
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
@@ -150,8 +150,6 @@ Box::Box(Scene*& scene)
     m_lights[0]->setViewProjectionParameters(vpParameters_point);
     m_lights[1]->setViewProjectionParameters(vpParameters_directional);
     m_lights[2]->setViewProjectionParameters(vpParameters_spotlight);
-
-    m_model.load("models/cottage/Cottage_FREE.3DS");
 }
 
 Box::~Box()
@@ -176,7 +174,7 @@ void Box::onRender()
     ******************/
 
     // setup viewport and framebuffer
-    glViewport(0, 0, 2000, 2000);
+    glViewport(0, 0, 4096, 4096);
     m_shadowFBO.bind();
     // enable depth testing and face culling
     glEnable(GL_CULL_FACE);
@@ -185,21 +183,18 @@ void Box::onRender()
 
     auto renderSceneShadowPass = [this]() {
         // draw mesh
-        //glCullFace(GL_BACK);
-        //for (const auto& mesh : m_meshes) {
-        //    m_shadowShader.setMat4("u_modelMatrix", mesh.modelMatrix);
-        //    mesh.mesh->draw(m_shadowShader);
-        //}
+        glCullFace(GL_BACK);
+        for (const auto& mesh : m_meshes) {
+            m_shadowShader.setMat4("u_modelMatrix", mesh.modelMatrix);
+            mesh.mesh->draw(m_shadowShader);
+        }
 
-        //glCullFace(GL_BACK);
-        //// draw box
-        //for (const auto& wall : m_wallMeshes) {
-        //    m_shadowShader.setMat4("u_modelMatrix", wall.modelMatrix);
-        //    wall.mesh->draw(m_shadowShader);
-        //}
-
-        m_shadowShader.setMat4("u_modelMatrix", glm::scale(glm::vec3(0.001f)));
-        m_model.draw(m_shadowShader);
+        glCullFace(GL_BACK);
+        // draw box
+        for (const auto& wall : m_wallMeshes) {
+            m_shadowShader.setMat4("u_modelMatrix", wall.modelMatrix);
+            wall.mesh->draw(m_shadowShader);
+        }
     };
 
     for (size_t i = 0, shadowTextureIndex = 0; i < m_lights.size(); ++i) {
@@ -266,14 +261,11 @@ void Box::onRender()
     }
 
     // draw meshes
-    /*for (const auto& mesh : m_meshes) {
+    for (const auto& mesh : m_meshes) {
         mesh.materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
         m_shaders[m_modelIndex].setMat4("u_modelMatrix", mesh.modelMatrix);
         mesh.mesh->draw(m_shaders[m_modelIndex]);
-    }*/
-
-    m_shaders[m_modelIndex].setMat4("u_modelMatrix", glm::scale(glm::vec3(0.001f)));
-    m_model.draw(m_shaders[m_modelIndex]);
+    }
 
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

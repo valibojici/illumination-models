@@ -31,8 +31,6 @@ private:
 		std::string name;
 	};
 
-	Model m_model;
-
 	Framebuffer m_hdrFBO;
 	Framebuffer m_shadowFBO;
 	ScreenQuadRenderer m_screenQuadRenderer;
