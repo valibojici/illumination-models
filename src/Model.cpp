@@ -105,11 +105,11 @@ std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 			std::string file;
 			switch (texTypes[i].assimpType)
 			{
-				/*case aiTextureType_DIFFUSE: file = "diffuse.png"; break;
-				case aiTextureType_SPECULAR: file = "specular.png"; break;*/
+				case aiTextureType_DIFFUSE: file = "diffuse.png"; break;
+				case aiTextureType_SPECULAR: file = "specular.png"; break;
 				case aiTextureType_NORMALS: file = "normal.png"; break;
-				/*case aiTextureType_METALNESS: file = "metallic.png"; break;
-				case aiTextureType_DIFFUSE_ROUGHNESS: file = "roughness.png"; break;*/
+				case aiTextureType_METALNESS: file = "metallic.png"; break;
+				case aiTextureType_DIFFUSE_ROUGHNESS: file = "roughness.png"; break;
 			}
 
 			// load texture with textureManager (handles caching)
