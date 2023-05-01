@@ -39,6 +39,7 @@ void Mesh::draw(Shader &shader)
 	shader.setBool("u_hasSpecTexture", false);
 	shader.setBool("u_hasNormTexture", false);
 	shader.setBool("u_hasRoughTexture", false);
+	shader.setBool("u_hasMetallicTexture", false);
 
 	for (unsigned int i = 0; i < m_textures.size(); ++i) {
 		// bind this texture
@@ -62,7 +63,12 @@ void Mesh::draw(Shader &shader)
 			shader.setInt("u_RoughTex", i);
 			shader.setBool("u_hasRoughTexture", true);
 			break;
+		case Texture::Type::METALLIC:
+			shader.setInt("u_MetallicTex", i);
+			shader.setBool("u_hasMetallicTexture", true);
+			break;
 		}
+
 	}
 	m_vao->bind();
 	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
@@ -71,6 +77,7 @@ void Mesh::draw(Shader &shader)
 	shader.setBool("u_hasSpecTexture", false);
 	shader.setBool("u_hasNormTexture", false);
 	shader.setBool("u_hasRoughTexture", false);
+	shader.setBool("u_hasMetallicTexture", false);
 }
 
 Mesh *Mesh::getCube(float width, float height, float depth)
