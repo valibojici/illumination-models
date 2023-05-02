@@ -289,7 +289,7 @@ void Box::onRenderImGui()
 
     // render UI for every light
     for (auto &light : m_lights) {
-        light->imGuiRender(m_shaders[m_modelIndex]);
+        light->imGuiRender();
     }
 
     if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0")) {
