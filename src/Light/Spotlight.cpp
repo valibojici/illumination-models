@@ -10,14 +10,14 @@ Spotlight::Spotlight(int index, const glm::vec3& position, const glm::vec3& targ
 	m_target = target;
 }
 
-void Spotlight::imGuiRender(Shader& shader)
+void Spotlight::imGuiRender()
 {
 	ImGui::PushID(this);
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.2f, 0.2f, 1.0f)); // Set header color
 	
 	if (ImGui::CollapsingHeader(m_name.c_str())) {
 
-		Light::imGuiRender(shader);
+		Light::imGuiRender();
 
 		if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
 			calculateLightSpaceMatrix();

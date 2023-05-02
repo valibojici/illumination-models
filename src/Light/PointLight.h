@@ -24,7 +24,7 @@ public:
 	/// <summary>
 	/// Draw UI in ImGui
 	/// </summary>
-	void imGuiRender(Shader& shader) override;
+	void imGuiRender() override;
 
 	/// <summary>
 	/// Sets all uniforms for this light (at m_index)

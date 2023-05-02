@@ -41,7 +41,7 @@ public:
 	/// <summary>
 	/// Draw UI in ImGui, sets uniforms on value change.
 	/// </summary>
-	void imGuiRender(Shader& shader) override;
+	void imGuiRender() override;
 
 	/// <summary>
 	/// Sets all uniforms for this light (at m_index)
