@@ -51,15 +51,15 @@ void PointLight::calculateLightSpaceMatrix()
 	}
 }
 
-void PointLight::imGuiRender(Shader& shader)
+void PointLight::imGuiRender()
 {
 	ImGui::PushID(this);
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.2f, 0.2f, 1.0f)); // Set header color
 	if (ImGui::CollapsingHeader(m_name.c_str())) {
 
-		Light::imGuiRender(shader);
+		Light::imGuiRender();
 
-		if (ImGui::DragFloat3("Position", &m_position.x, 0.1f, -5.0f, 5.0f)) {
+		if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
 		}

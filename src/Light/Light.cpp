@@ -36,7 +36,7 @@ void Light::draw(Shader& shader)
 	shader.setVec3("u_emission", glm::vec3(0.0f));
 }
 
-void Light::imGuiRender(Shader& shader)
+void Light::imGuiRender()
 {
 	ImGui::Checkbox("Draw light", &m_draw);
 	ImGui::SameLine();

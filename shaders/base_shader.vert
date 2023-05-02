@@ -39,6 +39,8 @@ struct Light{
 };
 
 uniform Light u_lights[MAX_LIGHTS]; 
+uniform float u_textureScaleX = 1.0f;
+uniform float u_textureScaleY = 1.0f;
 
 void main()
 {
@@ -52,7 +54,7 @@ void main()
     vs_out.TBN = TBN;
     vs_out.normal = normal;
     vs_out.fragPos = vec3(u_modelMatrix * vec4(in_Position, 1.0f));
-    vs_out.texCoords = in_TexCoords;
+    vs_out.texCoords = vec2(u_textureScaleX, u_textureScaleY) * in_TexCoords;
 
     for(int i=0;i<MAX_LIGHTS;++i){
         if(u_lights[i].shadow){

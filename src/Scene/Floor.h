@@ -23,13 +23,25 @@
 class Floor : public Scene
 {
 private:
-	std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getPlane(12.0f, 12.0f));
+	struct MaterialMesh {
+		std::vector<std::unique_ptr<Material>> materials;
+		glm::mat4 modelMatrix;
+		std::unique_ptr<Mesh> mesh;
+		std::string name;
+		float textureScaleX = 1.0f;
+		float textureScaleY = 1.0f;
+		int modelIndex = 0;
+	};
 
-	// which lighting model is used
-	int m_modelIndex = 0;
+	// framebuffer to use lighting with hdr
+	Framebuffer m_hdrFBO;
 
-	// material for each model for main mesh
-	std::vector<std::unique_ptr<Material>> m_materials;
+	// helper to render texture to screen
+	ScreenQuadRenderer m_screenQuadRenderer;
+
+
+	std::vector<MaterialMesh> m_meshes;
+	//std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getPlane(12.0f, 12.0f));
 
 	// all lights in the scene
 	std::vector<std::unique_ptr<Light> > m_lights;
@@ -37,12 +49,11 @@ private:
 	Camera m_camera;
 	std::vector<Shader> m_shaders;
 	Shader m_postprocessShader;
-	Framebuffer m_fbo;
-	ScreenQuadRenderer m_screenQuadRenderer;
-	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
+
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);
-	
+
+	// helper for post processing UI
 	PostprocessUI m_postProcessUI;
 
 	// enable/disable wireframes, for debug

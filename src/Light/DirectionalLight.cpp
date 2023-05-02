@@ -9,14 +9,14 @@ DirectionalLight::DirectionalLight(int index, const glm::vec3& direction) : Ligh
 	m_position = direction;
 }
 
-void DirectionalLight::imGuiRender(Shader& shader)
+void DirectionalLight::imGuiRender()
 {
 	ImGui::PushID(this);
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.2f, 0.2f, 1.0f)); // Set header color
 	if (ImGui::CollapsingHeader(m_name.c_str())) {
-		Light::imGuiRender(shader);
+		Light::imGuiRender();
 
-		if (ImGui::DragFloat3("Direction", &m_position.x, 0.1f, -5.0f, 5.0f)) {
+		if (ImGui::DragFloat3("Direction", &m_position.x, 0.01f)) {
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
 		}

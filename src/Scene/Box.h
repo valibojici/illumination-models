@@ -52,11 +52,6 @@ private:
 	// which lighting model is used
 	int m_modelIndex = 0;
 
-	// materials for each model for each wall (color, diffuse, etc)
-	std::vector<std::vector<std::unique_ptr<Material>>> m_wallMaterials;
-	// material for each model for main mesh
-	std::vector<std::unique_ptr<Material>> m_materials;
-
 	// all lights in the scene
 	std::vector<std::unique_ptr<Light> > m_lights;
 

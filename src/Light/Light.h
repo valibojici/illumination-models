@@ -166,7 +166,7 @@ public:
 	/// Draws the GUI in ImGui for: [draw light] [enabled] [color] [intensity]
 	/// Other options are in derived classes
 	/// </summary>
-	virtual void imGuiRender(Shader& shader);
+	virtual void imGuiRender();
 
 
 	/// <summary>

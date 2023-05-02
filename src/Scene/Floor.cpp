@@ -1,6 +1,6 @@
 #include "Floor.h"
 
-Floor::Floor(Scene*& scene) : Scene(scene), m_fbo(1280, 720)
+Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
 {
     m_camera = Camera({ 0.0f, 1.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
@@ -10,7 +10,10 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_fbo(1280, 720)
 
     m_lights.push_back(std::move(std::make_unique<PointLight>(0, glm::vec3(-5.0f, 1.0f, 0.0f))));
     m_lights.push_back(std::move(std::make_unique<PointLight>(1, glm::vec3(0.0f, 1.0f, 0.0f))));
-    m_lights.push_back(std::move(std::make_unique<PointLight>(2, glm::vec3(5.0f, 1.0f, 0.0f))));
+
+    m_lights.push_back(std::move(std::make_unique<PointLight>(2, glm::vec3(-5.0f, 1.0f, 10.0f))));
+    m_lights.push_back(std::move(std::make_unique<PointLight>(3, glm::vec3(0.0f, 1.0f, 10.0f))));
+    m_lights.push_back(std::move(std::make_unique<PointLight>(4, glm::vec3(5.0f, 1.0f, 10.0f))));
 
     // load shaders
     m_shaders.resize(3);
@@ -27,35 +30,65 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_fbo(1280, 720)
     for (auto& shader : m_shaders) {
         shader.bind();
         shader.setMat4("u_projMatrix", m_projMatrix);
-        shader.setInt("u_numLights", 3);
+        shader.setInt("u_numLights", m_lights.size());
         for (auto& light : m_lights) {
             light->setUniforms(shader);
         }
     }
     
+    MaterialMesh floor;
+    floor.modelMatrix = glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    floor.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 8.0f));
+    floor.mesh->setTextures({ 
+        TextureManager::get().getTexture("textures/metal_floor/diffuse.png", Texture::Type::DIFFUSE),
+        TextureManager::get().getTexture("textures/metal_floor/normal.png", Texture::Type::NORMAL),
+        TextureManager::get().getTexture("textures/metal_floor/roughness.png", Texture::Type::ROUGHNESS),
+        TextureManager::get().getTexture("textures/metal_floor/metallic.png", Texture::Type::METALLIC),
+    });
+    floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+    floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    floor.name = "Metal floor";
+    floor.textureScaleX = 2.0f;
+    floor.textureScaleY = 2.0f * 8.0f / 4.0f;
+    m_meshes.push_back(std::move(floor));
 
-    // set up materials
-    m_materials.push_back(std::move(std::make_unique<PhongMaterial>()));
-    m_materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
-    m_materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    floor = MaterialMesh();
+    floor.modelMatrix = glm::translate(glm::vec3(-5.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    floor.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 8.0f));
+    floor.mesh->setTextures({
+        TextureManager::get().getTexture("textures/wood_floor/diffuse.png", Texture::Type::DIFFUSE),
+        TextureManager::get().getTexture("textures/wood_floor/normal.png", Texture::Type::NORMAL),
+        TextureManager::get().getTexture("textures/wood_floor/roughness.png", Texture::Type::ROUGHNESS),
+    });
+    floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+    floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    floor.name = "Wood floor";
+    floor.textureScaleX = 2.0f;
+    floor.textureScaleY = 2.0f * 8.0f / 4.0f;
+    m_meshes.push_back(std::move(floor));
 
-    //set up textures
-    std::vector<std::shared_ptr<Texture>> textures = {
-        TextureManager::get().getTexture("textures/floor.png", Texture::Type::DIFFUSE),
-        TextureManager::get().getTexture("textures/floor_normal.png", Texture::Type::NORMAL),
-        TextureManager::get().getTexture("textures/floor_specular.png", Texture::Type::SPECULAR),
-        TextureManager::get().getTexture("textures/floor_roughness.png", Texture::Type::ROUGHNESS),
-    };
-    m_mesh->setTextures(textures);
+    for (int i = -1; i <= 1; ++i) {
+        floor = MaterialMesh();
+        floor.modelMatrix = glm::translate(glm::vec3(-5.0f * i, 0.0f, 10.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        floor.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 8.0f));
+        floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+        floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+        floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+        for (auto& material : floor.materials) {
+            material->setColor({ 0.5f, 0.5f, 0.5f });
+            material->setAmbient({ 0.5f, 0.5f, 0.5f });
+        }
+        floor.name = std::string("Floor ") + std::to_string(i + 1);
+        floor.textureScaleX = 2.0f;
+        floor.textureScaleY = 2.0f * 8.0f / 4.0f;
+        m_meshes.push_back(std::move(floor));
+    }
 
-    m_modelMatrix = glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    // bind current shader
-    m_shaders[m_modelIndex].bind();
-
-    m_fbo.addColorAttachament(GL_TEXTURE_2D, GL_RGB);
-    m_fbo.addDepthAttachment(GL_TEXTURE_2D);
-    m_fbo.create();
+    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB16F);
+    m_hdrFBO.addDepthAttachment(GL_TEXTURE_2D);
+    m_hdrFBO.create();
 }
 
 Floor::~Floor()
@@ -69,7 +102,7 @@ void Floor::onRender()
 {
     static double time = glfwGetTime();
     
-    m_fbo.bind();
+    m_hdrFBO.bind();
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -78,9 +111,10 @@ void Floor::onRender()
     // update camera position and uniforms
     m_camera.update(glfwGetTime() - time);
     time = glfwGetTime();
-    m_shaders[m_modelIndex].bind();
-    m_shaders[m_modelIndex].setMat4("u_viewMatrix", m_camera.getMatrix());
-    m_shaders[m_modelIndex].setVec3("u_viewPos", m_camera.getPosition());
+    for (auto& shader : m_shaders) {
+        shader.setMat4("u_viewMatrix", m_camera.getMatrix());
+        shader.setVec3("u_viewPos", m_camera.getPosition());
+    }
 
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
@@ -88,24 +122,32 @@ void Floor::onRender()
 
     // lights
     for (auto& light : m_lights) {
-        light->setUniforms(m_shaders[m_modelIndex]);
-        light->draw(m_shaders[m_modelIndex]);
+        light->draw(m_shaders[0]);
+        for (auto& shader : m_shaders) {
+            light->setUniforms(shader);
+        }
     }
 
     // draw mesh
-    m_materials[m_modelIndex]->setUniforms(m_shaders[m_modelIndex]);
-    m_shaders[m_modelIndex].setMat4("u_modelMatrix", m_modelMatrix);
-    m_mesh->draw(m_shaders[m_modelIndex]);
+    for (auto& mesh : m_meshes) {
+        Shader& shader = m_shaders[mesh.modelIndex];
+        mesh.materials[mesh.modelIndex]->setUniforms(shader);
+        shader.setMat4("u_modelMatrix", mesh.modelMatrix);
+        shader.setFloat("u_textureScaleX", mesh.textureScaleX);
+        shader.setFloat("u_textureScaleY", mesh.textureScaleY);
+        mesh.mesh->draw(shader);
+
+    }
 
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    m_fbo.unbind();
+    m_hdrFBO.unbind();
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_fbo.getColorAttachment(0), m_postprocessShader);
+    m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
 }
 
 void Floor::onRenderImGui()
@@ -120,20 +162,20 @@ void Floor::onRenderImGui()
 
     // render UI for every light
     for (auto& light : m_lights) {
-        light->imGuiRender(m_shaders[m_modelIndex]);
+        light->imGuiRender();
     }
-
-    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0")) {
-        m_shaders[m_modelIndex].bind();
-    }
+ 
     ImGui::NewLine();
 
-    // render UI for material
-    ImGui::PushID(this);
-    if (ImGui::CollapsingHeader("Material settings")) {
-        m_materials[m_modelIndex]->imGuiRender(m_shaders[m_modelIndex]);
+    // render UI for materials
+    for (auto& mesh : m_meshes) {
+        ImGui::PushID(mesh.materials[mesh.modelIndex].get());
+        if (ImGui::CollapsingHeader(mesh.name.c_str())) {
+            ImGui::Combo("Lighting model", &mesh.modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0");
+            mesh.materials[mesh.modelIndex]->imGuiRender(m_shaders[mesh.modelIndex]);
+        }
+        ImGui::PopID();
     }
-    ImGui::PopID();
 
     // button to reset camera position and orientation
     if (ImGui::Button("Reset camera")) {
