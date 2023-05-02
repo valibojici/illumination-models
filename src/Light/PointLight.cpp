@@ -59,7 +59,7 @@ void PointLight::imGuiRender(Shader& shader)
 
 		Light::imGuiRender(shader);
 
-		if (ImGui::DragFloat3("Position", &m_position.x, 0.1f, -5.0f, 5.0f)) {
+		if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
 		}
