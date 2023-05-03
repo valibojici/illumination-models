@@ -21,7 +21,7 @@ void Model::processNode(const aiScene* scene, const aiNode* node)
 /// <summary>
 /// This methods creates a mesh (vertex attributes, indices, textures)
 /// </summary>
-std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mesh)
+std::unique_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mesh)
 {
 	std::vector<Vertex> vertices;
 	
@@ -124,7 +124,7 @@ std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 			}
 		}
 	}
-	return std::make_shared<Mesh>(vertices, indices, textures);
+	return std::make_unique<Mesh>(vertices, indices, textures);
 }
 
 void Model::load(const std::string& path)
@@ -149,7 +149,7 @@ void Model::load(const std::string& path)
 
 void Model::draw(Shader& shader) const
 {
-	for (auto mesh : m_meshes) {
+	for (auto& mesh : m_meshes) {
 		mesh->draw(shader);
 	}
 }
