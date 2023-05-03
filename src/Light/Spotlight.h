@@ -36,7 +36,7 @@ public:
 	/// <param name="index">: index of light in the *shader uniform array*</param>
 	/// <param name="position">: position of the light</param>
 	/// <param name="target">: where the spotlight is pointing</param>
-	Spotlight(int index, const glm::vec3& position, const glm::vec3& target);
+	Spotlight(int index, const glm::vec3& position, const glm::vec3& target, const glm::vec3& color = glm::vec3(1.0f), float cutOff = 30.0f, float outerCutoff = 35.0f);
 
 	/// <summary>
 	/// Draw UI in ImGui, sets uniforms on value change.
