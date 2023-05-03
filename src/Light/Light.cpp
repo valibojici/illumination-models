@@ -2,7 +2,7 @@
 
 std::unique_ptr<Mesh> Light::s_lightMesh;
 
-Light::Light(int index) : m_index(index)
+Light::Light(int index, const glm::vec3& color) : m_index(index), m_color(color)
 {
 	// set static variable if it has not been set
 	if (!s_lightMesh) {
