@@ -70,22 +70,20 @@ std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 
 
 	// 1 material has all textures used
-	const unsigned int TYPE_COUNT = 5;
-	struct {
-		aiTextureType assimpType;
-		Texture::Type type;
-	} texTypes[TYPE_COUNT] = {
-		{aiTextureType_DIFFUSE, Texture::Type::DIFFUSE},
-		{aiTextureType_SPECULAR, Texture::Type::SPECULAR},
-		{aiTextureType_NORMALS, Texture::Type::NORMAL},
-		{aiTextureType_METALNESS, Texture::Type::METALLIC},
-		{aiTextureType_DIFFUSE_ROUGHNESS, Texture::Type::ROUGHNESS }
-	};
-
+	static std::unordered_map<aiTextureType, Texture::Type> textureTypeMapping;
+	textureTypeMapping[aiTextureType_DIFFUSE] = Texture::Type::DIFFUSE;
+	textureTypeMapping[aiTextureType_SPECULAR] = Texture::Type::SPECULAR;
+	textureTypeMapping[aiTextureType_NORMALS] = Texture::Type::NORMAL;
+	textureTypeMapping[aiTextureType_NORMAL_CAMERA] = Texture::Type::NORMAL;
+	textureTypeMapping[aiTextureType_METALNESS] = Texture::Type::METALLIC;
+	textureTypeMapping[aiTextureType_REFLECTION] = Texture::Type::METALLIC;
+	textureTypeMapping[aiTextureType_DIFFUSE_ROUGHNESS] = Texture::Type::ROUGHNESS;
+	textureTypeMapping[aiTextureType_SHININESS] = Texture::Type::ROUGHNESS;
+	
 	// iterate through all texture types used
-	for (unsigned int i = 0; i < TYPE_COUNT; ++i) {
-		auto assimpType = texTypes[i].assimpType;
-		auto type = texTypes[i].type;
+	for (auto& it : textureTypeMapping) {
+		auto assimpType = it.first;
+		auto type = it.second;
 		// get all textures for each type (currently supporting only 1 texture per type)
 		// TODO: support loading multiple textures of same type
 		for (unsigned int j = 0; j < material->GetTextureCount(assimpType); ++j) {
@@ -99,23 +97,26 @@ std::shared_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 		}
 
 	}
+
 	// if no textures are loaded assume we have to load manually
 	if (textures.size() == 0) {
-		for (unsigned int i = 0; i < TYPE_COUNT; ++i) {
+		const aiTextureType types[] = { aiTextureType_DIFFUSE, aiTextureType_SPECULAR,aiTextureType_NORMALS,aiTextureType_METALNESS,aiTextureType_DIFFUSE_ROUGHNESS };
+		for (auto& it : textureTypeMapping) {
 			std::string file;
-			switch (texTypes[i].assimpType)
+			switch (it.first)
 			{
 				case aiTextureType_DIFFUSE: file = "diffuse.png"; break;
 				case aiTextureType_SPECULAR: file = "specular.png"; break;
 				case aiTextureType_NORMALS: file = "normal.png"; break;
 				case aiTextureType_METALNESS: file = "metallic.png"; break;
 				case aiTextureType_DIFFUSE_ROUGHNESS: file = "roughness.png"; break;
+				default: continue;
 			}
 
 			// load texture with textureManager (handles caching)
 			try {
 				textures.push_back(
-					TextureManager::get().getTexture(assetDirectory + file.c_str(), texTypes[i].type)
+					TextureManager::get().getTexture(assetDirectory + file.c_str(), it.second)
 				);
 			}
 			catch (std::exception& e) {
