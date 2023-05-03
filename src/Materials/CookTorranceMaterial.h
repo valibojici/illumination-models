@@ -12,13 +12,10 @@ private:
 
 	// 0 = perfectly smooth, 1 = very rough
 	// should be between these to avoid division errors
-	float m_roughness = 0.5;
-	
-	// refraction index of material, used for calculating fresnel term
-	float m_refractionIndex = 1.2f;
+	float m_roughness = 0.5f;
 
-	// diffuse : specular ratio (1 = diffuse 0 = specular)
-	float m_ratio = 0.5f;
+	// diffuse : specular ratio (1 = specular 0 = diffuse)
+	float m_ratio = 0.2f;
 
 	// reflectance function F at normal incidence (perpendicular)
 	// used for metals because the value is RGB
@@ -35,12 +32,12 @@ public:
 	/// <summary>
 	/// Renders UI and does NOT set uniforms on value change
 	/// </summary>
-	void imGuiRender(Shader& shader);
+	void imGuiRender() override;
 
 	/// <summary>
 	/// Sets all uniforms in shader
 	/// </summary>
-	void setUniforms(Shader& shader);
+	void setUniforms(Shader& shader) override;
 
 	void setColor(const glm::vec3& albedo) override { m_albedo = albedo; }
 	void setAmbient(const glm::vec3& c) override { m_ia = c; }

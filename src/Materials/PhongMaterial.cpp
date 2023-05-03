@@ -1,7 +1,7 @@
 #include "PhongMaterial.h"
 #include "Scene/Scene.h"
 
-void PhongMaterial::imGuiRender(Shader& shader)
+void PhongMaterial::imGuiRender()
 {
     ImGui::ColorEdit3("Diffuse color", &m_diffuseColor.x, ImGuiColorEditFlags_Float);
 
