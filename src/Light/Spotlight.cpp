@@ -1,6 +1,7 @@
 #include "Spotlight.h"
 
-Spotlight::Spotlight(int index, const glm::vec3& position, const glm::vec3& target) : Light(index)
+Spotlight::Spotlight(int index, const glm::vec3& position, const glm::vec3& target, const glm::vec3& color, float cutOff, float outerCutoff) 
+	: Light(index, color)
 {
 	m_type = Type::SPOT;
 	std::stringstream ss;
@@ -8,6 +9,8 @@ Spotlight::Spotlight(int index, const glm::vec3& position, const glm::vec3& targ
 	m_name = ss.str();
 	m_position = position;
 	m_target = target;
+	m_cutOff = cutOff;
+	m_outerCutOff = outerCutoff;
 }
 
 void Spotlight::imGuiRender()

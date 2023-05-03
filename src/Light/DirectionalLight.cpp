@@ -1,6 +1,7 @@
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(int index, const glm::vec3& direction) : Light(index)
+DirectionalLight::DirectionalLight(int index, const glm::vec3& direction, const glm::vec3& color) : 
+	Light(index, color)
 {
 	m_type = Type::DIRECTIONAL;
 	std::stringstream ss;

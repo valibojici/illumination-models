@@ -1,6 +1,6 @@
 #include "PointLight.h"
 
-PointLight::PointLight(int index, const glm::vec3& position) : Light(index)
+PointLight::PointLight(int index, const glm::vec3& position, const glm::vec3& color) : Light(index, color)
 {
 	m_type = Type::POINT;
 	std::stringstream ss;
