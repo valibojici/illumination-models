@@ -3,6 +3,7 @@
 #include "ModelTestScene.h"
 #include "Box.h"
 #include "Floor.h"
+#include "Reflections.h"
 
 class SceneMenu : public Scene
 {

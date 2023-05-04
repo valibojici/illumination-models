@@ -17,6 +17,11 @@ void SceneMenu::onRenderImGui()
 		m_currentScene = new Box(m_currentScene);
 		delete temp;
 	}
+	if (ImGui::Button("Reflections")) {
+		Scene* temp = m_currentScene;
+		m_currentScene = new Reflections(m_currentScene);
+		delete temp;
+	}
 }
 
 void SceneMenu::onRender()

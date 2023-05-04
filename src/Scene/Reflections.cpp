@@ -52,6 +52,14 @@ Reflections::Reflections(Scene*& scene)
 
     // load skybox
     m_skyboxTexture = TextureManager::get().getTexture("textures/skybox", Texture::Type::CUBEMAP, false);
+
+    // bind skybox to slot 1
+    m_skyboxTexture->bind(1);
+    // set skybox texture sampler in shaders
+    for (auto& shader : m_shaders) {
+        shader.setBool("u_useReflections", true);
+        shader.setInt("u_reflectionMap", 1);
+    }
 }
 
 Reflections::~Reflections()
