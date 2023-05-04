@@ -16,6 +16,7 @@ public:
 		ROUGHNESS,
 		METALLIC,
 		EMISSIVE,
+		OPACITY
 	};
 
 	Texture() = default;
