@@ -55,11 +55,11 @@ void Texture::loadFromFile(const std::string& filepath, bool flipY)
 	{
 	case 3:
 		format = GL_RGB;
-		internalFormat = m_type == Type::DIFFUSE ? GL_SRGB : GL_RGB;
+		internalFormat = (m_type == Type::DIFFUSE || m_type == Type::EMISSIVE) ? GL_SRGB : GL_RGB;
 		break;
 	case 4:
 		format = GL_RGBA;
-		internalFormat = m_type == Type::DIFFUSE ? GL_SRGB_ALPHA : GL_RGBA;
+		internalFormat = (m_type == Type::DIFFUSE || m_type == Type::EMISSIVE) ? GL_SRGB_ALPHA : GL_RGBA;
 		break;
 	default:
 		format = internalFormat = GL_RED;
