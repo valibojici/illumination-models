@@ -10,7 +10,7 @@ public:
 	/// <summary>
 	/// Renders UI and does NOT set uniforms on value change
 	/// </summary>
-	virtual void imGuiRender(Shader& shader) = 0;
+	virtual void imGuiRender() = 0;
 
 	/// <summary>
 	/// Sets all uniforms in shader

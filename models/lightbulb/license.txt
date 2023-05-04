@@ -1,0 +1,11 @@
+Model Information:
+* title:	Simple Ceiling Light
+* source:	https://sketchfab.com/3d-models/simple-ceiling-light-a0465299981c48b4a086bf7baba45914
+* author:	grimren13 (https://sketchfab.com/grimren13)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Simple Ceiling Light" (https://sketchfab.com/3d-models/simple-ceiling-light-a0465299981c48b4a086bf7baba45914) by grimren13 (https://sketchfab.com/grimren13) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

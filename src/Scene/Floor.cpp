@@ -8,6 +8,10 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    // enable blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     m_lights.push_back(std::move(std::make_unique<PointLight>(0, glm::vec3(-5.0f, 1.0f, 0.0f))));
     m_lights.push_back(std::move(std::make_unique<PointLight>(1, glm::vec3(0.0f, 1.0f, 0.0f))));
 
@@ -40,10 +44,11 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
     floor.modelMatrix = glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     floor.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 8.0f));
     floor.mesh->setTextures({ 
-        TextureManager::get().getTexture("textures/metal_floor/diffuse.png", Texture::Type::DIFFUSE),
-        TextureManager::get().getTexture("textures/metal_floor/normal.png", Texture::Type::NORMAL),
-        TextureManager::get().getTexture("textures/metal_floor/roughness.png", Texture::Type::ROUGHNESS),
-        TextureManager::get().getTexture("textures/metal_floor/metallic.png", Texture::Type::METALLIC),
+        TextureManager::get().getTexture("textures/chain_floor/diffuse.png", Texture::Type::DIFFUSE),
+        TextureManager::get().getTexture("textures/chain_floor/normal.png", Texture::Type::NORMAL),
+        TextureManager::get().getTexture("textures/chain_floor/roughness.png", Texture::Type::ROUGHNESS),
+        TextureManager::get().getTexture("textures/chain_floor/metallic.png", Texture::Type::METALLIC),
+        TextureManager::get().getTexture("textures/chain_floor/opacity.png", Texture::Type::OPACITY),
     });
     floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
@@ -95,6 +100,7 @@ Floor::~Floor()
 {
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
     EventManager::getInstance().removeHandler(&m_camera);
 }
 
@@ -172,7 +178,7 @@ void Floor::onRenderImGui()
         ImGui::PushID(mesh.materials[mesh.modelIndex].get());
         if (ImGui::CollapsingHeader(mesh.name.c_str())) {
             ImGui::Combo("Lighting model", &mesh.modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0");
-            mesh.materials[mesh.modelIndex]->imGuiRender(m_shaders[mesh.modelIndex]);
+            mesh.materials[mesh.modelIndex]->imGuiRender();
         }
         ImGui::PopID();
     }

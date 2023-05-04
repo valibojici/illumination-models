@@ -40,6 +40,8 @@ void Mesh::draw(Shader &shader)
 	shader.setBool("u_hasNormTexture", false);
 	shader.setBool("u_hasRoughTexture", false);
 	shader.setBool("u_hasMetallicTexture", false);
+	shader.setBool("u_hasEmissiveTexture", false);
+	shader.setBool("u_hasOpacityTexture", false);
 
 	for (unsigned int i = 0; i < m_textures.size(); ++i) {
 		// bind this texture
@@ -67,7 +69,16 @@ void Mesh::draw(Shader &shader)
 			shader.setInt("u_MetallicTex", i);
 			shader.setBool("u_hasMetallicTexture", true);
 			break;
+		case Texture::Type::EMISSIVE:
+			shader.setInt("u_EmissiveTex", i);
+			shader.setBool("u_hasEmissiveTexture", true);
+			break;
+		case Texture::Type::OPACITY:
+			shader.setInt("u_OpacityTex", i);
+			shader.setBool("u_hasOpacityTexture", true);
+			break;
 		}
+
 
 	}
 	m_vao->bind();
@@ -78,6 +89,8 @@ void Mesh::draw(Shader &shader)
 	shader.setBool("u_hasNormTexture", false);
 	shader.setBool("u_hasRoughTexture", false);
 	shader.setBool("u_hasMetallicTexture", false);
+	shader.setBool("u_hasEmissiveTexture", false);
+	shader.setBool("u_hasOpacityTexture", false);
 }
 
 Mesh *Mesh::getCube(float width, float height, float depth)

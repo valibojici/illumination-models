@@ -42,7 +42,7 @@ public:
 	/// <summary>
 	/// Renders UI in ImGui, does not set uniforms
 	/// </summary>
-	virtual void imGuiRender(Shader& shader) override;
+	virtual void imGuiRender() override;
 
 	/// <summary>
 	/// Sets all material uniforms in shader

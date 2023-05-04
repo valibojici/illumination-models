@@ -1,0 +1,11 @@
+Model Information:
+* title:	Book Stack
+* source:	https://sketchfab.com/3d-models/book-stack-07c4feb4845d40459bb9bba3fd439e79
+* author:	MOJackal (https://sketchfab.com/MOJackal)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Book Stack" (https://sketchfab.com/3d-models/book-stack-07c4feb4845d40459bb9bba3fd439e79) by MOJackal (https://sketchfab.com/MOJackal) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

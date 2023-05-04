@@ -301,7 +301,7 @@ void Box::onRenderImGui()
     for (auto& mesh : m_meshes) {
         ImGui::PushID(mesh.materials[m_modelIndex].get());
         if (ImGui::CollapsingHeader(mesh.name.c_str())) {
-            mesh.materials[m_modelIndex]->imGuiRender(m_shaders[m_modelIndex]);
+            mesh.materials[m_modelIndex]->imGuiRender();
         }
         ImGui::PopID();
     }

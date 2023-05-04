@@ -42,11 +42,18 @@ uniform bool u_hasSpecTexture = false;
 uniform bool u_hasRoughTexture = false;
 uniform bool u_hasNormTexture = false;
 uniform bool u_hasMetallicTexture = false;
+uniform bool u_hasEmissiveTexture = false;
+uniform bool u_hasOpacityTexture = false;
 uniform sampler2D u_DiffuseTex;
 uniform sampler2D u_SpecularTex;
 uniform sampler2D u_NormalTex;
 uniform sampler2D u_RoughTex;
 uniform sampler2D u_MetallicTex;
+uniform sampler2D u_EmissiveTex;
+uniform sampler2D u_OpacityTex;
+
+uniform bool u_useReflections = false;
+uniform samplerCube u_reflectionMap;
 
 uniform vec3 u_emission;         // emission
 

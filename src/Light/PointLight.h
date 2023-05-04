@@ -17,7 +17,7 @@ public:
 	/// </summary>
 	/// <param name="index">: index of light in the *shader uniform array*</param>
 	/// <param name="position">: position of the light</param>
-	PointLight(int index, const glm::vec3& position);
+	PointLight(int index, const glm::vec3& position, const glm::vec3& color = glm::vec3(1.0f));
 
 	void calculateLightSpaceMatrix() override;
 

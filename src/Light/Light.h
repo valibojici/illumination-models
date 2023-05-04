@@ -104,7 +104,7 @@ public:
 	///	The index refers to the index in the shader lights uniform array
 	/// </summary>
 	/// <param name="index">: index of the light in uniform array</param>
-	Light(int index);
+	Light(int index, const glm::vec3& color);
 
 	// name of light displayed in UI: "<type> #<m_index>"
 	std::string m_name;
@@ -125,8 +125,33 @@ public:
 	/// Set if the light is casting shadow
 	/// </summary>
 	void setShadow(bool value) { m_shadow = true; }
-
 	bool getShadow() const { return m_shadow; }
+
+	/// <summary>
+	/// Set the light intensity. Default is 1.
+	/// </summary>
+	void setIntensity(float value) { m_intensity = value; }
+	float getIntensity() const { return m_intensity; }
+
+	/// <summary>
+	/// Draw the light mesh (cube)
+	/// </summary>
+	void enableDraw() { m_draw = true; }
+
+	/// <summary>
+	/// Do not draw the light mesh (cube)
+	/// </summary>
+	void disableDraw() { m_draw = false; }
+
+	/// <summary>
+	/// Disable the light (does not light the scene)
+	/// </summary>
+	void disable() { m_enabled = false; }
+
+	/// <summary>
+	/// Enable the light (lights the scene)
+	/// </summary>
+	void enable() { m_enabled = true; }
 
 	unsigned int getShadowTextureSlot() const { return m_shadowTextureSlot; }
 	void setShadowTextureSlot(unsigned int slot) { m_shadowTextureSlot = slot; }

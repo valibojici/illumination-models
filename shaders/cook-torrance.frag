@@ -88,7 +88,17 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     specular = specular * PI; // multiply with PI to denormalize
 
     float ratio = u_hasMetallicTexture ? texture(u_MetallicTex, fs_in.texCoords).r : u_material.ratio;
-    return mix(diffuse, specular, ratio); // the result depends on the diffuse/specular ratio
+    if(u_useReflections){
+        // for skybox scene
+        // get reflection direction
+        vec3 reflectDir = reflect(fs_in.fragPos - u_viewPos, normal);
+        // sample cubebox
+        vec3 reflection = texture(u_reflectionMap, reflectDir).rgb;
+        specular = mix(reflection, specular, u_material.roughness); // mix reflections into specular
+        return mix(diffuse, specular, ratio);
+    } else {
+        return mix(diffuse, specular, ratio); // the result depends on the diffuse/specular ratio
+    }
 }
 
 // fresnel term

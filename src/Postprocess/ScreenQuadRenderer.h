@@ -39,4 +39,19 @@ public:
 		shader.setInt("u_texture", 0);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
+
+	/// <summary>
+	/// Render cubemap
+	/// </summary>
+	/// <param name="texture">: cubemap texture</param>
+	/// <param name="inverseViewProjMatrix">: (view * projection) ^ -1 == projection^-1 * view^-1</param>
+	void renderCubemap(unsigned int texture, Shader& shader, const glm::mat4& inverseViewProjMatrix) {
+		m_vao.bind();
+		shader.bind();
+		shader.setMat4("u_inverseViewProjMatrix", inverseViewProjMatrix);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+		shader.setInt("u_texture", 0);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
 };

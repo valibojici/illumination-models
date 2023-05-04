@@ -12,7 +12,7 @@ public:
 	/// </summary>
 	/// <param name="index">: index of light in the *shader uniform array*</param>
 	/// <param name="direction">: the light will be emitted from this direction</param>
-	DirectionalLight(int index, const glm::vec3& direction);
+	DirectionalLight(int index, const glm::vec3& direction, const glm::vec3& color = glm::vec3(1.0f));
 
 	/// <summary>
 	/// Calculate the light space matrix using the member parameters
