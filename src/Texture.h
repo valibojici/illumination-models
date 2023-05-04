@@ -15,6 +15,7 @@ public:
 		NORMAL,
 		ROUGHNESS,
 		METALLIC,
+		EMISSIVE,
 	};
 
 	Texture() = default;
