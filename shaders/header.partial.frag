@@ -52,6 +52,9 @@ uniform sampler2D u_MetallicTex;
 uniform sampler2D u_EmissiveTex;
 uniform sampler2D u_OpacityTex;
 
+uniform bool u_useReflections = false;
+uniform samplerCube u_reflectionMap;
+
 uniform vec3 u_emission;         // emission
 
 vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
