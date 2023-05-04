@@ -80,6 +80,7 @@ std::unique_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 	textureTypeMapping[aiTextureType_DIFFUSE_ROUGHNESS] = Texture::Type::ROUGHNESS;
 	textureTypeMapping[aiTextureType_SHININESS] = Texture::Type::ROUGHNESS;
 	textureTypeMapping[aiTextureType_EMISSIVE] = Texture::Type::EMISSIVE;
+	textureTypeMapping[aiTextureType_OPACITY] = Texture::Type::OPACITY;
 	
 	// iterate through all texture types used
 	for (auto& it : textureTypeMapping) {
@@ -112,6 +113,7 @@ std::unique_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 				case aiTextureType_METALNESS: file = "metallic.png"; break;
 				case aiTextureType_DIFFUSE_ROUGHNESS: file = "roughness.png"; break;
 				case aiTextureType_EMISSIVE: file = "emissive.png"; break;
+				case aiTextureType_OPACITY: file = "opacity.png"; break;
 				default: continue;
 			}
 
