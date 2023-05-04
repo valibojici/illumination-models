@@ -16,7 +16,8 @@ public:
 		ROUGHNESS,
 		METALLIC,
 		EMISSIVE,
-		OPACITY
+		OPACITY,
+		CUBEMAP
 	};
 
 	Texture() = default;
@@ -36,6 +37,11 @@ public:
 	/// Load texture from file (using stb_image.h).
 	/// </summary>
 	void loadFromFile(const std::string& filepath, bool flipY = true);
+
+	/// <summary>
+	/// Load cubemap texture from file (using stb_image.h).
+	/// </summary>
+	void loadCubemapFromFile(const std::string& directory, bool flipY = true);
 	
 	/// <summary>
 	/// Activate the texture slot and bind this texture.
