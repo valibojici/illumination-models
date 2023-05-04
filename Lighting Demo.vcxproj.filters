@@ -117,6 +117,9 @@
     <ClCompile Include="src\Scene\Floor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\Reflections.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h">
@@ -212,6 +215,9 @@
     <ClInclude Include="src\Scene\Floor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\Reflections.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\phong.frag" />
@@ -229,5 +235,7 @@
     <None Include="shaders\shadowmap-view.frag" />
     <None Include="shaders\shadowmap_v2.vert" />
     <None Include="shaders\shadowmap_v2.frag" />
+    <None Include="shaders\skybox.vert" />
+    <None Include="shaders\skybox.frag" />
   </ItemGroup>
 </Project>
