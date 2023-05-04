@@ -38,6 +38,9 @@ void main()
         if(u_lights[i].type == 0){
             lightDir = normalize(u_lights[i].position.xyz); // the direction is the light "position"
         }
+
+        // check if light is behind
+        if(dot(normalize(fs_in.normal), lightDir) < 0.0f) continue;
         
         // calculate geometryTerm using light direction and the actual surface normal
         float geometryTerm = max(0.0f, dot(normal, lightDir));
