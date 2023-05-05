@@ -151,6 +151,7 @@
     <ClCompile Include="src\VAO.cpp" />
     <ClCompile Include="src\Buffer\VBO.cpp" />
     <ClCompile Include="src\TextureManager.cpp" />
+    <ClCompile Include="src\Materials\ToonMaterial.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui_demo.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui_draw.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="src\VAO.h" />
     <ClInclude Include="src\Buffer\VBO.h" />
     <ClInclude Include="src\TextureManager.h" />
+    <ClInclude Include="src\Materials\ToonMaterial.h" />
     <ClInclude Include="vendor\STB_IMAGE\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
@@ -212,6 +214,8 @@
     <None Include="shaders\shadowmap_v2.vert" />
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\skybox.vert" />
+    <None Include="shaders\toon.frag" />
+    <None Include="shaders\toon_postprocess.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -120,6 +120,9 @@
     <ClCompile Include="src\Scene\Reflections.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Materials\ToonMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h">
@@ -218,6 +221,9 @@
     <ClInclude Include="src\Scene\Reflections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Materials\ToonMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\phong.frag" />
@@ -237,5 +243,7 @@
     <None Include="shaders\shadowmap_v2.frag" />
     <None Include="shaders\skybox.vert" />
     <None Include="shaders\skybox.frag" />
+    <None Include="shaders\toon.frag" />
+    <None Include="shaders\toon_postprocess.frag" />
   </ItemGroup>
 </Project>
