@@ -14,14 +14,16 @@ Box::Box(Scene*& scene)
     m_lights.push_back(std::move(std::make_unique<Spotlight>(2, glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f))));
 
     // load shaders
-    m_shaders.resize(3);
+    m_shaders.resize(4);
     m_shaders[0].load("base_shader.vert", "phong.frag");
     m_shaders[1].load("base_shader.vert", "blinn.frag");
     m_shaders[2].load("base_shader.vert", "cook-torrance.frag");
+    m_shaders[3].load("base_shader.vert", "toon.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
+    m_toonPostProcessShader.load("postprocess.vert", "toon_postprocess.frag");
     m_shadowShader.load("shadowmap_v2.vert", "shadowmap_v2.frag");
 
-    m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_postprocessShader });
+    m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_shaders[3], &m_postprocessShader, &m_toonPostProcessShader });
     m_postProcessUI.setUniforms();
     // setting uniforms
     // TODO: get screen size from config class?
@@ -49,6 +51,7 @@ Box::Box(Scene*& scene)
         m.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
         m.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
         m.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+        m.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
         for (auto& material : m.materials) {
             material->disableHighlights();
             switch (i)
@@ -77,6 +80,7 @@ Box::Box(Scene*& scene)
     sphere.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     sphere.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     sphere.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    sphere.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
     for (auto& material : sphere.materials) {
         material->setColor({ 1.0f, 0.0f, 0.0f });
         material->setAmbient({ 1.0f, 0.0f, 0.0f });
@@ -90,6 +94,7 @@ Box::Box(Scene*& scene)
     cone.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     cone.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     cone.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    cone.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
     for (auto& material : cone.materials) {
         material->setColor({ 0.0f, 1.0f, 0.0f });
         material->setAmbient({ 0.0f, 1.0f, 0.0f });
@@ -103,6 +108,7 @@ Box::Box(Scene*& scene)
     cube.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     cube.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     cube.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    cube.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
     for (auto& material : cube.materials) {
         material->setColor({ 1.0f, 1.0f, 0.0f });
         material->setAmbient({ 1.0f, 1.0f, 0.0f });
@@ -111,6 +117,7 @@ Box::Box(Scene*& scene)
     m_meshes.push_back(std::move(cube));
 
     // set up HDR framebuffer
+    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
     m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
     m_hdrFBO.addDepthAttachment(GL_RENDERBUFFER);
     m_hdrFBO.create();
@@ -274,7 +281,12 @@ void Box::onRender()
     m_hdrFBO.unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
+    if (m_modelIndex != 3) {
+        m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
+    }
+    else {
+        m_screenQuadRenderer.renderToon(m_hdrFBO.getColorAttachment(0), m_hdrFBO.getColorAttachment(1), m_toonPostProcessShader);
+    }
 }
 
 void Box::onRenderImGui()
@@ -292,7 +304,7 @@ void Box::onRenderImGui()
         light->imGuiRender();
     }
 
-    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0")) {
+    if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0Toon\0\0")) {
         m_shaders[m_modelIndex].bind();
     }
     ImGui::NewLine();
