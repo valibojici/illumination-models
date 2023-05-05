@@ -82,7 +82,9 @@ void Framebuffer::create()
 		glReadBuffer(GL_NONE);
 	}
 
+	std::vector<GLenum> buffers;
 	for (size_t i = 0; i < m_colorAttachments.size(); ++i) {
+		buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
 		if (m_colorAttachments[i].type == GL_TEXTURE_2D) {
 			// activate slot and bind this texture
 			glActiveTexture(GL_TEXTURE0);
@@ -99,6 +101,7 @@ void Framebuffer::create()
 			glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		}
 	}
+	glDrawBuffers(m_colorAttachments.size(), buffers.data());
 	
 	activateDepthAttachment(0, m_depthAttachments[0].type == GL_TEXTURE_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP_POSITIVE_X);
 	

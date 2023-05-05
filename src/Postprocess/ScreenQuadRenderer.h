@@ -54,4 +54,20 @@ public:
 		shader.setInt("u_texture", 0);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
+
+	/// <summary>
+	/// Render textures for toon shading
+	/// </summary>
+	/// <param name="color">Color texture</param>
+	/// <param name="distance_normal">Texture with distance from camera and normal luminance</param>
+	void renderToon(unsigned int color, unsigned int distance_normal, Shader& shader) {
+		m_vao.bind();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, color);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, distance_normal);
+		shader.setInt("u_colorTex", 0);
+		shader.setInt("u_distNormalTex", 1);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
 };

@@ -13,6 +13,7 @@
 #include "Materials/PhongMaterial.h"
 #include "Materials/BlinnMaterial.h"
 #include "Materials/CookTorranceMaterial.h"
+#include "Materials/ToonMaterial.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
@@ -58,6 +59,7 @@ private:
 	Camera m_camera;
 	std::vector<Shader> m_shaders;
 	Shader m_postprocessShader;
+	Shader m_toonPostProcessShader;
 	Shader m_shadowShader;
 	
 	std::vector<glm::mat4> m_modelMatrix;
