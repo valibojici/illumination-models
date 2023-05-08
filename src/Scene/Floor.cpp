@@ -5,19 +5,14 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
     m_camera = Camera({ 0.0f, 1.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
     // enable depth testing
-    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-
+    glEnable(GL_CULL_FACE);
     // enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    m_lights.push_back(std::move(std::make_unique<PointLight>(0, glm::vec3(-5.0f, 1.0f, 0.0f))));
-    m_lights.push_back(std::move(std::make_unique<PointLight>(1, glm::vec3(0.0f, 1.0f, 0.0f))));
-
-    m_lights.push_back(std::move(std::make_unique<PointLight>(2, glm::vec3(-5.0f, 1.0f, 10.0f))));
-    m_lights.push_back(std::move(std::make_unique<PointLight>(3, glm::vec3(0.0f, 1.0f, 10.0f))));
-    m_lights.push_back(std::move(std::make_unique<PointLight>(4, glm::vec3(5.0f, 1.0f, 10.0f))));
+    m_lights.push_back(std::move(std::make_unique<PointLight>(0, glm::vec3(-5.0f, 1.5f, -0.5f))));
+    m_lights.push_back(std::move(std::make_unique<PointLight>(1, glm::vec3(0.0f, 1.5f, -0.5f))));
 
     // load shaders
     m_shaders.resize(3);
@@ -39,57 +34,78 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
             light->setUniforms(shader);
         }
     }
-    
-    MaterialMesh floor;
-    floor.modelMatrix = glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    floor.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 8.0f));
-    floor.mesh->setTextures({ 
+
+    // load meshes
+    m_meshes.push_back(std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 4.0f)));
+    m_meshes.push_back(std::unique_ptr<Mesh>(Mesh::getSphere(1.4f, 6)));
+
+    // load textures
+    m_textures.push_back({}); // no textures
+
+    m_textures.push_back({
+       TextureManager::get().getTexture("textures/wood_floor/diffuse.png", Texture::Type::DIFFUSE),
+       TextureManager::get().getTexture("textures/wood_floor/normal.png", Texture::Type::NORMAL),
+       TextureManager::get().getTexture("textures/wood_floor/roughness.png", Texture::Type::ROUGHNESS),
+        });
+
+    m_textures.push_back({
         TextureManager::get().getTexture("textures/chain_floor/diffuse.png", Texture::Type::DIFFUSE),
         TextureManager::get().getTexture("textures/chain_floor/normal.png", Texture::Type::NORMAL),
         TextureManager::get().getTexture("textures/chain_floor/roughness.png", Texture::Type::ROUGHNESS),
         TextureManager::get().getTexture("textures/chain_floor/metallic.png", Texture::Type::METALLIC),
         TextureManager::get().getTexture("textures/chain_floor/opacity.png", Texture::Type::OPACITY),
-    });
+        });
+   
+    m_textures.push_back({
+        TextureManager::get().getTexture("textures/art_deco/diffuse.png", Texture::Type::DIFFUSE),
+        TextureManager::get().getTexture("textures/art_deco/normal.png", Texture::Type::NORMAL),
+        TextureManager::get().getTexture("textures/art_deco/metallic.png", Texture::Type::METALLIC),
+        TextureManager::get().getTexture("textures/art_deco/roughness.png", Texture::Type::ROUGHNESS),
+        });
+
+    m_textures.push_back({
+        TextureManager::get().getTexture("textures/metal/diffuse.png", Texture::Type::DIFFUSE, false),
+        TextureManager::get().getTexture("textures/metal/normal.png", Texture::Type::NORMAL, false),
+        TextureManager::get().getTexture("textures/metal/metallic.png", Texture::Type::METALLIC, false),
+        TextureManager::get().getTexture("textures/metal/roughness.png", Texture::Type::ROUGHNESS, false),
+        });
+
+    m_textures.push_back({
+        TextureManager::get().getTexture("textures/wood_platform/diffuse.png", Texture::Type::DIFFUSE),
+        TextureManager::get().getTexture("textures/wood_platform/normal.png", Texture::Type::NORMAL),
+        TextureManager::get().getTexture("textures/wood_platform/roughness.png", Texture::Type::ROUGHNESS),
+        TextureManager::get().getTexture("textures/wood_platform/metallic.png", Texture::Type::METALLIC),
+        TextureManager::get().getTexture("textures/wood_platform/opacity.png", Texture::Type::OPACITY),
+        });
+
+    m_textures.push_back({
+        TextureManager::get().getTexture("textures/grass/diffuse.png", Texture::Type::DIFFUSE),
+        TextureManager::get().getTexture("textures/grass/normal.png", Texture::Type::NORMAL),
+        TextureManager::get().getTexture("textures/grass/roughness.png", Texture::Type::ROUGHNESS),
+        TextureManager::get().getTexture("textures/grass/metallic.png", Texture::Type::METALLIC),
+        });
+    
+    MaterialMesh floor;
+    floor.modelMatrix = glm::translate(glm::vec3(-5.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    floor.name = "Metal floor";
+    floor.name = "Floor 1";
     floor.textureScaleX = 2.0f;
-    floor.textureScaleY = 2.0f * 8.0f / 4.0f;
-    m_meshes.push_back(std::move(floor));
+    floor.textureScaleY = 2.0f;
+    floor.textureIndex = 1;
+    m_materialMeshes.push_back(std::move(floor));
 
     floor = MaterialMesh();
-    floor.modelMatrix = glm::translate(glm::vec3(-5.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    floor.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 8.0f));
-    floor.mesh->setTextures({
-        TextureManager::get().getTexture("textures/wood_floor/diffuse.png", Texture::Type::DIFFUSE),
-        TextureManager::get().getTexture("textures/wood_floor/normal.png", Texture::Type::NORMAL),
-        TextureManager::get().getTexture("textures/wood_floor/roughness.png", Texture::Type::ROUGHNESS),
-    });
+    floor.modelMatrix = glm::rotate(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    floor.name = "Wood floor";
+    floor.name = "Floor 2";
     floor.textureScaleX = 2.0f;
-    floor.textureScaleY = 2.0f * 8.0f / 4.0f;
-    m_meshes.push_back(std::move(floor));
-
-    for (int i = -1; i <= 1; ++i) {
-        floor = MaterialMesh();
-        floor.modelMatrix = glm::translate(glm::vec3(-5.0f * i, 0.0f, 10.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        floor.mesh = std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 8.0f));
-        floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
-        floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
-        floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-        for (auto& material : floor.materials) {
-            material->setColor({ 0.5f, 0.5f, 0.5f });
-            material->setAmbient({ 0.5f, 0.5f, 0.5f });
-        }
-        floor.name = std::string("Floor ") + std::to_string(i + 1);
-        floor.textureScaleX = 2.0f;
-        floor.textureScaleY = 2.0f * 8.0f / 4.0f;
-        m_meshes.push_back(std::move(floor));
-    }
+    floor.textureScaleY = 2.0f;
+    floor.textureIndex = 2;
+    m_materialMeshes.push_back(std::move(floor));
 
     m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB16F);
     m_hdrFBO.addDepthAttachment(GL_TEXTURE_2D);
@@ -109,7 +125,6 @@ void Floor::onRender()
     static double time = glfwGetTime();
     
     m_hdrFBO.bind();
-    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -135,14 +150,20 @@ void Floor::onRender()
     }
 
     // draw mesh
-    for (auto& mesh : m_meshes) {
+    for (auto& mesh : m_materialMeshes) {
         Shader& shader = m_shaders[mesh.modelIndex];
         mesh.materials[mesh.modelIndex]->setUniforms(shader);
         shader.setMat4("u_modelMatrix", mesh.modelMatrix);
-        shader.setFloat("u_textureScaleX", mesh.textureScaleX);
-        shader.setFloat("u_textureScaleY", mesh.textureScaleY);
-        mesh.mesh->draw(shader);
-
+        if (mesh.meshIndex == 1) {
+            shader.setFloat("u_textureScaleX", glm::pi<float>() * mesh.textureScaleX);
+            shader.setFloat("u_textureScaleY", mesh.textureScaleY);
+        }
+        else {
+            shader.setFloat("u_textureScaleX", mesh.textureScaleX);
+            shader.setFloat("u_textureScaleY", mesh.textureScaleY);
+        }
+        m_meshes[mesh.meshIndex]->setTextures(m_textures[mesh.textureIndex]);
+        m_meshes[mesh.meshIndex]->draw(shader);
     }
 
     if (m_wireframeEnabled) {
@@ -150,7 +171,6 @@ void Floor::onRender()
     }
 
     m_hdrFBO.unbind();
-    glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
     m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
@@ -174,12 +194,16 @@ void Floor::onRenderImGui()
     ImGui::NewLine();
 
     // render UI for materials
-    for (auto& mesh : m_meshes) {
+    for (auto& mesh : m_materialMeshes) {
         ImGui::PushID(mesh.materials[mesh.modelIndex].get());
         if (ImGui::CollapsingHeader(mesh.name.c_str())) {
+            ImGui::Combo("Texture", &mesh.textureIndex, "No texture\0Wood\0Chain\0Art Deco\0Rusted metal\0Wood platform\0Grass\0\0");
+            ImGui::Combo("Mesh", &mesh.meshIndex, "Plane\0Sphere\0\0");
+            ImGui::NewLine();
             ImGui::Combo("Lighting model", &mesh.modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0");
             mesh.materials[mesh.modelIndex]->imGuiRender();
         }
+        ImGui::NewLine();
         ImGui::PopID();
     }
 
