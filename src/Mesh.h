@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Buffer/EBO.h"
 #include "Texture.h"
+#include <cmath>
 
 class Mesh
 {
