@@ -63,7 +63,11 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     
     // we need to calculate F D and G terms
     // F - Fresnel Term
-    vec3 fresnel = F_Schlick(u_material.f0, VH);
+    vec3 F0 = u_material.f0;
+    if(u_material.f0 == vec3(0.0f)){ // dont use custom f0, use albedo
+        F0 = mix(vec3(0.04f), diffuse, u_material.ratio);
+    }
+    vec3 fresnel = F_Schlick(F0, VH);
     // D - Slope distribution function
     float slope_distribution;
     switch(u_Dindex){ // chosen from application side
@@ -88,6 +92,7 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     specular = specular * PI; // multiply with PI to denormalize
 
     float ratio = u_hasMetallicTexture ? texture(u_MetallicTex, fs_in.texCoords).r : u_material.ratio;
+    ratio = max(ratio, 0.002); // add some to have fresnel reflections at least
     if(u_useReflections){
         // for skybox scene
         // get reflection direction

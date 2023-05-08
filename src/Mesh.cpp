@@ -220,6 +220,7 @@ Mesh *Mesh::getPlane(float width, float height)
 
 Mesh *Mesh::getSphere(float radius, int subdivisions)
 {
+	const float PI = 3.14159265359f;
 	const float phi = 1.618033988749895f; // golden ratio
 	
 	// helper to get a Vertex at a certain radius from normalized coordinates
@@ -318,6 +319,20 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 		}
 		// replace the original indices after this subdivision
 		indices = newIndices;
+	}
+
+	// calculate texture coords
+	auto equalZero = [](float val, float epsilon = 0.001f) {return val >= -epsilon && val <= epsilon; };
+	for (auto& vertex : vertices) {
+		glm::vec3 normalizedPosition = glm::normalize(vertex.position);
+		// to get u coord calculate the angle using atan2 then map to 0,1
+		float u;
+		// there will be problems when the texture wraps, when the angle becomes 2 pi
+		u = std::atan2(normalizedPosition.x, normalizedPosition.z) + PI;
+		// map [0,2pi] to [0,1]
+		u = u / (2 * PI);
+		float v = (normalizedPosition.y + 1) / 2; // v is y coordinate, map from -1,1 to 0,1
+		vertex.texCoords = { u, v };
 	}
 
 	return new Mesh(vertices, indices);

@@ -26,12 +26,15 @@ private:
 	struct MaterialMesh {
 		std::vector<std::unique_ptr<Material>> materials;
 		glm::mat4 modelMatrix;
-		std::unique_ptr<Mesh> mesh;
-		std::string name;
+		int meshIndex = 0; // index of mesh (plane or sphere)
+		std::string name; // name of this material mesh
+		int textureIndex = 0; // index of texture array to use
 		float textureScaleX = 1.0f;
 		float textureScaleY = 1.0f;
-		int modelIndex = 0;
+		int modelIndex = 0; // which lighting model is used
 	};
+
+	std::vector<MaterialMesh> m_materialMeshes;
 
 	// framebuffer to use lighting with hdr
 	Framebuffer m_hdrFBO;
@@ -40,8 +43,7 @@ private:
 	ScreenQuadRenderer m_screenQuadRenderer;
 
 
-	std::vector<MaterialMesh> m_meshes;
-	//std::unique_ptr<Mesh> m_mesh = std::unique_ptr<Mesh>(Mesh::getPlane(12.0f, 12.0f));
+	std::vector<std::unique_ptr<Mesh>> m_meshes;
 
 	// all lights in the scene
 	std::vector<std::unique_ptr<Light> > m_lights;
@@ -58,6 +60,11 @@ private:
 
 	// enable/disable wireframes, for debug
 	bool m_wireframeEnabled = false;
+
+	// textures used for meshes
+	std::vector<std::vector<std::shared_ptr<Texture>>> m_textures;
+
+	// 
 public:
 	Floor(Scene*& scene);
 	~Floor();
