@@ -16,7 +16,6 @@ void Renderer::init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 	// create window 
-    // HACK: dont hardode window size
 	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "Lighting demo", NULL, NULL);
 
 	glfwMakeContextCurrent(m_window);
