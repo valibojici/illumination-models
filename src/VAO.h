@@ -10,9 +10,6 @@ public:
 		VEC2,
 		VEC3,
 		VEC4,
-		// TODO: check if these are need (only needed for instancing)
-		MAT3,
-		MAT4
 	};
 	VAO() = default;
 	~VAO();
