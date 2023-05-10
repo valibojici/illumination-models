@@ -1,8 +1,10 @@
 #include "ModelTestScene.h"
 static glm::vec3 trans = glm::vec3(1.56f, -1.1f, 0.62f);
-ModelTestScene::ModelTestScene(Scene*& scene)
-    : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(2048, 2048)
+ModelTestScene::ModelTestScene(Scene*& scene, unsigned int width, unsigned int height)
+    : Scene(scene, width, height), m_shadowFBO(2048, 2048)
 {
+    updateWidthHeight(width, height);
+
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
     // enable depth testing
@@ -26,9 +28,6 @@ ModelTestScene::ModelTestScene(Scene*& scene)
     m_postProcessUI.addShaders({ &m_shader, &m_postprocessShader });
     m_postProcessUI.setUniforms();
     // setting uniforms
-    // TODO: get screen size from config class?
-    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f);
-
     m_shader.setMat4("u_projMatrix", m_projMatrix);
     m_shader.setInt("u_numLights", m_lights.size());
     for (auto& light : m_lights) {
@@ -78,11 +77,6 @@ ModelTestScene::ModelTestScene(Scene*& scene)
        
         m_wallMeshes.push_back(std::move(m));
     }
-
-    // set up HDR framebuffer
-    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
-    m_hdrFBO.addDepthAttachment(GL_RENDERBUFFER);
-    m_hdrFBO.create();
 
     // set up shadow related variables
     m_lights[1]->setShadow(true);
@@ -218,14 +212,14 @@ void ModelTestScene::onRender()
     /******************
     * LIGHTING PASS
     ******************/
-    glViewport(0, 0, 1280, 720);
-    m_hdrFBO.bind();
+    glViewport(0, 0, m_width, m_height);
+    m_hdrFBO->bind();
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_shader.bind();
+    m_shader.setMat4("u_projMatrix", m_projMatrix);
     m_material.setUniforms(m_shader);
 
     if (m_wireframeEnabled) {
@@ -258,10 +252,10 @@ void ModelTestScene::onRender()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    m_hdrFBO.unbind();
+    m_hdrFBO->unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
+    m_screenQuadRenderer.render(m_hdrFBO->getColorAttachment(0), m_postprocessShader);
 }
 
 void ModelTestScene::onRenderImGui()
@@ -269,7 +263,7 @@ void ModelTestScene::onRenderImGui()
     // back button
     if (ImGui::Button("Back")) {
         Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene);
+        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
         delete temp;
         return;
     }
@@ -295,4 +289,15 @@ void ModelTestScene::onRenderImGui()
     ImGui::Checkbox("Show wireframe", &m_wireframeEnabled);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+}
+
+void ModelTestScene::updateWidthHeight(unsigned int width, unsigned int height)
+{
+    m_width = width;
+    m_height = height;
+    m_hdrFBO = std::make_unique<Framebuffer>(width, height);
+    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
+    m_hdrFBO->addDepthAttachment(GL_RENDERBUFFER);
+    m_hdrFBO->create();
+    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
 }

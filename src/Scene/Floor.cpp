@@ -1,7 +1,9 @@
 #include "Floor.h"
 
-Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
+Floor::Floor(Scene*& scene,unsigned int width, unsigned int height) : 
+    Scene(scene, width, height)
 {
+    updateWidthHeight(width, height);
     m_camera = Camera({ 0.0f, 1.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
     // enable depth testing
@@ -24,11 +26,8 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_postprocessShader });
     m_postProcessUI.setUniforms();
 
-    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f);
-
     for (auto& shader : m_shaders) {
         shader.bind();
-        shader.setMat4("u_projMatrix", m_projMatrix);
         shader.setInt("u_numLights", m_lights.size());
         for (auto& light : m_lights) {
             light->setUniforms(shader);
@@ -107,9 +106,7 @@ Floor::Floor(Scene*& scene) : Scene(scene), m_hdrFBO(1280, 720)
     floor.textureIndex = 2;
     m_materialMeshes.push_back(std::move(floor));
 
-    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB16F);
-    m_hdrFBO.addDepthAttachment(GL_TEXTURE_2D);
-    m_hdrFBO.create();
+    
 }
 
 Floor::~Floor()
@@ -124,10 +121,11 @@ void Floor::onRender()
 {
     static double time = glfwGetTime();
     
-    m_hdrFBO.bind();
+    m_hdrFBO->bind();
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glViewport(0, 0, m_width, m_height);
 
     // update camera position and uniforms
     m_camera.update(glfwGetTime() - time);
@@ -135,6 +133,7 @@ void Floor::onRender()
     for (auto& shader : m_shaders) {
         shader.setMat4("u_viewMatrix", m_camera.getMatrix());
         shader.setVec3("u_viewPos", m_camera.getPosition());
+        shader.setMat4("u_projMatrix", m_projMatrix);
     }
 
     if (m_wireframeEnabled) {
@@ -170,10 +169,10 @@ void Floor::onRender()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    m_hdrFBO.unbind();
+    m_hdrFBO->unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
+    m_screenQuadRenderer.render(m_hdrFBO->getColorAttachment(0), m_postprocessShader);
 }
 
 void Floor::onRenderImGui()
@@ -181,7 +180,7 @@ void Floor::onRenderImGui()
     // back button
     if (ImGui::Button("Back")) {
         Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene);
+        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
         delete temp;
         return;
     }
@@ -219,4 +218,15 @@ void Floor::onRenderImGui()
     ImGui::Checkbox("Show wireframe", &m_wireframeEnabled);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+}
+
+void Floor::updateWidthHeight(unsigned int width, unsigned int height)
+{
+    m_width = width;
+    m_height = height;
+    m_hdrFBO = std::make_unique<Framebuffer>(width, height);
+    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB16F);
+    m_hdrFBO->addDepthAttachment(GL_TEXTURE_2D);
+    m_hdrFBO->create();
+    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
 }

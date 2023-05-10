@@ -37,7 +37,7 @@ private:
 	std::vector<MaterialMesh> m_materialMeshes;
 
 	// framebuffer to use lighting with hdr
-	Framebuffer m_hdrFBO;
+	std::unique_ptr<Framebuffer> m_hdrFBO;
 
 	// helper to render texture to screen
 	ScreenQuadRenderer m_screenQuadRenderer;
@@ -66,9 +66,10 @@ private:
 
 	// 
 public:
-	Floor(Scene*& scene);
+	Floor(Scene*& scene, unsigned int width, unsigned int height);
 	~Floor();
 	void onRender() override;
 	void onRenderImGui() override;
+	void updateWidthHeight(unsigned int width, unsigned int height) override;
 };
 
