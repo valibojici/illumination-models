@@ -103,7 +103,9 @@ void Framebuffer::create()
 	}
 	glDrawBuffers(m_colorAttachments.size(), buffers.data());
 	
-	activateDepthAttachment(0, m_depthAttachments[0].type == GL_TEXTURE_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	if (m_depthAttachments.size() != 0) {
+		activateDepthAttachment(0, m_depthAttachments[0].type == GL_TEXTURE_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	}
 	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		printf("ERROR Framebuffer not complete.");

@@ -7,14 +7,14 @@ void Camera::handleEvent(const Event& e)
 
 	case Event::Type::MOUSE_BUTTON_PRESS:
 		// ignore other mouse clicks except left mouse click
-		if (e.key.keyCode != GLFW_MOUSE_BUTTON_LEFT) return;
+		if (e.mouse.keyCode != GLFW_MOUSE_BUTTON_LEFT) return;
 		m_mousePressed = true;
 		m_lastMousePos = { e.mouse.x, e.mouse.y };
 		break;
 
 	case Event::Type::MOUSE_BUTTON_RELEASE:
 		// ignore other mouse clicks except left mouse click
-		if (e.key.keyCode != GLFW_MOUSE_BUTTON_LEFT) return;
+		if (e.mouse.keyCode != GLFW_MOUSE_BUTTON_LEFT) return;
 		m_mousePressed = false;
 		break;
 

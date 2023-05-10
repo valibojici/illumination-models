@@ -1,8 +1,10 @@
 #include "Box.h"
 
-Box::Box(Scene*& scene)
-    : Scene(scene), m_hdrFBO(1280, 720), m_shadowFBO(4096, 4096)
+Box::Box(Scene*& scene, unsigned int width, unsigned int height)
+    : Scene(scene, width, height), m_shadowFBO(4096, 4096)
 {
+    updateWidthHeight(width, height);
+    
     m_camera = Camera({ 0.0f, 0.0f, 5.0f }, { 0.0f, 0.0f, 0.0f });
     EventManager::getInstance().addHandler(&m_camera);
     // enable depth testing
@@ -27,11 +29,9 @@ Box::Box(Scene*& scene)
     m_postProcessUI.setUniforms();
     // setting uniforms
     // TODO: get screen size from config class?
-    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f);
 
     for (auto& shader : m_shaders) {
         shader.bind();
-        shader.setMat4("u_projMatrix", m_projMatrix);
         shader.setInt("u_numLights", 3);
         for (auto& light : m_lights) {
             light->setUniforms(shader);
@@ -117,10 +117,7 @@ Box::Box(Scene*& scene)
     m_meshes.push_back(std::move(cube));
 
     // set up HDR framebuffer
-    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
-    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
-    m_hdrFBO.addDepthAttachment(GL_RENDERBUFFER);
-    m_hdrFBO.create();
+    
 
     // set up shadow related variables
     m_lights[1]->setShadow(true);
@@ -241,8 +238,8 @@ void Box::onRender()
     /******************
     * LIGHTING PASS
     ******************/
-    glViewport(0, 0, 1280, 720);
-    m_hdrFBO.bind();
+    glViewport(0, 0, m_width, m_height);
+    m_hdrFBO->bind();
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
@@ -250,7 +247,7 @@ void Box::onRender()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_shaders[m_modelIndex].bind();
     
-
+    m_shaders[m_modelIndex].setMat4("u_projMatrix", m_projMatrix);
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
@@ -278,14 +275,14 @@ void Box::onRender()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    m_hdrFBO.unbind();
+    m_hdrFBO->unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
     if (m_modelIndex != 3) {
-        m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
+        m_screenQuadRenderer.render(m_hdrFBO->getColorAttachment(0), m_postprocessShader);
     }
     else {
-        m_screenQuadRenderer.renderToon(m_hdrFBO.getColorAttachment(0), m_hdrFBO.getColorAttachment(1), m_toonPostProcessShader);
+        m_screenQuadRenderer.renderToon(m_hdrFBO->getColorAttachment(0), m_hdrFBO->getColorAttachment(1), m_toonPostProcessShader);
     }
 }
 
@@ -294,7 +291,7 @@ void Box::onRenderImGui()
     // back button
     if (ImGui::Button("Back")) {
         Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene);
+        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
         delete temp;
         return;
     }
@@ -330,4 +327,16 @@ void Box::onRenderImGui()
     ImGui::Checkbox("Show wireframe", &m_wireframeEnabled);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+}
+
+void Box::updateWidthHeight(unsigned width, unsigned height)
+{
+    m_width = width;
+    m_height = height;
+    m_hdrFBO = std::make_unique<Framebuffer>(width, height);
+    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
+    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
+    m_hdrFBO->addDepthAttachment(GL_RENDERBUFFER);
+    m_hdrFBO->create();
+    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
 }

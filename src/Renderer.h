@@ -12,17 +12,20 @@
 #include "Buffer/VBO.h"
 #include "Scene/Scene.h"
 #include "Event/EventManager.h"
+#include "Scene/SceneMenu.h"
 
 class Renderer : public EventHandler
 {
 public:
 	void init();
-	void render(Scene*& scene);
+	void render();
 	void close();
 private:
-	Shader m_shader;
-	VAO m_vao;
 	GLFWwindow* m_window = nullptr;
+	unsigned int m_windowWidth = 1280;
+	unsigned int m_windowHeight = 720;
+	
+	Scene* m_scene;
 
 	void handleEvent(const Event& e) override;
 

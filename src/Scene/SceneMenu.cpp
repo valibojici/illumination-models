@@ -4,22 +4,17 @@ void SceneMenu::onRenderImGui()
 {
 	if (ImGui::Button("Model test scene")) {
 		Scene* temp = m_currentScene;
-		m_currentScene = new ModelTestScene(m_currentScene);
+		m_currentScene = new ModelTestScene(m_currentScene, m_width, m_height);
 		delete temp;
 	}
 	if (ImGui::Button("Floor scene")) {
 		Scene* temp = m_currentScene;
-		m_currentScene = new Floor(m_currentScene);
+		m_currentScene = new Floor(m_currentScene, m_width, m_height);
 		delete temp;
 	}
 	if (ImGui::Button("Box room scene")) {
 		Scene* temp = m_currentScene;
-		m_currentScene = new Box(m_currentScene);
-		delete temp;
-	}
-	if (ImGui::Button("Reflections")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new Reflections(m_currentScene);
+		m_currentScene = new Box(m_currentScene, m_width, m_height);
 		delete temp;
 	}
 }

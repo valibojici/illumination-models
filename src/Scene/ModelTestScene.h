@@ -34,7 +34,7 @@ private:
 
 	
 
-	Framebuffer m_hdrFBO;
+	std::unique_ptr<Framebuffer> m_hdrFBO;
 	Framebuffer m_shadowFBO;
 	ScreenQuadRenderer m_screenQuadRenderer;
 	std::vector<MaterialMesh> m_meshes;
@@ -76,8 +76,9 @@ private:
 	
 	std::vector<Model> m_models;
 public:
-	ModelTestScene(Scene*& scene);
+	ModelTestScene(Scene*& scene, unsigned int width, unsigned int height);
 	~ModelTestScene();
 	void onRender() override;
 	void onRenderImGui() override;
+	void updateWidthHeight(unsigned int width, unsigned int height) override;
 };

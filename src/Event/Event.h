@@ -10,28 +10,27 @@ public:
 		MOUSE_MOVE,
 		KEY_PRESS,
 		KEY_RELEASE,
-		WINDOW_RESIZE
+		WINDOW_RESIZE,
+		NONE
 	};
-	// TODO: read more about tagged unions
-	union {
-		struct{
-			double x;
-			double y;
-			int keyCode;
-		}mouse;
+	
+	struct{
+		int keyCode = 0;
+		float x = 0;
+		float y = 0;
+	}mouse;
 
-		struct {
-			int width;
-			int height;
-		}window;
+	struct{
+		int width = 0;
+		int height = 0;
+	}window;
 
-		struct {
-			int keyCode;
-		}key;
-	};
+	struct{
+		int keyCode = 0;
+	}key;
 
 	Type type() const { return m_type; }
 private:
 	friend class EventManager; // set as friend so it can have access to this class
-	Type m_type;
+	Type m_type = Type::NONE;
 };

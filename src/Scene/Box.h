@@ -32,7 +32,7 @@ private:
 		std::string name;
 	};
 
-	Framebuffer m_hdrFBO;
+	std::unique_ptr<Framebuffer> m_hdrFBO;
 	Framebuffer m_shadowFBO;
 	ScreenQuadRenderer m_screenQuadRenderer;
 	std::vector<MaterialMesh> m_meshes;
@@ -71,8 +71,9 @@ private:
 	// enable/disable wireframes, for debug
 	bool m_wireframeEnabled = false;
 public:
-	Box(Scene*& scene);
+	Box(Scene*& scene, unsigned int width, unsigned int height);
 	~Box();
 	void onRender() override;
 	void onRenderImGui() override;
+	void updateWidthHeight(unsigned int width, unsigned int height) override;
 };

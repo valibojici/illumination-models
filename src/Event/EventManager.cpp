@@ -10,9 +10,7 @@ EventManager& EventManager::getInstance()
 
 void EventManager::registerCallbacks(GLFWwindow* window)
 {
-	printf("Registering callbacks...\n");
-	// TODO: add other callbacks here
-	glfwSetWindowSizeCallback(window, EventManager::handleResize);
+	glfwSetFramebufferSizeCallback(window, EventManager::handleResize);
 	glfwSetKeyCallback(window, EventManager::handleKey);
 	glfwSetCursorPosCallback(window, EventManager::handleMousePosition);
 	glfwSetMouseButtonCallback(window, EventManager::handleMouseButton);
@@ -76,7 +74,9 @@ void EventManager::handleMousePosition(GLFWwindow* window, double xpos, double y
 	}
 	Event e;
 	e.m_type = Event::Type::MOUSE_MOVE;
-	e.mouse = { xpos, ypos };
+	e.mouse.keyCode = 0;
+	e.mouse.x = (float)xpos;
+	e.mouse.y = (float)ypos;
 	getInstance().sendEvent(e);
 }
 
@@ -93,7 +93,10 @@ void EventManager::handleMouseButton(GLFWwindow* window, int button, int action,
 	else if (action == GLFW_RELEASE) {
 		e.m_type = Event::Type::MOUSE_BUTTON_RELEASE;
 	}
-	glfwGetCursorPos(window, &e.mouse.x, &e.mouse.y);
+	double x, y;
+	glfwGetCursorPos(window, &x, &y);
 	e.mouse.keyCode = button;
+	e.mouse.x = (float)x;
+	e.mouse.y = (float)y;
 	getInstance().sendEvent(e);
 }
