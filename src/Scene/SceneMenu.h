@@ -3,12 +3,11 @@
 #include "ModelTestScene.h"
 #include "Box.h"
 #include "Floor.h"
-#include "Reflections.h"
 
 class SceneMenu : public Scene
 {
 public:
-	SceneMenu(Scene*& scene) : Scene(scene) {}
+	SceneMenu(Scene*& scene, unsigned int width, unsigned int height) : Scene(scene, width, height) {}
 	void onRenderImGui() override;
 	void onRender() override;
 };
