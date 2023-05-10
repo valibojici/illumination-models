@@ -17,7 +17,7 @@ void Renderer::init()
 
 	// create window 
     // HACK: dont hardode window size
-	m_window = glfwCreateWindow(1280, 720, "Lighting demo", NULL, NULL);
+	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "Lighting demo", NULL, NULL);
 
 	glfwMakeContextCurrent(m_window);
 
@@ -53,46 +53,27 @@ void Renderer::init()
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
+
+    m_scene = new SceneMenu(m_scene, m_windowWidth, m_windowHeight);
 }
 
-void Renderer::render(Scene*& scene)
+void Renderer::render()
 {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     EventManager::setImGuiIO(&io);
 
+    // render loop taken from example_glfw_opengl3/main.cpp
     while (!glfwWindowShouldClose(m_window))
     {
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
-        int display_w, display_h;
-        glfwGetFramebufferSize(m_window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-#if 0
-       
-
-        // Rendering
-        ImGui::Render();
-        
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        m_vao.bind();
-        m_shader.setVec3("u_color", { clear_color.x, clear_color.y, clear_color.z });
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-#else
-        
-        
 
         ImGui::Begin("Window");
-        scene->onRenderImGui();
+        m_scene->onRenderImGui();
 
         static bool open = true;
         ImGui::ShowDemoWindow(&open);
@@ -100,8 +81,7 @@ void Renderer::render(Scene*& scene)
         ImGui::End();
         ImGui::EndFrame();
         ImGui::Render();
-        scene->onRender();
-#endif
+        m_scene->onRender();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -115,7 +95,6 @@ void Renderer::render(Scene*& scene)
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
-
         glfwSwapBuffers(m_window);
     }
 }
@@ -133,24 +112,11 @@ void Renderer::close()
 
 void Renderer::handleEvent(const Event& e)
 {
-    /*switch (e.type()) {
+    switch (e.type()) {
     case Event::Type::WINDOW_RESIZE:
-        printf("New window size: %d %d \n", e.window.width, e.window.height);
+        m_windowWidth = (unsigned int) e.window.width;
+        m_windowHeight = (unsigned int) e.window.height;
+        m_scene->updateWidthHeight(m_windowWidth, m_windowHeight);
         break;
-    case Event::Type::MOUSE_MOVE:
-        printf("Mouse move: %f %f \n", e.mouse.x, e.mouse.x);
-        break;
-    case Event::Type::KEY_PRESS:
-        printf("Key press: %d \n", e.key.keyCode);
-        break;
-    case Event::Type::KEY_RELEASE:
-        printf("Key release: %d \n", e.key.keyCode);
-        break;
-    case Event::Type::MOUSE_BUTTON_PRESS:
-        printf("Mouse button press: %d \n", e.key.keyCode);
-        break;
-    case Event::Type::MOUSE_BUTTON_RELEASE:
-        printf("Mouse button release: %d \n", e.key.keyCode);
-        break;
-    };*/
+    };
 }
