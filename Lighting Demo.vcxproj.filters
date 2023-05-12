@@ -117,9 +117,6 @@
     <ClCompile Include="src\Scene\Floor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Reflections.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Materials\ToonMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -216,9 +213,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Floor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\Reflections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Materials\ToonMaterial.h">
