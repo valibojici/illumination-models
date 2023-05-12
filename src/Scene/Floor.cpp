@@ -124,7 +124,8 @@ void Floor::onRender()
     m_hdrFBO->bind();
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec3 clearColor = m_postProcessUI.getGammaCorrection() ? glm::pow(glm::vec3(0.1f), glm::vec3(2.2f)) : glm::vec3(0.1f);
+    glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.0f);
     glViewport(0, 0, m_width, m_height);
 
     // update camera position and uniforms

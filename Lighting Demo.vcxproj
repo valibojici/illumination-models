@@ -124,7 +124,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Scene\Reflections.cpp" />
     <ClCompile Include="src\Postprocess\PostprocessUI.cpp" />
     <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\Materials\CookTorranceMaterial.cpp" />
@@ -162,7 +161,6 @@
     <ClCompile Include="vendor\STB_IMAGE\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Scene\Reflections.h" />
     <ClInclude Include="src\Postprocess\PostprocessUI.h" />
     <ClInclude Include="src\Postprocess\ScreenQuadRenderer.h" />
     <ClInclude Include="src\Framebuffer.h" />

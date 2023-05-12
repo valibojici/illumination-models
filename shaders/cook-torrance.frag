@@ -15,6 +15,11 @@ uniform Material u_material;
 @section "extra_uniforms"
 uniform int u_Gindex = 0;
 uniform int u_Dindex = 0;
+
+uniform bool u_outputDFG = false; // flag if should output N G or F functions to debug/view
+uniform int u_outputD = 0;
+uniform int u_outputF = 0;
+uniform int u_outputG = 0;
 @endsection
 
 @section "BRDF_implementation"
@@ -83,6 +88,14 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
         case 2: geometrical_attenuation = G2_U_GGX(NV, NL); break;
         case 3: geometrical_attenuation = G2_Beckmann(NV, NL); break;
         case 4: geometrical_attenuation = G2_GGX(NV, NL); break;
+    }
+
+    if(u_outputDFG){
+        vec3 result = vec3(0.0f);
+        result += u_outputD * vec3(slope_distribution);
+        result += u_outputG * vec3(geometrical_attenuation);
+        result += u_outputF * fresnel;
+        return result;
     }
 
     // formula is FDG / (4 * NL * NV)

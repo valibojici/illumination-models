@@ -48,15 +48,19 @@ void main()
         // gamma correct the light color
         vec3 lightCol = u_gammaCorrect ? toLinear(u_lights[i].color) : u_lights[i].color;
 
-        result += getShadow(i) *
+        vec3 brdfResult = BRDF(geometryTerm, lightDir, normal, viewDir);
+        
+        result +=  
+            u_outputOnlyBRDF * brdfResult + (1 - u_outputOnlyBRDF) * // (branchless toggle for showing the brdf only)
+            getShadow(i) *
             u_lights[i].intensity * lightCol * geometryTerm *       // light amount at this fragment
-            BRDF(geometryTerm, lightDir, normal, viewDir) *         // BRDF
+            brdfResult *         // BRDF
             lightAttenuation(u_lights[i], fs_in.fragPos) *          // attenuation
             spotlightFactor(u_lights[i], lightDir);                 // spotlightFactor
     }
     
-    // add ambient light at the end
-    result += indirectLighting();
+    // add ambient light at the end (if not outputting only bdrf)
+    result += (1 - u_outputOnlyBRDF) * indirectLighting();
 
     // add emission
     if(u_hasEmissiveTexture){
