@@ -39,6 +39,7 @@ public:
 	void onRenderImGui();
 
 	inline void setGammaCorrection(bool value) { m_gammaCorrect = value; }
+	inline bool getGammaCorrection()const { return m_gammaCorrect; }
 	inline void setHDR(int value) { m_hdr = value; }
 };
 
