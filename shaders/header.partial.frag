@@ -57,6 +57,8 @@ uniform samplerCube u_reflectionMap;
 
 uniform vec3 u_emission;         // emission
 
+uniform int u_outputOnlyBRDF = 0;
+
 vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
 
 // helper function to convert to linear from SRGB (raise to 2.2)
