@@ -31,6 +31,11 @@ private:
 
 	// flag to use/not use custom F0 from UI
 	bool m_customF0 = false;
+
+	// flags to output F N G functions directly
+	bool m_outputDFG = false; 
+	int m_outputDFG_choice = 0;
+
 public:
 	/// <summary>
 	/// Renders UI and does NOT set uniforms on value change
