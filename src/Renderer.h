@@ -24,6 +24,8 @@ private:
 	GLFWwindow* m_window = nullptr;
 	unsigned int m_windowWidth = 1280;
 	unsigned int m_windowHeight = 720;
+	bool m_showImguiWindow = true;
+	bool m_setImguiWindowPos = false;
 	
 	Scene* m_scene;
 

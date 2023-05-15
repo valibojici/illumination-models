@@ -71,13 +71,16 @@ void Renderer::render()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Window");
-        m_scene->onRenderImGui();
+        if (m_showImguiWindow) {
+            if (!m_setImguiWindowPos) {
+                m_setImguiWindowPos = true;
+                ImGui::SetNextWindowPos(ImGui::GetMousePos());
+            }
+            ImGui::Begin("Window", &m_showImguiWindow);
+            m_scene->onRenderImGui();
+            ImGui::End();
+        }
 
-        static bool open = true;
-        ImGui::ShowDemoWindow(&open);
-
-        ImGui::End();
         ImGui::EndFrame();
         ImGui::Render();
         m_scene->onRender();
@@ -116,6 +119,14 @@ void Renderer::handleEvent(const Event& e)
         m_windowWidth = (unsigned int) e.window.width;
         m_windowHeight = (unsigned int) e.window.height;
         m_scene->updateWidthHeight(m_windowWidth, m_windowHeight);
+        printf("%d %d\n", m_windowWidth, m_windowHeight);
         break;
+    case Event::Type::MOUSE_BUTTON_PRESS:
+        if (e.mouse.keyCode == GLFW_MOUSE_BUTTON_2) {
+            m_showImguiWindow = !m_showImguiWindow;
+            if (m_showImguiWindow) {
+                m_setImguiWindowPos = false;
+            }
+        }
     };
 }
