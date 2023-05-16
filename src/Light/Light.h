@@ -13,36 +13,19 @@ class Light
 {
 public:
 	struct ViewProjectionParameters {
-		float minx = 0;
-		float miny = 0;
-		float maxx = 0;
-		float maxy = 0;
-		float fov = 0;
+		float minx = -4;
+		float miny = 4;
+		float maxx = -4;
+		float maxy = 4;
+		float fov = 0.6f;
 		float aspect = 1.0f;
 		float near_plane = 0.1f;
 		float far_plane = 5.0f;
 		float directionalLightScale = 2.5f;
 		glm::vec3 UP = { 0.0f, 0.0f, 1.0f };
-		void directional(float minx_, float maxx_, float miny_, float maxy_, float near_plane_, float far_plane_, float scale_, glm::vec3 UP_) {
-			minx = minx_;
-			maxx = maxx_;
-			miny = miny_;
-			maxy = maxy_;
-			near_plane = near_plane_;
-			far_plane = far_plane_;
-			directionalLightScale = scale_;
-			UP = UP_;
-		}
-		void spotlight(float aspect_, float near_plane_, float far_plane_, glm::vec3 UP_) {
-			aspect = aspect_;
-			near_plane = near_plane_;
-			far_plane = far_plane_;
-			UP = UP_;
-		}
-		void point(float aspect_, float near_plane_, float far_plane_) {
-			fov = 90.0f;
-			spotlight(aspect_, near_plane_, far_plane_, glm::vec3(0.0f));
-		}
+		ViewProjectionParameters& directional(float minx_ = -4, float maxx_ = 4, float miny_ = -4, float maxy_ = 4, float near_plane_ = 0.1f, float far_plane_ = 12.0f, float scale_ = 2.5f, glm::vec3 UP_ = { 0.0f, 0.0f, 1.0f });
+		ViewProjectionParameters& spotlight(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f, glm::vec3 UP_ = { 0.0f, 0.0f, 1.0f });
+		ViewProjectionParameters& point(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f);
 	};
 
 	enum class Type {

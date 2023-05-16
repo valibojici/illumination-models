@@ -102,14 +102,10 @@ ModelTestScene::ModelTestScene(Scene*& scene, unsigned int width, unsigned int h
 
     m_shadowFBO.create(); // create the shadow framebuffer
 
-
-    Light::ViewProjectionParameters parameters;
-    parameters.point(1.0f, 0.02f, 12.0f);
-    m_lights[0]->setViewProjectionParameters(parameters);
-    parameters.point(1.0f, 0.02f, 12.0f);
-    m_lights[1]->setViewProjectionParameters(parameters);
-    parameters.point(1.0f, 0.1f, 12.0f);
-    m_lights[2]->setViewProjectionParameters(parameters);
+    // set view proj parameters for lights
+    m_lights[0]->setViewProjectionParameters(Light::ViewProjectionParameters().point(1.0f, 0.02f, 12.0f));
+    m_lights[1]->setViewProjectionParameters(Light::ViewProjectionParameters().point(1.0f, 0.02f, 12.0f));
+    m_lights[2]->setViewProjectionParameters(Light::ViewProjectionParameters().point(1.0f, 0.1f, 12.0f));
 
 
     // load models
