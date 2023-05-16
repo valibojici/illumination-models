@@ -144,16 +144,7 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
     
     m_shadowFBO.create(); // create the shadow framebuffer
 
-
-    Light::ViewProjectionParameters vpParameters_directional;
-    vpParameters_directional.directional(-4, 4, -4, 4, 0.1f, 12.0f, 2.5f, { 0.0f, 0.0f, 1.0f });
-    Light::ViewProjectionParameters vpParameters_spotlight;
-    vpParameters_spotlight.spotlight(1.0f, 1.0f, 12.0f, { 0.0f, 0.0f, 1.0f });
-    Light::ViewProjectionParameters vpParameters_point;
-    vpParameters_point.point(1.0f, 0.1f, 12.0f);
-    m_lights[0]->setViewProjectionParameters(vpParameters_point);
-    m_lights[1]->setViewProjectionParameters(vpParameters_directional);
-    m_lights[2]->setViewProjectionParameters(vpParameters_spotlight);
+    m_lights[1]->setViewProjectionParameters(Light::ViewProjectionParameters().directional(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 12.0f, 2.8f));
 }
 
 Box::~Box()
