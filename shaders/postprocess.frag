@@ -5,29 +5,13 @@ in vec2 texCoords;
 
 uniform sampler2D u_texture;
 
-// what HDR algorithm is used:
-// 0 = disabled | 1 = reinhard | 2 = filmic
-uniform int u_hdr;
+// flag if HDR is used:
+uniform bool u_hdr;
 
 // flag to enable/disable gamma correction
 uniform bool  u_gammaCorrect = false; 
 
-uniform float u_exposure = 0.0f;
-
 uniform float u_reinhardWhite = 4;
-
-const float LinearWhite = 11.2; // linear white point value for filmin tonemapping
-
-vec3 filmic_tonemap(vec3 col){
-    const float A = 0.22; // shoulder strength
-    const float B = 0.30; // linear strength
-    const float C = 0.10; // linear angle
-    const float D = 0.20; // toe strength
-    const float E = 0.01; // toe numerator
-    const float F = 0.30; // toe denomimator
-   
-    return (col * (A * col + C * B) + D * E) / (col * (A * col + B) + D * F) - E / F;
-}
 
 vec3 reinhard_tonemap(vec3 col){
     // get luminance
@@ -39,12 +23,10 @@ vec3 reinhard_tonemap(vec3 col){
 }
 
 void main(){
-	vec3 color = texture(u_texture, texCoords).rgb * pow(2, u_exposure);
+	vec3 color = texture(u_texture, texCoords).rgb;
 
-    if(u_hdr == 1){
+    if(u_hdr){
         color = reinhard_tonemap(color);
-    } else if(u_hdr == 2){
-        color = filmic_tonemap(color) / filmic_tonemap(vec3(LinearWhite));
     }
 
     if(u_gammaCorrect){
