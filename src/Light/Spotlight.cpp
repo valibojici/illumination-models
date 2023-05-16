@@ -11,6 +11,10 @@ Spotlight::Spotlight(int index, const glm::vec3& position, const glm::vec3& targ
 	m_target = target;
 	m_cutOff = cutOff;
 	m_outerCutOff = outerCutoff;
+	
+	// set light projection parameters
+	m_parameters.spotlight(1.0f, 1.0f, 12.0f, { 0.0f, 0.0f, 1.0f });
+	calculateLightSpaceMatrix();
 }
 
 void Spotlight::imGuiRender()
@@ -23,6 +27,8 @@ void Spotlight::imGuiRender()
 		Light::imGuiRender();
 
 		if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
+			// set UP vector to positive Y if light is on Z axis
+			m_parameters.UP = (m_position.x == 0.0f && m_position.y == 0.0f) ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.0f);
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
 		}
@@ -47,6 +53,22 @@ void Spotlight::imGuiRender()
 		}
 		// slider is logaritmic for greater control
 		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+
+		// UI for light view projection parameters
+		if (ImGui::CollapsingHeader("Light projection matrix parameters")) {
+			if (ImGui::DragFloat("Aspect", &m_parameters.aspect, 0.001f, 0.001f, 50.0f)) {
+				calculateLightSpaceMatrix();
+				m_shadowNeedsRender = true;
+			}
+			if (ImGui::DragFloat("Near plane", &m_parameters.near_plane, 0.001f, 0.001f, 50.0f)) {
+				calculateLightSpaceMatrix();
+				m_shadowNeedsRender = true;
+			}
+			if (ImGui::DragFloat("Far plane", &m_parameters.far_plane, 0.001f, 0.001f, 50.0f)) {
+				calculateLightSpaceMatrix();
+				m_shadowNeedsRender = true;
+			}
+		}
 	}
 	ImGui::NewLine();
 	ImGui::PopStyleColor();

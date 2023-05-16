@@ -7,6 +7,10 @@ PointLight::PointLight(int index, const glm::vec3& position, const glm::vec3& co
 	ss << "Point light #" << index;
 	m_name = ss.str();
 	m_position = position;
+
+	// set light projection parameters
+	m_parameters.point(1.0f, 0.1f, 12.0f);
+	calculateLightSpaceMatrix();
 }
 
 void PointLight::calculateLightSpaceMatrix()
@@ -64,6 +68,22 @@ void PointLight::imGuiRender()
 			m_shadowNeedsRender = true;
 		}
 		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+
+		// UI for light view projection parameters
+		if (ImGui::CollapsingHeader("Light projection matrix parameters")) {
+			if (ImGui::DragFloat("Aspect", &m_parameters.aspect, 0.001f, 0.001f, 50.0f)) {
+				calculateLightSpaceMatrix();
+				m_shadowNeedsRender = true;
+			}
+			if (ImGui::DragFloat("Near plane", &m_parameters.near_plane, 0.001f, 0.001f, 50.0f)) {
+				calculateLightSpaceMatrix();
+				m_shadowNeedsRender = true;
+			}
+			if (ImGui::DragFloat("Far plane", &m_parameters.far_plane, 0.001f, 0.001f, 50.0f)) {
+				calculateLightSpaceMatrix();
+				m_shadowNeedsRender = true;
+			}
+		}
 	}
 	ImGui::NewLine();
 	ImGui::PopStyleColor();
