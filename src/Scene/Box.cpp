@@ -289,8 +289,44 @@ void Box::onRenderImGui()
     }
 
     // render UI for every light
-    for (auto &light : m_lights) {
-        light->imGuiRender();
+    for (size_t i = 0; i < m_lights.size();++i) {
+        ImGui::PushID(m_lights[i].get());
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.2f, 0.2f, 1.0f)); // Set header color
+        if (ImGui::CollapsingHeader(m_lights[i]->m_name.c_str())) {
+            // render combox for light type
+            int type = (int)m_lights[i]->getType();
+            bool hadShadow = m_lights[i]->getShadow();
+            // recreate depth buffers for shadowmapping
+            unsigned int textureType = GL_TEXTURE_2D;
+            if (ImGui::Combo("Type", &type, "Point\0Directional\0Spotlight\0\0")) {
+                switch (type)
+                {
+                case 0:
+                    m_lights[i] = std::move(std::make_unique<PointLight>(i, m_lights[i]->getPosition()));
+                    textureType = GL_TEXTURE_CUBE_MAP;
+                    break;
+                case 1:
+                    m_lights[i] = std::move(std::make_unique<DirectionalLight>(i, m_lights[i]->getPosition()));
+                    m_lights[i]->setViewProjectionParameters(Light::ViewProjectionParameters().directional(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 12.0f, 2.8f));
+                    break;
+                case 2:
+                    m_lights[i] = std::move(std::make_unique<Spotlight>(i, m_lights[i]->getPosition(), glm::vec3(0.0f)));
+                    break;
+                }
+                m_lights[i]->setShadow(hadShadow);
+                // recreate depth buffers for shadowmapping
+                unsigned int id = m_shadowFBO.addDepthAttachmentAtSlot(i, textureType);
+                // set the depth maps starting from slot 8 
+                glActiveTexture(GL_TEXTURE8 + i);
+                glBindTexture(textureType, id);
+                m_lights[i]->setShadowTextureSlot(8 + i);
+            }
+            // render the rest of UI
+            m_lights[i]->imGuiRender();
+        }
+        ImGui::PopStyleColor();
+        ImGui::PopID();
+        ImGui::NewLine();
     }
 
     if (ImGui::Combo("Lighting model", &m_modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0Toon\0\0")) {

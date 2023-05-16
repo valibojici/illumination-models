@@ -66,5 +66,12 @@ public:
 	/// </summary>
 	/// <param name="target">: texture target, GL_TEXTURE_2D or GL_TEXTURE_CUBE_MAP_direction</param>
 	void activateDepthAttachment(int slot, unsigned int target = GL_TEXTURE_2D);
+
+	/// <summary>
+	/// Add a depth attachment texture/renderbuffer overwriting an existing one
+	/// </summary>
+	/// <param name="type">: GL_TEXTURE_2D, GL_RENDERBUFFER or GL_TEXTURE_CUBE_MAP</param>
+	/// <param name="internalFormat">: default is GL_DEPTH_COMPONENT</param>
+	unsigned int addDepthAttachmentAtSlot(int slot, unsigned int type = GL_TEXTURE_2D, unsigned int internalFormat = GL_DEPTH_COMPONENT);
 };
 

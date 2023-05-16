@@ -159,3 +159,22 @@ void Framebuffer::activateDepthAttachment(int slot, unsigned int target)
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}
 }
+
+unsigned int Framebuffer::addDepthAttachmentAtSlot(int slot, unsigned int type, unsigned int internalFormat)
+{
+	// save the old attachment for deleting
+	Attachment oldAttachment = m_depthAttachments[slot];
+	// create new attachment and copy to slot position
+	addDepthAttachment(type, internalFormat);
+	m_depthAttachments[slot] = m_depthAttachments[m_depthAttachments.size() - 1];
+	m_depthAttachments.pop_back();
+
+	// delete old texture/renderbuffer
+	if (oldAttachment.type != GL_RENDERBUFFER) {
+		glDeleteTextures(1, &oldAttachment.id);
+	}
+	else {
+		glDeleteRenderbuffers(1, &oldAttachment.id);
+	}
+	return m_depthAttachments[slot].id;
+}
