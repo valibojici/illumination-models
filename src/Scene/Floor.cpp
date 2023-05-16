@@ -187,8 +187,32 @@ void Floor::onRenderImGui()
     }
 
     // render UI for every light
-    for (auto& light : m_lights) {
-        light->imGuiRender();
+    for (size_t i = 0; i < m_lights.size(); ++i) {
+        ImGui::PushID(m_lights[i].get());
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.2f, 0.2f, 1.0f)); // Set header color
+        if (ImGui::CollapsingHeader(m_lights[i]->m_name.c_str())) {
+            // render combox for light type
+            int type = (int)m_lights[i]->getType();
+            if (ImGui::Combo("Type", &type, "Point\0Directional\0Spotlight\0\0")) {
+                switch (type)
+                {
+                case 0:
+                    m_lights[i] = std::move(std::make_unique<PointLight>(i, m_lights[i]->getPosition()));
+                    break;
+                case 1:
+                    m_lights[i] = std::move(std::make_unique<DirectionalLight>(i, m_lights[i]->getPosition()));
+                    break;
+                case 2:
+                    m_lights[i] = std::move(std::make_unique<Spotlight>(i, m_lights[i]->getPosition(), glm::vec3(0.0f)));
+                    break;
+                }
+            }
+            // render the rest of UI
+            m_lights[i]->imGuiRender();
+        }
+        ImGui::PopStyleColor();
+        ImGui::PopID();
+        ImGui::NewLine();
     }
  
     ImGui::NewLine();
