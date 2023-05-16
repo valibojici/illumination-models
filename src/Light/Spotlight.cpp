@@ -19,60 +19,53 @@ Spotlight::Spotlight(int index, const glm::vec3& position, const glm::vec3& targ
 
 void Spotlight::imGuiRender()
 {
-	ImGui::PushID(this);
-	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.2f, 0.2f, 1.0f)); // Set header color
-	
-	if (ImGui::CollapsingHeader(m_name.c_str())) {
+	Light::imGuiRender();
 
-		Light::imGuiRender();
+	if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
+		// set UP vector to positive Y if light is on Z axis
+		m_parameters.UP = (m_position.x == 0.0f && m_position.y == 0.0f) ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.0f);
+		calculateLightSpaceMatrix();
+		m_shadowNeedsRender = true;
+	}
 
-		if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
-			// set UP vector to positive Y if light is on Z axis
-			m_parameters.UP = (m_position.x == 0.0f && m_position.y == 0.0f) ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.0f);
+	if (ImGui::DragFloat3("Target", &m_target.x, 0.01f)) {
+		calculateLightSpaceMatrix();
+		m_shadowNeedsRender = true;
+	}
+	/*
+	* the cut off and outer cut off are stored in degrees
+	* but the shader expects cos values
+	*/
+	if (ImGui::DragFloat("Cut off", &m_cutOff, 0.1f, 0.1f, 90.0f, "%.1f deg")) {
+		m_outerCutOff = std::max(m_outerCutOff, m_cutOff);
+		calculateLightSpaceMatrix();
+		m_shadowNeedsRender = true;
+	}
+	if (ImGui::DragFloat("Outer cut off", &m_outerCutOff, 0.1f, 0.1f, 90.0f, "%.1f deg")) {
+		m_cutOff = std::min(m_cutOff, m_outerCutOff);
+		calculateLightSpaceMatrix();
+		m_shadowNeedsRender = true;
+	}
+	// slider is logaritmic for greater control
+	ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+
+	// UI for light view projection parameters
+	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.25f, 0.25f, 1.0f)); // Set header color
+	if (ImGui::CollapsingHeader("Light projection matrix parameters")) {
+		if (ImGui::DragFloat("Aspect", &m_parameters.aspect, 0.001f, 0.001f, 50.0f)) {
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
 		}
-
-		if (ImGui::DragFloat3("Target", &m_target.x, 0.01f)) {
+		if (ImGui::DragFloat("Near plane", &m_parameters.near_plane, 0.001f, 0.001f, 50.0f)) {
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
 		}
-		/*
-		* the cut off and outer cut off are stored in degrees
-		* but the shader expects cos values
-		*/
-		if (ImGui::DragFloat("Cut off", &m_cutOff, 0.1f, 0.1f, 90.0f, "%.1f deg")) {
-			m_outerCutOff = std::max(m_outerCutOff, m_cutOff);
+		if (ImGui::DragFloat("Far plane", &m_parameters.far_plane, 0.001f, 0.001f, 50.0f)) {
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
-		}
-		if (ImGui::DragFloat("Outer cut off", &m_outerCutOff, 0.1f, 0.1f, 90.0f, "%.1f deg")) {
-			m_cutOff = std::min(m_cutOff, m_outerCutOff);
-			calculateLightSpaceMatrix();
-			m_shadowNeedsRender = true;
-		}
-		// slider is logaritmic for greater control
-		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
-
-		// UI for light view projection parameters
-		if (ImGui::CollapsingHeader("Light projection matrix parameters")) {
-			if (ImGui::DragFloat("Aspect", &m_parameters.aspect, 0.001f, 0.001f, 50.0f)) {
-				calculateLightSpaceMatrix();
-				m_shadowNeedsRender = true;
-			}
-			if (ImGui::DragFloat("Near plane", &m_parameters.near_plane, 0.001f, 0.001f, 50.0f)) {
-				calculateLightSpaceMatrix();
-				m_shadowNeedsRender = true;
-			}
-			if (ImGui::DragFloat("Far plane", &m_parameters.far_plane, 0.001f, 0.001f, 50.0f)) {
-				calculateLightSpaceMatrix();
-				m_shadowNeedsRender = true;
-			}
 		}
 	}
-	ImGui::NewLine();
 	ImGui::PopStyleColor();
-	ImGui::PopID();
 }
 
 void Spotlight::setUniforms(Shader& shader)

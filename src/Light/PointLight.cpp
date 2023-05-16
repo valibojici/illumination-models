@@ -57,37 +57,31 @@ void PointLight::calculateLightSpaceMatrix()
 
 void PointLight::imGuiRender()
 {
-	ImGui::PushID(this);
-	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.2f, 0.2f, 1.0f)); // Set header color
-	if (ImGui::CollapsingHeader(m_name.c_str())) {
+	Light::imGuiRender();
 
-		Light::imGuiRender();
+	if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
+		calculateLightSpaceMatrix();
+		m_shadowNeedsRender = true;
+	}
+	ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 
-		if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
+	// UI for light view projection parameters
+	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.25f, 0.25f, 1.0f)); // Set header color
+	if (ImGui::CollapsingHeader("Light projection matrix parameters")) {
+		if (ImGui::DragFloat("Aspect", &m_parameters.aspect, 0.001f, 0.001f, 50.0f)) {
 			calculateLightSpaceMatrix();
 			m_shadowNeedsRender = true;
 		}
-		ImGui::SliderFloat3("Attenuation", &m_attenuation[0], 0.0f, 1.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
-
-		// UI for light view projection parameters
-		if (ImGui::CollapsingHeader("Light projection matrix parameters")) {
-			if (ImGui::DragFloat("Aspect", &m_parameters.aspect, 0.001f, 0.001f, 50.0f)) {
-				calculateLightSpaceMatrix();
-				m_shadowNeedsRender = true;
-			}
-			if (ImGui::DragFloat("Near plane", &m_parameters.near_plane, 0.001f, 0.001f, 50.0f)) {
-				calculateLightSpaceMatrix();
-				m_shadowNeedsRender = true;
-			}
-			if (ImGui::DragFloat("Far plane", &m_parameters.far_plane, 0.001f, 0.001f, 50.0f)) {
-				calculateLightSpaceMatrix();
-				m_shadowNeedsRender = true;
-			}
+		if (ImGui::DragFloat("Near plane", &m_parameters.near_plane, 0.001f, 0.001f, 50.0f)) {
+			calculateLightSpaceMatrix();
+			m_shadowNeedsRender = true;
+		}
+		if (ImGui::DragFloat("Far plane", &m_parameters.far_plane, 0.001f, 0.001f, 50.0f)) {
+			calculateLightSpaceMatrix();
+			m_shadowNeedsRender = true;
 		}
 	}
-	ImGui::NewLine();
 	ImGui::PopStyleColor();
-	ImGui::PopID();
 }
 
 void PointLight::setUniforms(Shader& shader)
