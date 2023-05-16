@@ -14,10 +14,8 @@ private:
 	// flag to enable/disable gamma correction
 	bool m_gammaCorrect = true;
 
-	// 0 = no hdr | 1 = Reinhard tonemapping | 2 = filmic tonemapping
-	int m_hdr = 0;
-
-	float m_exposure = 0;
+	// flag to use/not use HDR
+	bool m_hdr = true;
 
 	// parameter for Reinhard tonemapping
 	float m_reinhardWhite = 4;
@@ -40,6 +38,6 @@ public:
 
 	inline void setGammaCorrection(bool value) { m_gammaCorrect = value; }
 	inline bool getGammaCorrection()const { return m_gammaCorrect; }
-	inline void setHDR(int value) { m_hdr = value; }
+	inline void setHDR(bool value) { m_hdr = value; }
 };
 
