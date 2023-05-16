@@ -367,4 +367,6 @@ void Box::updateWidthHeight(unsigned width, unsigned height)
     m_hdrFBO->addDepthAttachment(GL_RENDERBUFFER);
     m_hdrFBO->create();
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
+    m_toonPostProcessShader.setFloat("u_textureWidth", m_width);
+    m_toonPostProcessShader.setFloat("u_textureHeight", m_height);
 }
