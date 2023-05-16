@@ -53,3 +53,31 @@ std::string Light::formatAttribute(const std::string& name)
 	ss << "u_lights[" << m_index << "]." << name;
 	return ss.str();
 }
+
+Light::ViewProjectionParameters& Light::ViewProjectionParameters::directional(
+	float minx_, float maxx_, float miny_, float maxy_, float near_plane_, float far_plane_, float scale_, glm::vec3 UP_) {
+
+	minx = minx_;
+	maxx = maxx_;
+	miny = miny_;
+	maxy = maxy_;
+	near_plane = near_plane_;
+	far_plane = far_plane_;
+	directionalLightScale = scale_;
+	UP = UP_;
+	return *this;
+}
+
+Light::ViewProjectionParameters& Light::ViewProjectionParameters::spotlight(float aspect_, float near_plane_, float far_plane_, glm::vec3 UP_) {
+	aspect = aspect_;
+	near_plane = near_plane_;
+	far_plane = far_plane_;
+	UP = UP_;
+	return *this;
+}
+
+Light::ViewProjectionParameters& Light::ViewProjectionParameters::point(float aspect_, float near_plane_, float far_plane_) {
+	fov = 90.0f;
+	spotlight(aspect_, near_plane_, far_plane_, glm::vec3(0.0f));
+	return *this;
+}
