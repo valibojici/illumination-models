@@ -38,6 +38,8 @@ private:
 
 	// framebuffer to use lighting with hdr
 	std::unique_ptr<Framebuffer> m_hdrFBO;
+	// framebuffer used to output after postprocessing
+	std::unique_ptr<Framebuffer> m_outputFBO;
 
 	// helper to render texture to screen
 	ScreenQuadRenderer m_screenQuadRenderer;
@@ -51,6 +53,7 @@ private:
 	Camera m_camera;
 	std::vector<Shader> m_shaders;
 	Shader m_postprocessShader;
+	Shader m_textureDisplayShader;
 
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
 	glm::mat4 m_projMatrix = glm::mat4(1.0f);

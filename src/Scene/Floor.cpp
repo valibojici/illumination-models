@@ -22,6 +22,7 @@ Floor::Floor(Scene*& scene,unsigned int width, unsigned int height) :
     m_shaders[1].load("base_shader.vert", "blinn.frag");
     m_shaders[2].load("base_shader.vert", "cook-torrance.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
+    m_textureDisplayShader.load("postprocess.vert", "texture_display.frag");
     
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_postprocessShader });
     m_postProcessUI.setUniforms();
@@ -170,10 +171,17 @@ void Floor::onRender()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    m_hdrFBO->unbind();
+    // apply postprocessing and write to another FBO
+    m_outputFBO->bind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
     m_screenQuadRenderer.render(m_hdrFBO->getColorAttachment(0), m_postprocessShader);
+
+    // bind default framebuffer
+    m_outputFBO->unbind(); 
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+    m_screenQuadRenderer.render(m_outputFBO->getColorAttachment(0), m_textureDisplayShader);
 }
 
 void Floor::onRenderImGui()
@@ -237,6 +245,10 @@ void Floor::onRenderImGui()
         m_camera.setTarget({ 0.0f, 0.0f, 0.0f });
     }
 
+    if (ImGui::Button("Screenshot")) {
+        m_outputFBO->saveColorAttachmentToPNG(0);
+    }
+
     m_postProcessUI.onRenderImGui();
 
     // enable/disable wireframes, for debug
@@ -253,5 +265,9 @@ void Floor::updateWidthHeight(unsigned int width, unsigned int height)
     m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB16F);
     m_hdrFBO->addDepthAttachment(GL_TEXTURE_2D);
     m_hdrFBO->create();
+    // setup output FBO (after postprocessing)
+    m_outputFBO = std::make_unique<Framebuffer>(width, height);
+    m_outputFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB);
+    m_outputFBO->create();
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
 }
