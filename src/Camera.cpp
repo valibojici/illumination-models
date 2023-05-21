@@ -18,11 +18,20 @@ void Camera::handleEvent(const Event& e)
 		m_mousePressed = false;
 		break;
 
+	// on press a flag is set indicating direction
 	case Event::Type::KEY_PRESS:
-	case Event::Type::KEY_RELEASE:
-		// on press a flag is set indicating direction
+		setMovingDirection(e.key.keyCode, true);
+		// if left shift is pressed => move faster
+		if (e.key.keyCode == GLFW_KEY_LEFT_SHIFT) {
+			CAMERA_SPEED = 2.5f;
+		}
+		break;
 		// on release, that flag is removed
-		setMovingDirection(e.key.keyCode, e.type() == Event::Type::KEY_PRESS);
+	case Event::Type::KEY_RELEASE:
+		setMovingDirection(e.key.keyCode, false);
+		if (e.key.keyCode == GLFW_KEY_LEFT_SHIFT) {
+			CAMERA_SPEED = 1.25f;
+		}
 		break;
 	case Event::Type::MOUSE_MOVE:
 		m_currentMousePos = { e.mouse.x, e.mouse.y };
@@ -68,7 +77,7 @@ void Camera::setMovingDirection(unsigned int key, bool pressed)
 	}
 }
 
-void Camera::changeOrientation(double mouseX, double mouseY)
+void Camera::changeOrientation()
 {
 	// mouse movement doesnt depend on time so there is no deltatime
 
@@ -80,9 +89,6 @@ void Camera::changeOrientation(double mouseX, double mouseY)
 	// view matrix needs update
 	m_needsUpdate = true;
 
-	// TODO: maybe dont hardcode this
-	const float SENSIVITY = 0.15f;
-
 	float deltaX = m_currentMousePos.x - m_lastMousePos.x;
 	// mouse y starts from top left so it is negated
 	float deltaY = -(m_currentMousePos.y - m_lastMousePos.y);
@@ -90,8 +96,8 @@ void Camera::changeOrientation(double mouseX, double mouseY)
 	m_lastMousePos = m_currentMousePos;
 
 	// multiply by sensitivity so mouse movement is not too much
-	deltaX *=  SENSIVITY;
-	deltaY *=  SENSIVITY;
+	deltaX *=  MOUSE_SENSIVITY;
+	deltaY *=  MOUSE_SENSIVITY;
 
 	// pitch (up/down)
 	glm::mat3 pitchRotateMatrix = glm::rotate(glm::radians(deltaY), m_right);
@@ -121,35 +127,32 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& target, const glm::ve
 
 void Camera::update(double deltaTime)
 {
-	// TODO: maybe dont hardcode this
-	const float SPEED = 2.5f;
-
 	// update axis based on mouse movement
-	changeOrientation(0, 0);
+	changeOrientation();
 
 	// update position based on keys pressed
 	if (m_moveDirection & CAMERA_MOVE_FORWARD) {
-		m_position += float(deltaTime * SPEED) * m_direction;
+		m_position += float(deltaTime * CAMERA_SPEED) * m_direction;
 		m_needsUpdate = true;
 	}
 	if (m_moveDirection & CAMERA_MOVE_BACKWARD) {
-		m_position -= float(deltaTime * SPEED) * m_direction;
+		m_position -= float(deltaTime * CAMERA_SPEED) * m_direction;
 		m_needsUpdate = true;
 	}
 	if (m_moveDirection & CAMERA_MOVE_LEFT) {
-		m_position -= float(deltaTime * SPEED) * m_right;
+		m_position -= float(deltaTime * CAMERA_SPEED) * m_right;
 		m_needsUpdate = true;
 	}
 	if (m_moveDirection & CAMERA_MOVE_RIGHT) {
-		m_position += float(deltaTime * SPEED) * m_right;
+		m_position += float(deltaTime * CAMERA_SPEED) * m_right;
 		m_needsUpdate = true;
 	}
 	if (m_moveDirection & CAMERA_MOVE_UP) {
-		m_position += float(deltaTime * SPEED) * m_cameraUp;
+		m_position += float(deltaTime * CAMERA_SPEED) * m_cameraUp;
 		m_needsUpdate = true;
 	}
 	if (m_moveDirection & CAMERA_MOVE_DOWN) {
-		m_position -= float(deltaTime * SPEED) * m_cameraUp;
+		m_position -= float(deltaTime * CAMERA_SPEED) * m_cameraUp;
 		m_needsUpdate = true;
 	}
 
