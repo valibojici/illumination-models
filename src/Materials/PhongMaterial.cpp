@@ -19,9 +19,8 @@ void PhongMaterial::imGuiRender()
 
     ImGui::Checkbox("Do not divide specular by geometry term", &m_modifiedSpecular);
     ImGui::SameLine();
-    Scene::helpPoput("If the specular term is divided by the geometry term it means\
- that the geometry term has no impact, this is a problem at grazing\
- angles but its more realistic because it is a basic fresnel effect");
+    Scene::helpPoput("If the specular term is not divided by the geometry term it means\
+ that the geometry term has impact");
 
     ImGui::DragFloat("Alpha (shininess)", &m_alpha, 1.0f, 1.0f, 1024.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
     ImGui::DragFloat("Ambient intensity", &m_ka, 0.00005f, 0.0f, 0.5f, "%.5f");

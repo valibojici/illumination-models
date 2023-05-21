@@ -142,7 +142,6 @@
     <ClCompile Include="src\Event\EventManager.cpp" />
     <ClCompile Include="src\Scene\SceneMenu.cpp" />
     <ClCompile Include="src\Buffer\EBO.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -185,7 +184,6 @@
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Scene\SceneMenu.h" />
     <ClInclude Include="src\Buffer\EBO.h" />
-    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\App.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />

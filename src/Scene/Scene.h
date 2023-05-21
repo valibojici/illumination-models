@@ -15,7 +15,6 @@ public:
 	virtual void onRender() {}
 	// TODO: add back button rendering here
 	virtual void onRenderImGui() {}
-	virtual void onUpdate() {}
 	virtual void updateWidthHeight(unsigned int width, unsigned int height) {}
 	virtual ~Scene() {}
 	static void helpPoput(const char* text);

@@ -1,14 +1,33 @@
 #pragma once
-#include "Renderer.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneMenu.h"
+#include "Event/EventManager.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include "GL/glew.h"
+#include <GLFW/glfw3.h>
 
-class App
+class App : public EventHandler
 {
-public:
-	void run();
-	App();
 private:
-	Renderer m_renderer;
+	GLFWwindow* m_window = nullptr;
+	unsigned int m_windowWidth = 1280;
+	unsigned int m_windowHeight = 720;
+	bool m_showImguiWindow = true;
+	bool m_setImguiWindowPos = false;
+
+	Scene* m_scene;
+
+	void handleEvent(const Event& e) override;
+
+	static void glfw_error_callback(int error, const char* description)
+	{
+		fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+	}
+public:
+	App();
+	~App();
+	void run();
 };
 

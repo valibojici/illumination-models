@@ -1,5 +1,5 @@
 #include "ModelTestScene.h"
-static glm::vec3 trans = glm::vec3(1.56f, -1.1f, 0.62f);
+
 ModelTestScene::ModelTestScene(Scene*& scene, unsigned int width, unsigned int height)
     : Scene(scene, width, height), m_shadowFBO(2048, 2048)
 {
@@ -313,7 +313,6 @@ void ModelTestScene::onRenderImGui()
         ImGui::NewLine();
     }
 
-    ImGui::DragFloat3("Trnaslte", &trans.x, 0.01f);
 
     m_material.imGuiRender();
 
