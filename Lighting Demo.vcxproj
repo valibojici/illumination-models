@@ -159,6 +159,7 @@
     <ClCompile Include="vendor\IMGUI\imgui_tables.cpp" />
     <ClCompile Include="vendor\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="vendor\STB_IMAGE\stb_image.cpp" />
+    <ClCompile Include="vendor\STB_IMAGE\stb_image_write.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Postprocess\PostprocessUI.h" />
@@ -193,8 +194,10 @@
     <ClInclude Include="src\TextureManager.h" />
     <ClInclude Include="src\Materials\ToonMaterial.h" />
     <ClInclude Include="vendor\STB_IMAGE\stb_image.h" />
+    <ClInclude Include="vendor\STB_IMAGE\stb_image_write.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\texture_display.frag" />
     <None Include="shaders\base_shader.frag" />
     <None Include="shaders\blinn.frag" />
     <None Include="shaders\cook-torrance.frag" />
