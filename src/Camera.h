@@ -60,7 +60,10 @@ private:
 	/// <summary>
 	/// Change camera view direction based on mouse coords.
 	/// </summary>
-	void changeOrientation(double mouseX, double mouseY);
+	void changeOrientation();
+
+	float MOUSE_SENSIVITY = 0.15f;
+	float CAMERA_SPEED = 1.25f;
 public:
 	Camera(
 		const glm::vec3& position = glm::vec3(0.0f, 0.0f, 1.0f), 
