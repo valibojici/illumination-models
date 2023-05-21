@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 #include "GL/glew.h"
+#include "stb_image_write.h"
+#include <ctime>
 
 /// <summary>
 /// Framebuffer class that sets up attachments and binds them
@@ -52,7 +54,7 @@ public:
 	~Framebuffer();
 
 	/// <summary>
-	/// Get the id of the colorAttachment<slot>
+	/// Get the id of the colorAttachment
 	/// </summary>
 	unsigned int getColorAttachment(int slot) const { return m_colorAttachments[slot].id; }
 	
@@ -73,5 +75,11 @@ public:
 	/// <param name="type">: GL_TEXTURE_2D, GL_RENDERBUFFER or GL_TEXTURE_CUBE_MAP</param>
 	/// <param name="internalFormat">: default is GL_DEPTH_COMPONENT</param>
 	unsigned int addDepthAttachmentAtSlot(int slot, unsigned int type = GL_TEXTURE_2D, unsigned int internalFormat = GL_DEPTH_COMPONENT);
+
+	/// <summary>
+	/// Save the color attachment at a slot to PNG file
+	/// The name is the timestamp
+	/// </summary>
+	void saveColorAttachmentToPNG(int slot);
 };
 

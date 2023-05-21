@@ -178,3 +178,24 @@ unsigned int Framebuffer::addDepthAttachmentAtSlot(int slot, unsigned int type, 
 	}
 	return m_depthAttachments[slot].id;
 }
+
+void Framebuffer::saveColorAttachmentToPNG(int slot)
+{
+	int channels;
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(m_colorAttachments[slot].type, m_colorAttachments[slot].id);
+
+	glGetTexLevelParameteriv(m_colorAttachments[slot].type, 0, GL_TEXTURE_INTERNAL_FORMAT, &channels);
+	channels = channels == GL_RGB ? 3 : 4;
+	// allocate space
+	unsigned char* data = new unsigned char[m_width * m_height * channels];
+	// get texture and write
+	glGetTexImage(GL_TEXTURE_2D, 0, channels == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
+	stbi_flip_vertically_on_write(true);
+	// save data to file
+	std::stringstream ss;
+	ss << std::time(nullptr) << ".png";
+	stbi_write_png(ss.str().c_str(), m_width, m_height, 3, data, m_width * channels);
+	// cleanup
+	delete[] data;
+}
