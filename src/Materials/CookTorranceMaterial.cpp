@@ -2,6 +2,35 @@
 
 void CookTorranceMaterial::imGuiRender()
 {
+	if (ImGui::Combo("Material", &m_presetIndex, "Custom\0Gold\0Copper\0Iron\0\0")) {
+		switch (m_presetIndex)
+		{
+		case 1:
+			m_f0 = { 1.0f, 0.782f, 0.344f };
+			m_roughness = 0.25;
+			break;
+		case 2:
+			m_f0 = { 0.955f, 0.638f, 0.538f };
+			m_roughness = 0.2;
+			break;
+		case 3:
+			m_f0 = { 0.562f, 0.565f, 0.578f };
+			m_roughness = 0.3;
+			break;
+		default:
+			break;
+		}
+		if (m_presetIndex != 0) {
+			m_customF0 = true;
+			m_ia = m_f0;
+			m_ka = 0.001f;
+			m_ratio = 0.9f;
+			m_Dindex = 1;
+			m_Gindex = 4;
+			m_albedo = { 0.0f, 0.0f, 0.0f };
+		}
+	}
+	if (m_presetIndex != 0)return;
 	ImGui::Combo("Distribution function", &m_Dindex, "Beckmann\0GGX\0Phong\0\0");
 	ImGui::Combo("Geometrical function", &m_Gindex, "Cook-Torrance\0Beckmann uncorrelated G2 Smith\0GGX uncorrelated G2 Smith\0Beckmann correlated G2 Smith\0GGX correlated G2 Smith\0\0");
 

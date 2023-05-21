@@ -36,6 +36,7 @@ private:
 	bool m_outputDFG = false; 
 	int m_outputDFG_choice = 0;
 
+	int m_presetIndex = 0;
 public:
 	/// <summary>
 	/// Renders UI and does NOT set uniforms on value change
