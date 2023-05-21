@@ -7,17 +7,20 @@ void CookTorranceMaterial::imGuiRender()
 		{
 		case 1:
 			m_f0 = { 1.0f, 0.782f, 0.344f };
-			m_roughness = 0.25;
+			m_roughness = 0.25f;
 			break;
 		case 2:
 			m_f0 = { 0.955f, 0.638f, 0.538f };
-			m_roughness = 0.2;
+			m_roughness = 0.2f;
 			break;
 		case 3:
 			m_f0 = { 0.562f, 0.565f, 0.578f };
-			m_roughness = 0.3;
+			m_roughness = 0.3f;
 			break;
 		default:
+			m_customF0 = false;
+			m_roughness = 0.5f;
+			m_ratio = 0.2f;
 			break;
 		}
 		if (m_presetIndex != 0) {
