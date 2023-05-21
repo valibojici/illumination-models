@@ -68,7 +68,7 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     
     // we need to calculate F D and G terms
     // F - Fresnel Term
-    vec3 F0 = u_material.f0;
+    vec3 F0 = u_gammaCorrect ? toLinear(u_material.f0) : u_material.f0;
     if(u_material.f0 == vec3(0.0f)){ // dont use custom f0, use albedo
         F0 = mix(vec3(0.04f), diffuse, u_material.ratio);
     }
