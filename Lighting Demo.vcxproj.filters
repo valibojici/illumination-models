@@ -120,6 +120,9 @@
     <ClCompile Include="src\Materials\ToonMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="vendor\STB_IMAGE\stb_image_write.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h">
@@ -218,6 +221,9 @@
     <ClInclude Include="src\Materials\ToonMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="vendor\STB_IMAGE\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\phong.frag" />
@@ -239,5 +245,6 @@
     <None Include="shaders\skybox.frag" />
     <None Include="shaders\toon.frag" />
     <None Include="shaders\toon_postprocess.frag" />
+    <None Include="shaders\texture_display.frag" />
   </ItemGroup>
 </Project>

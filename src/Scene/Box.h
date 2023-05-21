@@ -34,6 +34,9 @@ private:
 
 	std::unique_ptr<Framebuffer> m_hdrFBO;
 	Framebuffer m_shadowFBO;
+	// framebuffer used to output after postprocessing
+	std::unique_ptr<Framebuffer> m_outputFBO;
+
 	ScreenQuadRenderer m_screenQuadRenderer;
 	std::vector<MaterialMesh> m_meshes;
 	std::vector<MaterialMesh> m_wallMeshes;
@@ -61,6 +64,7 @@ private:
 	Shader m_postprocessShader;
 	Shader m_toonPostProcessShader;
 	Shader m_shadowShader;
+	Shader m_textureDisplayShader; // simple shader that displays texture
 	
 	std::vector<glm::mat4> m_modelMatrix;
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);

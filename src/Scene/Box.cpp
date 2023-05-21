@@ -24,6 +24,7 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
     m_toonPostProcessShader.load("postprocess.vert", "toon_postprocess.frag");
     m_shadowShader.load("shadowmap_v2.vert", "shadowmap_v2.frag");
+    m_textureDisplayShader.load("postprocess.vert", "texture_display.frag");
 
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_shaders[3], &m_postprocessShader, &m_toonPostProcessShader });
     m_postProcessUI.setUniforms();
@@ -267,7 +268,8 @@ void Box::onRender()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    m_hdrFBO->unbind();
+    // apply postprocessing and write to another FBO
+    m_outputFBO->bind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
     if (m_modelIndex != 3) {
@@ -276,6 +278,12 @@ void Box::onRender()
     else {
         m_screenQuadRenderer.renderToon(m_hdrFBO->getColorAttachment(0), m_hdrFBO->getColorAttachment(1), m_toonPostProcessShader);
     }
+
+    // bind default framebuffer
+    m_outputFBO->unbind();
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+    m_screenQuadRenderer.render(m_outputFBO->getColorAttachment(0), m_textureDisplayShader);
 }
 
 void Box::onRenderImGui()
@@ -349,6 +357,10 @@ void Box::onRenderImGui()
         m_camera.setTarget({ 0.0f, 0.0f, 0.0f });
     }
 
+    if (ImGui::Button("Screenshot")) {
+        m_outputFBO->saveColorAttachmentToPNG(0);
+    }
+
     m_postProcessUI.onRenderImGui();
 
     // enable/disable wireframes, for debug
@@ -366,6 +378,11 @@ void Box::updateWidthHeight(unsigned width, unsigned height)
     m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
     m_hdrFBO->addDepthAttachment(GL_RENDERBUFFER);
     m_hdrFBO->create();
+    // setup output FBO (after postprocessing)
+    m_outputFBO = std::make_unique<Framebuffer>(width, height);
+    m_outputFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB);
+    m_outputFBO->create();
+
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
     m_toonPostProcessShader.setFloat("u_textureWidth", m_width);
     m_toonPostProcessShader.setFloat("u_textureHeight", m_height);

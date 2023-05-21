@@ -32,9 +32,9 @@ private:
 		float textureScaleY = 1.0f;
 	};
 
-	
-
 	std::unique_ptr<Framebuffer> m_hdrFBO;
+	// framebuffer used to output after postprocessing
+	std::unique_ptr<Framebuffer> m_outputFBO;
 	Framebuffer m_shadowFBO;
 	ScreenQuadRenderer m_screenQuadRenderer;
 	std::vector<MaterialMesh> m_meshes;
@@ -62,6 +62,7 @@ private:
 	Shader m_shader;
 	Shader m_postprocessShader;
 	Shader m_shadowShader;
+	Shader m_textureDisplayShader;
 
 	std::vector<glm::mat4> m_modelMatrix;
 	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
