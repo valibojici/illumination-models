@@ -139,7 +139,7 @@ void Floor::onRender()
     }
 
     if (m_wireframeEnabled) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
     // lights
