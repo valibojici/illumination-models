@@ -127,7 +127,7 @@
     <ClCompile Include="src\Postprocess\PostprocessUI.cpp" />
     <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\Materials\CookTorranceMaterial.cpp" />
-    <ClCompile Include="src\Scene\Floor.cpp" />
+    <ClCompile Include="src\Scene\TextureScene.cpp" />
     <ClCompile Include="src\Light\PointLight.cpp" />
     <ClCompile Include="src\Light\Spotlight.cpp" />
     <ClCompile Include="src\Light\DirectionalLight.cpp" />
@@ -165,7 +165,7 @@
     <ClInclude Include="src\Postprocess\ScreenQuadRenderer.h" />
     <ClInclude Include="src\Framebuffer.h" />
     <ClInclude Include="src\Materials\CookTorranceMaterial.h" />
-    <ClInclude Include="src\Scene\Floor.h" />
+    <ClInclude Include="src\Scene\TextureScene.h" />
     <ClInclude Include="src\Materials\BlinnMaterial.h" />
     <ClInclude Include="src\Light\PointLight.h" />
     <ClInclude Include="src\Light\Spotlight.h" />
