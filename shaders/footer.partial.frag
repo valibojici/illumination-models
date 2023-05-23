@@ -19,8 +19,8 @@ float spotlightFactor(Light light, vec3 lightDir){
 	vec3 spotDir = normalize(light.target - light.position.xyz);
     // get the cos of the angle between the spotlight direction (light to target) and light direction (light to fragment)
 	float cosSpotDir_LightDir = dot(spotDir, -lightDir);
-    // TODO research more
-	return clamp((cosSpotDir_LightDir - light.outerCutOff) / (light.cutOff - light.outerCutOff) , 0.0f, 1.0f);
+    // formula from RealTime Rendering p. 115 (used in Frostbite engine)
+	return pow(clamp((cosSpotDir_LightDir - light.outerCutOff) / (light.cutOff - light.outerCutOff) , 0.0f, 1.0f), 2);
 }
 
 vec3 indirectLighting(){
