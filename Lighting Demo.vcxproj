@@ -206,13 +206,8 @@
     <None Include="shaders\base_shader.vert" />
     <None Include="shaders\postprocess.frag" />
     <None Include="shaders\postprocess.vert" />
-    <None Include="shaders\shadowmap-view.frag" />
     <None Include="shaders\shadowmap.frag" />
     <None Include="shaders\shadowmap.vert" />
-    <None Include="shaders\shadowmap_v2.frag" />
-    <None Include="shaders\shadowmap_v2.vert" />
-    <None Include="shaders\skybox.frag" />
-    <None Include="shaders\skybox.vert" />
     <None Include="shaders\toon.frag" />
     <None Include="shaders\toon_postprocess.frag" />
   </ItemGroup>
