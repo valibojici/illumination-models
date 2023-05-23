@@ -23,7 +23,7 @@ ModelTestScene::ModelTestScene(Scene*& scene, unsigned int width, unsigned int h
     // load shaders
     m_shader.load("base_shader.vert", "cook-torrance.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
-    m_shadowShader.load("shadowmap_v2.vert", "shadowmap_v2.frag");
+    m_shadowShader.load("shadowmap.vert", "shadowmap.frag");
     m_textureDisplayShader.load("postprocess.vert", "texture_display.frag");
 
     m_postProcessUI.addShaders({ &m_shader, &m_postprocessShader });

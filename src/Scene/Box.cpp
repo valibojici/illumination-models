@@ -23,7 +23,7 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
     m_shaders[3].load("base_shader.vert", "toon.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
     m_toonPostProcessShader.load("postprocess.vert", "toon_postprocess.frag");
-    m_shadowShader.load("shadowmap_v2.vert", "shadowmap_v2.frag");
+    m_shadowShader.load("shadowmap.vert", "shadowmap.frag");
     m_textureDisplayShader.load("postprocess.vert", "texture_display.frag");
 
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_shaders[3], &m_postprocessShader, &m_toonPostProcessShader });
@@ -384,6 +384,7 @@ void Box::updateWidthHeight(unsigned width, unsigned height)
     m_outputFBO->create();
 
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
+    // set new width/height in toon post process shader
     m_toonPostProcessShader.setFloat("u_textureWidth", m_width);
     m_toonPostProcessShader.setFloat("u_textureHeight", m_height);
 }
