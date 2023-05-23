@@ -13,20 +13,20 @@ uniform Material u_material;
 @endsection
 
 @section "extra_uniforms"
-uniform int u_Gindex = 0;
-uniform int u_Dindex = 0;
+uniform int u_Gindex = 0; // which geometry function is used
+uniform int u_Dindex = 0; // which microfacet normal distribution is used
 
 uniform bool u_outputDFG = false; // flag if should output N G or F functions to debug/view
-uniform int u_outputD = 0;
-uniform int u_outputF = 0;
-uniform int u_outputG = 0;
+uniform int u_outputD = 0; // output only D function
+uniform int u_outputF = 0; // output only G function
+uniform int u_outputG = 0; // output only F function
 @endsection
 
 @section "BRDF_implementation"
-// fresnel term
+// calculates fresnel term using Shlick approximation
 vec3 F_Schlick(vec3 f0, float VH);
 
-// geometrical attenuation coefficient functions
+// Geometrical attenuation functions - G
 // cook torrance paper version
 float G_Cook(float VH, float NH, float NV, float NL);
 // uncorrelated smith function for beckmann
@@ -38,16 +38,16 @@ float G2_Beckmann(float NV, float NL);
 // height-correlated smith function for GGX
 float G2_GGX(float NV, float NL);
 
-// slope distribution function
+// slope distribution function - D
 // beckmann version, used in cook-torrance paper
 float D_Beckmann(float NH);
-// ggx 
+// ggx version
 float D_GGX(float NH);
-// phong
+// phong version
 float D_Phong(float NH);
 
 vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
-    // calculate diffuse term
+    // calculate diffuse/albedo term
 
     // get the diffuse color from texture and do gamma correction
     vec3 diffuse;
@@ -66,23 +66,32 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     float VH = dot(viewDir, halfway);
     float NV = dot(normal, viewDir);
     
-    // we need to calculate F D and G terms
+    // calculate F D and G terms
     // F - Fresnel Term
+    // gamma correct custom rgb f0 
     vec3 F0 = u_gammaCorrect ? toLinear(u_material.f0) : u_material.f0;
-    if(u_material.f0 == vec3(0.0f)){ // dont use custom f0, use albedo
+    // if f0 == 0 => dont use custom f0, use average value of 0.04 for non metals
+    // and combine color with albedo based on metalness (more metalness == more albedo color for f0)
+    if(u_material.f0 == vec3(0.0f)){
         F0 = mix(vec3(0.04f), diffuse, u_material.ratio);
     }
+    // get fresnel term using this F0 
     vec3 fresnel = F_Schlick(F0, VH);
+
+
     // D - Slope distribution function
     float slope_distribution;
-    switch(u_Dindex){ // chosen from application side
+    // distribution function is chosen from UI
+    switch(u_Dindex){ 
         case 0: slope_distribution = D_Beckmann(NH); break;
         case 1: slope_distribution = D_GGX(NH); break;
         case 2: slope_distribution = D_Phong(NH);
     }
+
     // G - Geometrical attenuation function
     float geometrical_attenuation;
-    switch(u_Gindex){ // chosen from application side
+    // Geometrical function is chosen from UI
+    switch(u_Gindex){
         case 0: geometrical_attenuation = G_Cook(VH, NH, NV, NL); break;
         case 1: geometrical_attenuation = G2_U_Beckmann(NV, NL); break;
         case 2: geometrical_attenuation = G2_U_GGX(NV, NL); break;
@@ -90,6 +99,7 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
         case 4: geometrical_attenuation = G2_GGX(NV, NL); break;
     }
 
+    // if flag is set => ouput only F D or G function
     if(u_outputDFG){
         vec3 result = vec3(0.0f);
         result += u_outputD * vec3(slope_distribution);
@@ -98,60 +108,62 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
         return result;
     }
 
-    // formula is FDG / (4 * NL * NV)
+    // formula is FDG / (4 * NL * NV) from cook-torrance paper
     vec3 specular =  (fresnel * slope_distribution * geometrical_attenuation) / 
                     (4 * max(0.0001f, NL) * max(0.0001f, NV));
-    
-    specular = specular * PI; // multiply with PI to denormalize
 
+    // get metallic ratio
     float ratio = u_hasMetallicTexture ? texture(u_MetallicTex, fs_in.texCoords).r : u_material.ratio;
-    ratio = max(ratio, 0.002); // add some to have fresnel reflections at least
-    if(u_useReflections){
-        // for skybox scene
-        // get reflection direction
-        vec3 reflectDir = reflect(fs_in.fragPos - u_viewPos, normal);
-        // sample cubebox
-        vec3 reflection = texture(u_reflectionMap, reflectDir).rgb;
-        specular = mix(reflection, specular, u_material.roughness); // mix reflections into specular
-        return mix(diffuse, specular, ratio);
-    } else {
-        return mix(diffuse, specular, ratio); // the result depends on the diffuse/specular ratio
-    }
+    // use at least 0.005 to have some fresnel reflections
+    ratio = max(ratio, 0.005); 
+    
+    // linear interpolation between diffuse and specular based on metalness
+    return mix(diffuse, specular, ratio); 
 }
 
-// fresnel term
+// uses Schlick approximation from "An Inexpensive BRDF Model for Physically-based Rendering"
 vec3 F_Schlick(vec3 f0, float VH){
-    return f0 + (1 - f0) * pow(1-VH, 5);
+    return f0 + (1 - f0) * pow(1 - VH, 5);
 }
 
-// geometrical attenuation coefficient functions
+// geometrical attenuation functions
 // cook torrance paper version
 float G_Cook(float VH, float NH, float NV, float NL){
     return min(1, min(2 * NH * NV / NV, 2.0f * NH * NL / NV));
 }
-// smith version
+
+// G2 smith uncorrelated, Beckmann distribution using approximation
 float G2_U_Beckmann(float NV, float NL){
+    // uncorrelated G2 function = G1(V) * G1(L)
+
+    // get roughness value (from texture if used)
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
+
+    // compute G1(V) and G1(L):
     
-    // calculate a for V
+    // calculate 'a' parameter for V
     float a_V = NV / (alpha * sqrt(1-NV*NV));
-    float g_V = 1.0f;
+    float G1_V = 1.0f;
     if(a_V < 1.6f) {
-        g_V = (3.535*a_V + 2.181*a_V*a_V) / (1 + 2.276 * a_V + 2.577 * a_V * a_V);
+        G1_V = (3.535*a_V + 2.181*a_V*a_V) / (1 + 2.276 * a_V + 2.577 * a_V * a_V);
     }
 
-    // calculate a for L
+    // calculate 'a' parameter for V
     float a_L = NL / (alpha * sqrt(1-NL*NL));
-    float g_L = 1.0f;
+    float G1_L = 1.0f;
     if(a_L < 1.6f) {
-        g_L = (3.535*a_L + 2.181*a_L*a_L) / (1 + 2.276 * a_L + 2.577 * a_L * a_L);
+        G1_L = (3.535*a_L + 2.181*a_L*a_L) / (1 + 2.276 * a_L + 2.577 * a_L * a_L);
     }
     
-    return g_V * g_L;
+    return G1_V * G1_L; // G1(V) * G1(L)
 }
 
+// G2 smith height correlated, Beckmann distribution using approximation
 float G2_Beckmann(float NV, float NL){
+    // get roughness value (from texture if used)
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
+
+    // calculate 'a' and Lambda(a) values for L and V
     float a_V = NV / (alpha * sqrt(1-NV*NV));
     float lambda_V = a_V >= 1.6f ? 0.0f : (1 - 1.259*a_V + 0.396*a_V*a_V) / (3.535*a_V + 2.181 * a_V * a_V);
 
@@ -161,41 +173,51 @@ float G2_Beckmann(float NV, float NL){
     return 1 / (1 + lambda_L + lambda_V);
 }
 
-// GGX
+// G2 smith uncorrelated, GGX distribution
 float G2_U_GGX(float NV, float NL){
+    // uncorrelated G2 function = G1(V) * G1(L)
+    
+    // get roughness value (from texture if used)
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
-    float sq_alpha = alpha * alpha;
-    float g_V = 2 * NV / (NV + sqrt(NV*NV + sq_alpha * (1 - NV * NV)));
-    float g_L = 2 * NL / (NL + sqrt(NL*NL + sq_alpha * (1 - NL * NL)));
-    return g_V * g_L;
+    float sq_alpha = alpha * alpha; // square value to appear more linear
+    // compute G1(V) and G1(L)
+    float G1_V = 2 * NV / (NV + sqrt(NV*NV + sq_alpha * (1 - NV * NV)));
+    float G1_L = 2 * NL / (NL + sqrt(NL*NL + sq_alpha * (1 - NL * NL)));
+    return G1_V * G1_L;
 }
 
+// G2 smith height correlated, GGX distribution
 float G2_GGX(float NV, float NL){
+    // get roughness value (from texture if used)
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
-    float sq_alpha = alpha * alpha;
-
+    float sq_alpha = alpha * alpha; // square value to appear more linear
+    // use compact formula after substitutions and calculations
     return 2 * NL * NV / (NL * sqrt(sq_alpha + NV * (NV - alpha * NV)) + NV * sqrt(sq_alpha + NL * (NL - alpha * NL)));
 }
 
 // slope distribution function
 // beckmann version, used in cook-torrance paper
 float D_Beckmann(float NH){
+    // get roughness value (from texture if used)
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     float a = exp((NH * NH - 1) / (NH * NH * alpha * alpha));
     float b = pow(alpha, 2) * pow(NH, 4);
-    return a / b;
+    return a / b; // dont divide by PI to ignore normalization
 }
 // GGX distribution
 float D_GGX(float NH){
+    // get roughness value (from texture if used)
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
     alpha = alpha * alpha;
-    return alpha * alpha / (pow((pow(NH, 4) * (alpha * alpha - 1) + 1), 2));
+    return alpha * alpha / (pow((pow(NH, 4) * (alpha * alpha - 1) + 1), 2)); // dont divide by PI to ignore normalization
 }
 
 // phong distribution
 float D_Phong(float NH){
+    // get roughness value (from texture if used)
     float alpha = u_hasRoughTexture ? texture(u_RoughTex, fs_in.texCoords).r : u_material.roughness;
+    // remap phong roughness to [0,1]
     alpha = 2 / (alpha * alpha) - 2;
-    return (alpha + 2) / 2 * pow(NH, alpha);
+    return (alpha + 2) / 2 * pow(NH, alpha); // dont divide by PI to ignore normalization
 }
 @endsection
