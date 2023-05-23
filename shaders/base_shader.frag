@@ -42,21 +42,22 @@ void main()
         // check if light is behind
         if(dot(normalize(fs_in.normal), lightDir) < 0.0f) continue;
         
-        // calculate geometryTerm using light direction and the actual surface normal
+        // calculate geometryTerm using light direction and the normal
         float geometryTerm = max(0.0f, dot(normal, lightDir));
 
         // gamma correct the light color
         vec3 lightCol = u_gammaCorrect ? toLinear(u_lights[i].color) : u_lights[i].color;
 
+        // get the BRDF result for this light
         vec3 brdfResult = BRDF(geometryTerm, lightDir, normal, viewDir);
         
         result +=  
             u_outputOnlyBRDF * brdfResult + (1 - u_outputOnlyBRDF) * // (branchless toggle for showing the brdf only)
-            getShadow(i) *
-            u_lights[i].intensity * lightCol * geometryTerm *       // light amount at this fragment
-            brdfResult *         // BRDF
-            lightAttenuation(u_lights[i], fs_in.fragPos) *          // attenuation
-            spotlightFactor(u_lights[i], lightDir);                 // spotlightFactor
+            getShadow(i) *                                           // check if fragment is in shadow
+            u_lights[i].intensity * lightCol * geometryTerm *        // light amount at this fragment
+            brdfResult *                                             // BRDF
+            lightAttenuation(u_lights[i], fs_in.fragPos) *           // attenuation
+            spotlightFactor(u_lights[i], lightDir);                  // spotlightFactor
     }
     
     // add ambient light at the end (if not outputting only bdrf)
@@ -64,12 +65,16 @@ void main()
 
     // add emission
     if(u_hasEmissiveTexture){
+        // use emission from texture
         result += texture(u_EmissiveTex, fs_in.texCoords).rgb;
     } else {
+        // gamma correct emission color
         result += u_gammaCorrect ? toLinear(u_emission) : u_emission;
     }
     
+    // handle opacity texture
     if(u_hasOpacityTexture){
+        // get opacity from red channel
         float opacity = texture(u_OpacityTex, fs_in.texCoords).r;
         FragColor = vec4(result, opacity);
     } else {
