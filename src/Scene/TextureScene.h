@@ -20,7 +20,7 @@
 #include "Framebuffer.h"
 #include "Postprocess/PostprocessUI.h"
 
-class Floor : public Scene
+class TextureScene : public Scene
 {
 private:
 	struct MaterialMesh {
@@ -69,8 +69,8 @@ private:
 
 	// 
 public:
-	Floor(Scene*& scene, unsigned int width, unsigned int height);
-	~Floor();
+	TextureScene(Scene*& scene, unsigned int width, unsigned int height);
+	~TextureScene();
 	void onRender() override;
 	void onRenderImGui() override;
 	void updateWidthHeight(unsigned int width, unsigned int height) override;

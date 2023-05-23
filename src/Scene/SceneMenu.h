@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "ModelTestScene.h"
 #include "Box.h"
-#include "Floor.h"
+#include "TextureScene.h"
 
 class SceneMenu : public Scene
 {

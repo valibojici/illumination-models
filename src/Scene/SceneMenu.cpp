@@ -7,9 +7,9 @@ void SceneMenu::onRenderImGui()
 		m_currentScene = new ModelTestScene(m_currentScene, m_width, m_height);
 		delete temp;
 	}
-	if (ImGui::Button("Floor scene")) {
+	if (ImGui::Button("Texture test scene")) {
 		Scene* temp = m_currentScene;
-		m_currentScene = new Floor(m_currentScene, m_width, m_height);
+		m_currentScene = new TextureScene(m_currentScene, m_width, m_height);
 		delete temp;
 	}
 	if (ImGui::Button("Box room scene")) {

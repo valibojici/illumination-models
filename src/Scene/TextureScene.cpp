@@ -1,6 +1,6 @@
-#include "Floor.h"
+#include "TextureScene.h"
 
-Floor::Floor(Scene*& scene,unsigned int width, unsigned int height) : 
+TextureScene::TextureScene(Scene*& scene,unsigned int width, unsigned int height) : 
     Scene(scene, width, height)
 {
     updateWidthHeight(width, height);
@@ -90,7 +90,7 @@ Floor::Floor(Scene*& scene,unsigned int width, unsigned int height) :
     floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    floor.name = "Floor 1";
+    floor.name = "Object 1";
     floor.textureScaleX = 2.0f;
     floor.textureScaleY = 2.0f;
     floor.textureIndex = 1;
@@ -101,7 +101,7 @@ Floor::Floor(Scene*& scene,unsigned int width, unsigned int height) :
     floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    floor.name = "Floor 2";
+    floor.name = "Object 2";
     floor.textureScaleX = 2.0f;
     floor.textureScaleY = 2.0f;
     floor.textureIndex = 2;
@@ -110,7 +110,7 @@ Floor::Floor(Scene*& scene,unsigned int width, unsigned int height) :
     
 }
 
-Floor::~Floor()
+TextureScene::~TextureScene()
 {
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -118,7 +118,7 @@ Floor::~Floor()
     EventManager::getInstance().removeHandler(&m_camera);
 }
 
-void Floor::onRender()
+void TextureScene::onRender()
 {
     static double time = glfwGetTime();
     
@@ -184,7 +184,7 @@ void Floor::onRender()
     m_screenQuadRenderer.render(m_outputFBO->getColorAttachment(0), m_textureDisplayShader);
 }
 
-void Floor::onRenderImGui()
+void TextureScene::onRenderImGui()
 {
     // back button
     if (ImGui::Button("Back")) {
@@ -257,7 +257,7 @@ void Floor::onRenderImGui()
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
 
-void Floor::updateWidthHeight(unsigned int width, unsigned int height)
+void TextureScene::updateWidthHeight(unsigned int width, unsigned int height)
 {
     m_width = width;
     m_height = height;
