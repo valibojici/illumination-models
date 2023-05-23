@@ -37,7 +37,7 @@ uniform Light u_lights[MAX_LIGHTS];
 
 uniform bool  u_gammaCorrect = false; // flag to enable/disable gamma correction
 
-uniform vec3 u_emission;         // emission
+uniform vec3 u_emission; // emission color
 
 vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
 
@@ -51,7 +51,7 @@ float spotlightFactor(Light light, vec3 lightDir);
 float getShadow(int index);
 
 struct Material{
-   vec3 diffuseColor;     // "diffuse" color
+   vec3 diffuseColor;
    vec3 ambientColor;
 };
 uniform Material u_material;
@@ -85,7 +85,7 @@ void main()
         // check if light is behind
         if(dot(normalize(fs_in.normal), lightDir) < 0.0f) continue;
         
-        // calculate geometryTerm using light direction and the actual surface normal
+        // calculate geometryTerm using light direction and the normal
         float geometryTerm = max(0.0f, dot(normal, lightDir));
 
 
@@ -97,11 +97,11 @@ void main()
             diffuseColor *
             spotlightFactor(u_lights[i], lightDir);                 // spotlightFactor
         
-        // check if fragment is lit at all
+        // check if fragment is lit at all (shadow of spotlight factor or intensity == 0)
         bool isLit = dot(vec3(1.0f), currentResult) > 0;
-        if(!isLit) continue;
+        if(!isLit) continue; // if not lit skip
 
-        // check if it is partially/fully lit
+        // check if it is partially/fully lit based on geometry term
         if(geometryTerm < 0.5f) isPartiallyLit++;
         else if(geometryTerm > 0.5f) isFullyLit++;
 
@@ -114,12 +114,14 @@ void main()
         fragColor = vec4(ambientColor, 1.0f);    
     } else {
         // else check if it is more fully lit than partial lit
+        // partially lit => use diffuse color * 0.5
         float diffuseFactor = isPartiallyLit > isFullyLit ? 0.5f : 1.0f;
-        // partially lit => half diffuse color
         fragColor = vec4(ambientColor + diffuseColor * diffuseFactor, 1.0f);    
     }
     // output normal mapped to [0,1] and distance to fragment to second color attachment
-    distance_normal = vec4((normal + 1) / 2, length(u_viewPos - fs_in.fragPos) / 50);
+    // w coordinate = distance mapped to [0,1] : divide by far plane
+    //     because infinite perpective is used => far_plane is set to 50
+    distance_normal = vec4(normal * 0.5f + 0.5f, distance(u_viewPos, fs_in.fragPos) / 50);
 }
 
 
