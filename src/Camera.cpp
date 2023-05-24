@@ -18,7 +18,7 @@ void Camera::handleEvent(const Event& e)
 		m_mousePressed = false;
 		break;
 
-	// on press a flag is set indicating direction
+	// on key press a flag is set indicating direction
 	case Event::Type::KEY_PRESS:
 		setMovingDirection(e.key.keyCode, true);
 		// if left shift is pressed => move faster
@@ -79,9 +79,9 @@ void Camera::setMovingDirection(unsigned int key, bool pressed)
 
 void Camera::changeOrientation()
 {
-	// mouse movement doesnt depend on time so there is no deltatime
+	// mouse movement doesnt depend on time => no deltatime
 
-	// is mouse was not clicked then camera orientation does not change
+	// if mouse is not being clicked then camera orientation does not change
 	if (!m_mousePressed) {
 		return;
 	}
@@ -99,16 +99,16 @@ void Camera::changeOrientation()
 	deltaX *=  MOUSE_SENSIVITY;
 	deltaY *=  MOUSE_SENSIVITY;
 
-	// pitch (up/down)
+	// pitch (up/down), rotate along the camera 'right' vector
 	glm::mat3 pitchRotateMatrix = glm::rotate(glm::radians(deltaY), m_right);
 	
-	// check if looking straight down/up
-	// get the dot product absolute value and compare with 1.0 (means 0 degrees)
+	// check to not look straight down/up
+	// get the dot product absolute value and compare with 1.0 (cos 0 degrees == 1.0 )
 	if (1.0f - abs(glm::dot(pitchRotateMatrix * m_direction, m_UP)) > 0.005f) {
 		m_direction = pitchRotateMatrix * m_direction;
 	}
 
-	// yaw (left/right)
+	// yaw (left/right), rotate along camera real up vector
 	glm::mat3 yawRotateMatrix = glm::rotate(-glm::radians(deltaX), m_cameraUp);
 	m_direction = yawRotateMatrix * m_direction;
 	
@@ -159,23 +159,15 @@ void Camera::update(double deltaTime)
 	if (m_needsUpdate) {
 		// manually calculate view matrix, the axis vectors are already calculated
 		m_matrix = glm::mat4(
+			// axis change part, negate direction to point 'backwards'
 			glm::vec4(m_right.x, m_cameraUp.x, -m_direction.x, 0.0f),
 			glm::vec4(m_right.y, m_cameraUp.y, -m_direction.y, 0.0f),
 			glm::vec4(m_right.z, m_cameraUp.z, -m_direction.z, 0.0f),
-			glm::vec4(
-				-glm::dot(m_right, m_position), 
-				-glm::dot(m_cameraUp,m_position), 
-				-glm::dot(-m_direction, m_position),
-				1
-			)
+			// translation part
+			glm::vec4(-glm::dot(m_right, m_position),  -glm::dot(m_cameraUp,m_position), -glm::dot(-m_direction, m_position), 1)
 		);
-		/*m_matrix = glm::lookAt(m_position, m_position + m_direction, m_UP);*/
 		m_needsUpdate = false;
 	}
-
-	/*printf("Camera at %f %f %f looking at %f %f %f \n",
-		m_position.x, m_position.y, m_position.z,
-		(m_position + m_direction).x, (m_position + m_direction).y, (m_position + m_direction).z);*/
 }
 
 void Camera::setPosition(const glm::vec3& pos)
@@ -185,8 +177,11 @@ void Camera::setPosition(const glm::vec3& pos)
 }
 
 void Camera::setTarget(const glm::vec3& target) {
+	// calculate where the camera is looking
 	m_direction = glm::normalize(target - m_position);
+	// recalculate camera right vector
 	m_right = glm::normalize(glm::cross(m_direction, m_UP));
+	// recalculate camera up vector
 	m_cameraUp = glm::cross(-m_direction, m_right);
-	m_needsUpdate = true;
+	m_needsUpdate = true; // the view matrix needs to be recalculated
 }

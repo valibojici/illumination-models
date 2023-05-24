@@ -75,7 +75,6 @@ public:
 	/// </summary>
 	inline const glm::mat4& getMatrix() const { return m_matrix; }
 	
-	// TODO: maybe move this in the handler
 	/// <summary>
 	/// Recalculates camera matrix based on the position and orientation
 	/// </summary>

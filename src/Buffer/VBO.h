@@ -19,7 +19,7 @@ struct Vertex {
 
 class VBO {
 private:
-	static unsigned int s_currentBoundVBO;
+	static unsigned int s_currentBoundVBO; // currently bound VBO, 0 if not bound
 	unsigned int m_id = 0;
 public:
 
@@ -27,8 +27,15 @@ public:
 	VBO(void* data, unsigned int size);
 	VBO(const std::vector<Vertex> vertices);
 	~VBO();
+	// create EBO and assign id
 	void create();
+
+	// load data
 	void bufferData(void *data, unsigned int size);
+
+	// bind this VBO if not bound already
 	void bind() const;
+
+	// unbind / bind(0)
 	void unbind() const;
 };

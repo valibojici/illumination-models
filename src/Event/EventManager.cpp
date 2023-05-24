@@ -23,6 +23,7 @@ void EventManager::addHandler(EventHandler* handler)
 
 void EventManager::removeHandler(EventHandler* handler)
 {
+	// search through array, and delete (maybe use set to be faster)
 	auto pos = std::find(m_handlers.begin(), m_handlers.end(), handler);
 	if (pos == m_handlers.end()) {
 		// handler not found
@@ -33,6 +34,7 @@ void EventManager::removeHandler(EventHandler* handler)
 
 void EventManager::sendEvent(const Event& e)
 {
+	// go through all handlers and call handlEvent
 	for (auto& handler : m_handlers) {
 		handler->handleEvent(e);
 	}
@@ -41,9 +43,10 @@ void EventManager::sendEvent(const Event& e)
 void EventManager::handleResize(GLFWwindow* window, int width, int height)
 {
 	if (s_imguiIO->WantCaptureKeyboard || s_imguiIO->WantCaptureMouse) {
-		return;
+		return; // if imgui wants input => skip
 	}
 
+	// create and send event to handlers
 	Event e;
 	e.m_type = Event::Type::WINDOW_RESIZE;
 	e.window = { width, height };
@@ -53,9 +56,10 @@ void EventManager::handleResize(GLFWwindow* window, int width, int height)
 void EventManager::handleKey(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (s_imguiIO->WantCaptureKeyboard) {
-		return;
+		return; // if imgui wants input => skip
 	}
 
+	// create and send event to handlers
 	Event e;
 	if (action == GLFW_PRESS) {
 		e.m_type = Event::Type::KEY_PRESS;
@@ -70,11 +74,12 @@ void EventManager::handleKey(GLFWwindow* window, int key, int scancode, int acti
 void EventManager::handleMousePosition(GLFWwindow* window, double xpos, double ypos)
 {
 	if (s_imguiIO->WantCaptureMouse) {
-		return;
+		return; // if imgui wants input => skip
 	}
+
+	// create and send event to handlers
 	Event e;
 	e.m_type = Event::Type::MOUSE_MOVE;
-	e.mouse.keyCode = 0;
 	e.mouse.x = (float)xpos;
 	e.mouse.y = (float)ypos;
 	getInstance().sendEvent(e);
@@ -83,9 +88,10 @@ void EventManager::handleMousePosition(GLFWwindow* window, double xpos, double y
 void EventManager::handleMouseButton(GLFWwindow* window, int button, int action, int mods)
 {
 	if (s_imguiIO->WantCaptureMouse) {
-		return;
+		return; // if imgui wants input => skip
 	}
 
+	// create and send event to handlers
 	Event e;
 	if (action == GLFW_PRESS) {
 		e.m_type = Event::Type::MOUSE_BUTTON_PRESS;

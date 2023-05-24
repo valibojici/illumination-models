@@ -116,15 +116,15 @@ void App::handleEvent(const Event& e)
     case Event::Type::WINDOW_RESIZE:
         m_windowWidth = (unsigned int)e.window.width;
         m_windowHeight = (unsigned int)e.window.height;
-        m_scene->updateWidthHeight(m_windowWidth, m_windowHeight);
-        printf("%d %d\n", m_windowWidth, m_windowHeight);
+        m_scene->updateWidthHeight(m_windowWidth, m_windowHeight); // update FBOs 
         break;
     case Event::Type::MOUSE_BUTTON_PRESS:
         if (e.mouse.keyCode == GLFW_MOUSE_BUTTON_2) {
-            m_showImguiWindow = !m_showImguiWindow;
-            if (m_showImguiWindow) {
+            m_showImguiWindow = !m_showImguiWindow; // toggle flag to show/hide window
+            if (m_showImguiWindow) { // if window will be shown set the flag to set-window-position-to-mouse to true
                 m_setImguiWindowPos = false;
             }
         }
+        break;
     };
 }

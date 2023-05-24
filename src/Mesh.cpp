@@ -27,7 +27,7 @@ Mesh::Mesh(const std::vector<Vertex> &vertices,
 
 Mesh::~Mesh()
 {
-	// must delete VBO before VAO
+	// delete VBO before VAO
 	delete m_vbo;
 	delete m_ebo;
 	delete m_vao;
@@ -35,6 +35,7 @@ Mesh::~Mesh()
 
 void Mesh::draw(Shader &shader)
 {
+	// set all texture uniforms to false
 	shader.setBool("u_hasDiffTexture", false);
 	shader.setBool("u_hasSpecTexture", false);
 	shader.setBool("u_hasNormTexture", false);
@@ -43,6 +44,7 @@ void Mesh::draw(Shader &shader)
 	shader.setBool("u_hasEmissiveTexture", false);
 	shader.setBool("u_hasOpacityTexture", false);
 
+	// set uniforms for used textures
 	for (unsigned int i = 0; i < m_textures.size(); ++i) {
 		// bind this texture
 		m_textures[i]->bind(i);
@@ -98,7 +100,7 @@ Mesh *Mesh::getCube(float width, float height, float depth)
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 
-	// 1 half < 0 and 1 half > 0 so when added => the initial value
+	// center of the cube = origin
 	height = height / 2;
 	depth = depth / 2;
 	width = width / 2;
@@ -233,8 +235,14 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 		);
 	};
 
+	// create a sphere by subdividing an icosahedron
+
+	// start with a hardcoded icosahedron
 	// order of vertices and indices from https://schneide.blog/2016/07/15/generating-an-icosphere-in-c/
+	
 	std::vector<Vertex> vertices = {
+		// coordinates for an icosahedron with edge lenght of 2 is (0, +-1, +-phi) (+-phi, 0, +-1) (+-1, +-phi, 0)
+		// normalize to get the vertices on the unit spehre
 		getVertex(glm::normalize(glm::vec3(-1.0f, 0.0f, phi))),
 		getVertex(glm::normalize(glm::vec3(1.0f, 0.0f, phi))),
 		getVertex(glm::normalize(glm::vec3(-1.0f, 0.0f, -phi))),
@@ -258,39 +266,41 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 		6,10,1, 9,11,0, 9,2,11, 9,5,2, 7,11,2
 	};
 
+
 	// used to cache newly created vertices (midpoints)
-	// the same new vertex will be used 2 times so this halves the amount of vertices
-	// key = (index1 | index2 << 32) where vertex[index1], vertex[index2] are the ends of an edge
-	// value = the index of the vertex which is at the middle of vertex[index1], vertex[index2] 
-	std::unordered_map<unsigned long long, unsigned	int> cache;
+	std::unordered_map<unsigned long long, unsigned	int> middlePoints;
+	// the same new vertex will be created 2 times (because any 2 triangles share an edge) => this cuts the new vertices amount in half
+	// key = (index1 | index2 << 32) where index1, index2 are indices of 2 vertices that are the ends of an edge
+	// value = the index of the created vertex which is at the middle of vertex[index1], vertex[index2] 
 
 	// helper to get the middle point between 2 vertices
-	// uses cache, only creates it once
-	auto getMiddle = [&cache, &vertices, &getVertex](unsigned int i1, unsigned int i2) -> unsigned int {
+	auto getMiddle = [&middlePoints, &vertices, &getVertex](unsigned int i1, unsigned int i2) -> unsigned int {
 		// the edge is not oriented, swap i1 i2 to have i1 <= i2
 		if (i1 > i2) {
 			std::swap(i1, i2);
 		}
 		// get the one number representation of this edge
 		unsigned long long key = (1ULL * i1) | ((1ULL * i2) << 32);
-		if (cache.count(key) == 0) {
-			// if the middle of this edge was not created
+		
+		// if the middle of this edge was not created
+		if (middlePoints.count(key) == 0) {
 			glm::vec3 v1 = vertices[i1].position;
 			glm::vec3 v2 = vertices[i2].position;
 			// get the middle point between v1 and v2 which is on the unit sphere
 			auto a = glm::normalize(v1 + v2);
+			// push vertex scaled with radius
 			vertices.push_back(getVertex(a));
-			// cache the index of the newly created vertex
-			cache[key] = vertices.size() - 1;
+			// middlePoints the index of the newly created vertex
+			middlePoints[key] = vertices.size() - 1;
 		}
-		return cache[key];
+		return middlePoints[key];
 	};
 
 	// subdivide each triangle into 4 triangles
 	for (int k = 0; k < subdivisions; ++k) {
 		// vector to hold the newly created vertices
 		std::vector<unsigned int> newIndices;
-		// iterate through each triangle (aka 3 indices at a time)
+		// iterate through each triangle (3 indices at a time)
 		for (unsigned int i = 0; i < indices.size(); i += 3) {
 			// get the indices of this triangle
 			unsigned int i1 = indices[i];
@@ -315,6 +325,7 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 				t1, i2, t2,
 				t3, t2, i3
 			};
+			// insert the all the indices for these 4 triangles
 			newIndices.insert(newIndices.end(), newTriangles.begin(), newTriangles.end());
 		}
 		// replace the original indices after this subdivision
@@ -322,16 +333,19 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 	}
 
 	// calculate texture coords
-	auto equalZero = [](float val, float epsilon = 0.001f) {return val >= -epsilon && val <= epsilon; };
 	for (auto& vertex : vertices) {
 		glm::vec3 normalizedPosition = glm::normalize(vertex.position);
 		// to get u coord calculate the angle using atan2 then map to 0,1
+		// there will be problems when the texture wraps, when the angle becomes 2 pi :(
 		float u;
-		// there will be problems when the texture wraps, when the angle becomes 2 pi
-		u = std::atan2(normalizedPosition.x, normalizedPosition.z) + PI;
+		// get angle from Z+ axis (on xOz plane) (atan2(y,x) = atan2(-x, z) in opengl coords)
+		u = std::atan2f(-normalizedPosition.x, normalizedPosition.z) + PI;
+
 		// map [0,2pi] to [0,1]
-		u = u / (2 * PI);
-		float v = (normalizedPosition.y + 1) / 2; // v is y coordinate, map from -1,1 to 0,1
+		u /= (2 * PI);
+
+		// v is y coordinate, map from -1,1 to 0,1
+		float v = normalizedPosition.y * 0.5f + 0.5f;
 		vertex.texCoords = { u, v };
 	}
 
@@ -341,19 +355,27 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 Mesh* Mesh::getCone(float radius, float height, unsigned int sectors, unsigned int stacks)
 {
 	const float PI = 3.14159265359f;
-	const float MAX_V = 2 * PI;
-	const float sectorStep = MAX_V / sectors;
-	const float stackStep = height / stacks;
+	// make the cone out of vertical parts (sectors) and horizontal parts (stacks)
+	const float sectorStep = (2 * PI) / sectors; // divide 2PI in 'sectors' parts
+	const float stackStep = height / stacks; // divide height in 'stacks' parts
 	
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 
+	/* Formula for cone:
+	* x = u cos(v)
+	* y = u sin(v)
+	* z = u
+	*  where v in [0, 2pi]
+	*/
+
 	// helper to get a Vertex at a height H and radius R and angle angle
 	auto getVertex = [radius, height](float H, float R, float angle) {
-		glm::vec3 coords(R * glm::sin(angle), H, R * glm::cos(angle));
-		// "height" of the normal is based on the ratio: cone radius / cone height
+		// swap cos and sin, because 'x' coordinate is z and 'y' coordinate is x
+		glm::vec3 coords(R * glm::sin(angle), H,  R * glm::cos(angle));
+		// y coordinate of the normal is based on the ratio: cone radius / cone height
 		glm::vec3 normal(glm::sin(angle), radius / height, glm::cos(angle));
-
+		normal = glm::normalize(normal);
 		return Vertex(
 			coords,
 			{ 0.0f, 0.0f },
@@ -368,6 +390,7 @@ Mesh* Mesh::getCone(float radius, float height, unsigned int sectors, unsigned i
 			// get coords
 			float currentHeight = stack * stackStep;
 			float currentAngle = sector * sectorStep;
+			// calculate current radius
 			// clamp to a small value so the normal will not point straight up (bugs with lighting)
 			float currentRadius = std::max(0.0001f, 1.0f * (stacks - stack) / stacks * radius);
 			vertices.push_back(getVertex(currentHeight, currentRadius, currentAngle));

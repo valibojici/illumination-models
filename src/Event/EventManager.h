@@ -51,6 +51,7 @@ private:
 	/// </summary>
 	void sendEvent(const Event& e);
 	
+	// methods for creating dispatching events
 	static void handleResize(GLFWwindow* window, int width, int height);
 	static void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void handleMousePosition(GLFWwindow* window, double xpos, double ypos);

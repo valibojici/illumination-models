@@ -4,6 +4,7 @@
 /// </summary>
 class Event {
 public:
+	// Event type
 	enum class Type {
 		MOUSE_BUTTON_PRESS,
 		MOUSE_BUTTON_RELEASE,

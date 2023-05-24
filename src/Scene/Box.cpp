@@ -77,7 +77,7 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
 
     MaterialMesh sphere;
     sphere.modelMatrix = glm::translate(glm::vec3(0.75f, -1.25f, 0.75f));
-    sphere.mesh = std::unique_ptr<Mesh>(Mesh::getSphere(0.75f, 5));
+    sphere.mesh = std::unique_ptr<Mesh>(Mesh::getSphere(0.75f, 7));
     sphere.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
     sphere.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
     sphere.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));

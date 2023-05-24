@@ -15,12 +15,13 @@ private:
 	TextureManager(const TextureManager& o) = default ;
 	TextureManager& operator=(const TextureManager& o) = default;
 
+	// store weak pointers for each texture name, check if they are null and load texture
 	std::unordered_map<std::string, std::weak_ptr<Texture> > m_textures;
 public: 
 	static TextureManager& get();
-	std::shared_ptr<Texture> getTexture(
-		const std::string& path, 
-		Texture::Type type=Texture::Type::DIFFUSE,
-		bool flipY = true);
+	/// <summary>
+	/// Get a texture, load it if it has not been loaded yet
+	/// </summary>
+	std::shared_ptr<Texture> getTexture(const std::string& path, Texture::Type type=Texture::Type::DIFFUSE, bool flipY = true);
 };
 

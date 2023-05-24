@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <sstream>
 
+/// <summary>
+/// Class to load/store textures
+/// </summary>
 class Texture
 {
 

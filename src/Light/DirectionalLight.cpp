@@ -4,10 +4,11 @@ DirectionalLight::DirectionalLight(int index, const glm::vec3& direction, const 
 	Light(index, color)
 {
 	m_type = Type::DIRECTIONAL;
+	m_position = direction;
+	// set name
 	std::stringstream ss;
 	ss << "Directional light #" << index;
 	m_name = ss.str();
-	m_position = direction;
 
 	// set light projection parameters
 	m_parameters.directional(-4, 4, -4, 4, 0.1f, 12.0f, 2.5f, { 0.0f, 0.0f, 1.0f });
@@ -79,6 +80,7 @@ void DirectionalLight::setUniforms(Shader& shader)
 
 void DirectionalLight::calculateLightSpaceMatrix()
 {
+	// use orthographic projection for directional light
 	m_lightSpaceMatrix[0] = glm::ortho(
 		m_parameters.minx,
 		m_parameters.maxx,
@@ -87,7 +89,7 @@ void DirectionalLight::calculateLightSpaceMatrix()
 		m_parameters.near_plane,
 		m_parameters.far_plane) *
 		glm::lookAt(
-			m_parameters.directionalLightScale * glm::normalize(m_position), // "place" the light on a sphere with radius 2.5
+			m_parameters.directionalLightScale * glm::normalize(m_position), // "place" the light on a sphere with radius 'directionalLightScale'
 			glm::vec3(0.0f), // looking at origin
-			m_parameters.UP); // up vector is towards t
+			m_parameters.UP); // up vector
 }

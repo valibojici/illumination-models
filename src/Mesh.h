@@ -5,6 +5,9 @@
 #include "Texture.h"
 #include <cmath>
 
+/// <summary>
+/// Abstraction for different meshes drawable with one opengl call
+/// </summary>
 class Mesh
 {
 private:

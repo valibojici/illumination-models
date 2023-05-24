@@ -23,6 +23,7 @@ VBO::~VBO()
 
 void VBO::create()
 {
+	// create only if not already created
 	if (m_id == 0) {
 		glGenBuffers(1, &m_id);
 	}
@@ -46,7 +47,7 @@ void VBO::unbind() const
 
 void VBO::bufferData(void *data, unsigned int size)
 {
-	create();
-	bind();
-	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	create(); // create if not already
+	bind(); // bind this VBO
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // buffer data into VBO
 }
