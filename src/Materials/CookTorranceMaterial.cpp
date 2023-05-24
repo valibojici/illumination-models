@@ -2,7 +2,8 @@
 
 void CookTorranceMaterial::imGuiRender()
 {
-	if (ImGui::Combo("Material", &m_presetIndex, "Custom\0Gold\0Copper\0Iron\0\0")) {
+	// f0 values for presets taken from RealTime Rendering p. 323
+	if (m_showPresetsUI && ImGui::Combo("Material", &m_presetIndex, "Custom\0Gold\0Copper\0Iron\0\0")) {
 		switch (m_presetIndex)
 		{
 		case 1:
@@ -18,9 +19,6 @@ void CookTorranceMaterial::imGuiRender()
 			m_roughness = 0.3f;
 			break;
 		default:
-			m_customF0 = false;
-			m_roughness = 0.5f;
-			m_ratio = 0.2f;
 			break;
 		}
 		if (m_presetIndex != 0) {
