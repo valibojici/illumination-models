@@ -32,10 +32,10 @@ private:
 		std::string name;
 	};
 
-	std::unique_ptr<Framebuffer> m_hdrFBO;
+	Framebuffer m_hdrFBO;
 	Framebuffer m_shadowFBO;
 	// framebuffer used to output after postprocessing
-	std::unique_ptr<Framebuffer> m_outputFBO;
+	Framebuffer m_outputFBO;
 
 	ScreenQuadRenderer m_screenQuadRenderer;
 	std::vector<MaterialMesh> m_meshes;

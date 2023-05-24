@@ -37,9 +37,9 @@ private:
 	std::vector<MaterialMesh> m_materialMeshes;
 
 	// framebuffer to use lighting with hdr
-	std::unique_ptr<Framebuffer> m_hdrFBO;
+	Framebuffer m_hdrFBO;
 	// framebuffer used to output after postprocessing
-	std::unique_ptr<Framebuffer> m_outputFBO;
+	Framebuffer m_outputFBO;
 
 	// helper to render texture to screen
 	ScreenQuadRenderer m_screenQuadRenderer;

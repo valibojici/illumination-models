@@ -32,9 +32,9 @@ private:
 		float textureScaleY = 1.0f;
 	};
 
-	std::unique_ptr<Framebuffer> m_hdrFBO;
+	Framebuffer m_hdrFBO;
 	// framebuffer used to output after postprocessing
-	std::unique_ptr<Framebuffer> m_outputFBO;
+	Framebuffer m_outputFBO;
 	Framebuffer m_shadowFBO;
 	ScreenQuadRenderer m_screenQuadRenderer;
 	std::vector<MaterialMesh> m_meshes;

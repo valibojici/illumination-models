@@ -122,7 +122,7 @@ void TextureScene::onRender()
 {
     static double time = glfwGetTime();
     
-    m_hdrFBO->bind();
+    m_hdrFBO.bind();
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glm::vec3 clearColor = m_postProcessUI.getGammaCorrection() ? glm::pow(glm::vec3(0.1f), glm::vec3(2.2f)) : glm::vec3(0.1f);
@@ -172,16 +172,16 @@ void TextureScene::onRender()
     }
 
     // apply postprocessing and write to another FBO
-    m_outputFBO->bind();
+    m_outputFBO.bind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_hdrFBO->getColorAttachment(0), m_postprocessShader);
+    m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
 
     // bind default framebuffer
-    m_outputFBO->unbind(); 
+    m_outputFBO.unbind(); 
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_outputFBO->getColorAttachment(0), m_textureDisplayShader);
+    m_screenQuadRenderer.render(m_outputFBO.getColorAttachment(0), m_textureDisplayShader);
 }
 
 void TextureScene::onRenderImGui()
@@ -253,7 +253,7 @@ void TextureScene::onRenderImGui()
     }
 
     if (ImGui::Button("Screenshot")) {
-        m_outputFBO->saveColorAttachmentToPNG(0);
+        m_outputFBO.saveColorAttachmentToPNG(0);
     }
 
     m_postProcessUI.onRenderImGui();
@@ -268,13 +268,13 @@ void TextureScene::updateWidthHeight(unsigned int width, unsigned int height)
 {
     m_width = width;
     m_height = height;
-    m_hdrFBO = std::make_unique<Framebuffer>(width, height);
-    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB16F);
-    m_hdrFBO->addDepthAttachment(GL_TEXTURE_2D);
-    m_hdrFBO->create();
+    m_hdrFBO = Framebuffer(width, height);
+    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB16F);
+    m_hdrFBO.addDepthAttachment(GL_TEXTURE_2D);
+    m_hdrFBO.create();
     // setup output FBO (after postprocessing)
-    m_outputFBO = std::make_unique<Framebuffer>(width, height);
-    m_outputFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB);
-    m_outputFBO->create();
+    m_outputFBO = Framebuffer(width, height);
+    m_outputFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB);
+    m_outputFBO.create();
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
 }
