@@ -61,10 +61,10 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     vec3 halfway = normalize(lightDir + viewDir);
 
     // calculate vectors used in calculations
-    float NH = dot(normal, halfway);
-    float NL = dot(normal, lightDir);
-    float VH = dot(viewDir, halfway);
-    float NV = dot(normal, viewDir);
+    float NH = max(dot(normal, halfway), 0.0001f);
+    float NL = max(dot(normal, lightDir), 0.0001f);
+    float VH = max(dot(viewDir, halfway), 0.0001f);
+    float NV = max(dot(normal, viewDir), 0.0001f);
     
     // calculate F D and G terms
     // F - Fresnel Term
@@ -109,8 +109,7 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     }
 
     // formula is FDG / (4 * NL * NV) from cook-torrance paper
-    vec3 specular =  (fresnel * slope_distribution * geometrical_attenuation) / 
-                    (4 * max(0.0001f, NL) * max(0.0001f, NV));
+    vec3 specular =  (fresnel * slope_distribution * geometrical_attenuation) / (4 * NL * NV);
 
     // get metallic ratio
     float ratio = u_hasMetallicTexture ? texture(u_MetallicTex, fs_in.texCoords).r : u_material.ratio;
