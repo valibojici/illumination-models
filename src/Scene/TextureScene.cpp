@@ -234,6 +234,7 @@ void TextureScene::onRenderImGui()
                 // if no texture show UI for presets
                 for (auto& material : mesh.materials) {
                     material->setShowPresetsUI(mesh.textureIndex == 0);
+                    if (mesh.textureIndex != 0) material->defaultParameters(); // if texture => use default parameters
                 }
             }
             ImGui::Combo("Mesh", &mesh.meshIndex, "Plane\0Sphere\0\0");
