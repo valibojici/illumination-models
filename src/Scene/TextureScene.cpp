@@ -229,7 +229,13 @@ void TextureScene::onRenderImGui()
     for (auto& mesh : m_materialMeshes) {
         ImGui::PushID(mesh.materials[mesh.modelIndex].get());
         if (ImGui::CollapsingHeader(mesh.name.c_str())) {
-            ImGui::Combo("Texture", &mesh.textureIndex, "No texture\0Wood\0Chain\0Art Deco\0Rusted metal\0Wood platform\0Grass\0\0");
+            // render combo box for texture types
+            if (ImGui::Combo("Texture", &mesh.textureIndex, "No texture\0Wood\0Chain\0Art Deco\0Rusted metal\0Wood platform\0Grass\0\0")) {
+                // if no texture show UI for presets
+                for (auto& material : mesh.materials) {
+                    material->setShowPresetsUI(mesh.textureIndex == 0);
+                }
+            }
             ImGui::Combo("Mesh", &mesh.meshIndex, "Plane\0Sphere\0\0");
             ImGui::NewLine();
             ImGui::Combo("Lighting model", &mesh.modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0");
