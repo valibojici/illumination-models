@@ -6,6 +6,11 @@
 /// </summary>
 class Material
 {
+protected:
+	int m_presetIndex = 0;
+
+	// flag for presets in UI
+	bool m_showPresetsUI = false;
 public:
 	/// <summary>
 	/// Renders UI and does NOT set uniforms on value change
@@ -26,5 +31,7 @@ public:
 
 	// use very high exponent for phong, or low roughness
 	virtual void disableHighlights() = 0;
+
+	void setShowPresetsUI(bool value) { m_showPresetsUI = value; }
 };
 
