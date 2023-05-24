@@ -54,3 +54,9 @@ void BlinnMaterial::imGuiRender()
 	ImGui::DragFloat("Ambient intensity", &m_ka, 0.00005f, 0.0f, 0.5f, "%.5f");
 	ImGui::ColorEdit3("Ambient color", &m_ia.x, ImGuiColorEditFlags_Float);
 }
+
+void BlinnMaterial::defaultParameters()
+{
+	PhongMaterial::defaultParameters();
+	m_alpha *= 4;
+}

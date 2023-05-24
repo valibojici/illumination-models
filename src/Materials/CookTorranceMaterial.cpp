@@ -70,3 +70,19 @@ void CookTorranceMaterial::setUniforms(Shader& shader)
 	shader.setInt("u_outputF", m_outputDFG_choice == 1 ? 1 : 0);
 	shader.setInt("u_outputG", m_outputDFG_choice == 2 ? 1 : 0);
 }
+
+void CookTorranceMaterial::defaultParameters()
+{
+	m_presetIndex = 0;
+	m_albedo = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_roughness = 0.5f;
+	m_ratio = 0.2f;
+	m_f0 = glm::vec3(0.04f);
+	m_Gindex = 0;
+	m_Dindex = 0;
+	m_ia = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_ka = 0.005f;
+	m_customF0 = false;
+	m_outputDFG = false;
+	m_outputDFG_choice = 0;
+}

@@ -12,5 +12,7 @@ public:
 	/// Renders UI in ImGui, does not set uniforms
 	/// </summary>
 	void imGuiRender() override;
+
+	void defaultParameters() override;
 };
 

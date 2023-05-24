@@ -33,5 +33,8 @@ public:
 	virtual void disableHighlights() = 0;
 
 	void setShowPresetsUI(bool value) { m_showPresetsUI = value; }
+
+	// reset parameters to original values
+	virtual void defaultParameters() {};
 };
 

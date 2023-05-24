@@ -65,3 +65,15 @@ void PhongMaterial::setUniforms(Shader& shader)
     shader.setVec3("u_material.ia", m_ia);
     shader.setBool("u_modifiedSpecular", m_modifiedSpecular);
 }
+
+void PhongMaterial::defaultParameters()
+{
+	m_presetIndex = 0;
+	m_diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_kd = glm::vec3(1.0f);
+	m_ks = glm::vec3(0.5f);
+	m_ka = 0.005f;
+	m_ia = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_alpha = 32.0f;
+	m_modifiedSpecular = false;
+}

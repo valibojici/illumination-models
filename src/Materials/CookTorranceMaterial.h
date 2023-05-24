@@ -51,5 +51,7 @@ public:
 	void disableHighlights() override { m_roughness = 0.999f; m_ratio = 0.05f; }
 	void setRoughness(float r) { m_roughness = r; }
 	void setAmbientCoefficient(const float c) { m_ka = c; }
+
+	void defaultParameters() override;
 };
 
