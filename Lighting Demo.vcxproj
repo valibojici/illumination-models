@@ -124,6 +124,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Materials\BlinnMaterial.cpp" />
     <ClCompile Include="src\Postprocess\PostprocessUI.cpp" />
     <ClCompile Include="src\Framebuffer.cpp" />
     <ClCompile Include="src\Materials\CookTorranceMaterial.cpp" />
