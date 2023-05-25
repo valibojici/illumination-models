@@ -5,7 +5,7 @@ struct Material{
    vec3 albedo;     // "diffuse" color
    float roughness; // 0 = mirror | 1 = very rought
    vec3 f0;         // reflectance function at normal incidence (for fresnel)
-   float ratio;     // => mix(diffuse, specular, ratio)
+   float metallic;     // => mix(diffuse, specular, ratio)
    vec3  ia;        // ambient intensity/color
    float ka;        // ambient coefficient
 };
@@ -73,7 +73,7 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     // if f0 == 0 => dont use custom f0, use average value of 0.04 for non metals
     // and combine color with albedo based on metalness (more metalness == more albedo color for f0)
     if(u_material.f0 == vec3(0.0f)){
-        F0 = mix(vec3(0.04f), diffuse, u_material.ratio);
+        F0 = mix(vec3(0.04f), diffuse, u_material.metallic);
     }
     // get fresnel term using this F0 
     vec3 fresnel = F_Schlick(F0, VH);
@@ -112,12 +112,12 @@ vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir){
     vec3 specular =  (fresnel * slope_distribution * geometrical_attenuation) / (4 * NL * NV);
 
     // get metallic ratio
-    float ratio = u_hasMetallicTexture ? texture(u_MetallicTex, fs_in.texCoords).r : u_material.ratio;
+    float metallic = u_hasMetallicTexture ? texture(u_MetallicTex, fs_in.texCoords).r : u_material.metallic;
     // use at least 0.005 to have some fresnel reflections
-    ratio = max(ratio, 0.005); 
+    metallic = max(metallic, 0.005); 
     
     // linear interpolation between diffuse and specular based on metalness
-    return mix(diffuse, specular, ratio); 
+    return mix(diffuse, specular, metallic); 
 }
 
 // uses Schlick approximation from "An Inexpensive BRDF Model for Physically-based Rendering"
