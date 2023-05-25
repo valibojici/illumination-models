@@ -238,7 +238,8 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 	// create a sphere by subdividing an icosahedron
 
 	// start with a hardcoded icosahedron
-	// order of vertices and indices from https://schneide.blog/2016/07/15/generating-an-icosphere-in-c/
+	// order of vertices and indices from OpenGL Programming Guide versions 3.0 and 3.1 p. 115
+	// replaced X and Z with 1 and golden ratio
 	
 	std::vector<Vertex> vertices = {
 		// coordinates for an icosahedron with edge lenght of 2 is (0, +-1, +-phi) (+-phi, 0, +-1) (+-1, +-phi, 0)
@@ -258,7 +259,7 @@ Mesh *Mesh::getSphere(float radius, int subdivisions)
 		getVertex(glm::normalize(glm::vec3(phi, -1.0f, 0.0f))),
 		getVertex(glm::normalize(glm::vec3(-phi, -1.0f, 0.0f))),
 	};
-
+	// rearrange indices to be in counter-clockwise order
 	std::vector<unsigned int> indices{
 		0,1,4,   0,4,9,  9,4,5, 4,8,5, 4,1,8,
 		8,1,10,  8,10,3, 5,8,3, 5,3,2, 2,3,7,
