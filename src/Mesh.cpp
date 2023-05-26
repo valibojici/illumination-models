@@ -4,7 +4,7 @@ Mesh::Mesh(const std::vector<Vertex> &vertices,
 	const std::vector<unsigned int>& indices,
 	const std::vector<std::shared_ptr<Texture> >& textures
 )
-	: m_vertices(vertices), m_indices(indices), m_textures(textures)
+	: m_textures(textures)
 {
 	// create vao and bind it
 	m_vao = new VAO();
@@ -23,6 +23,8 @@ Mesh::Mesh(const std::vector<Vertex> &vertices,
 	// create EBO
 	m_ebo = new EBO(indices);
 	m_ebo->bind();
+
+	m_indicesCount = indices.size();
 }
 
 Mesh::~Mesh()
@@ -84,7 +86,7 @@ void Mesh::draw(Shader &shader)
 
 	}
 	m_vao->bind();
-	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_indicesCount, GL_UNSIGNED_INT, 0);
 	// reset to avoid bugs
 	shader.setBool("u_hasDiffTexture", false);
 	shader.setBool("u_hasSpecTexture", false);
