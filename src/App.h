@@ -26,10 +26,7 @@ private:
 	/// </summary>
 	void handleEvent(const Event& e) override;
 
-	static void glfw_error_callback(int error, const char* description)
-	{
-		fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-	}
+	static void glfw_error_callback(int error, const char* description);
 public:
 	App();
 	~App();
