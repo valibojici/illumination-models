@@ -83,7 +83,7 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
         glm::translate(glm::vec3(-0.75f, -1.25f, -0.75f))* glm::rotate(glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f))
     };
     Mesh* tempMeshes[] = {
-        Mesh::getSphere(0.75f, 7),
+        Mesh::getSphere(0.75f, 5),
         Mesh::getCone(0.75, 2.0f, 60),
         Mesh::getCube(1.5f, 1.5f, 1.5f)
     };
