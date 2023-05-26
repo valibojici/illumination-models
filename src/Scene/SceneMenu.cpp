@@ -3,19 +3,13 @@
 void SceneMenu::onRenderImGui()
 {
 	if (ImGui::Button("Model test scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new ModelTestScene(m_currentScene, m_width, m_height);
-		delete temp;
+		setScene(std::make_unique<ModelTestScene>(m_currentScene, m_width, m_height));
 	}
 	if (ImGui::Button("Texture test scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new TextureScene(m_currentScene, m_width, m_height);
-		delete temp;
+		setScene(std::make_unique<TextureScene>(m_currentScene, m_width, m_height));
 	}
 	if (ImGui::Button("Box room scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new Box(m_currentScene, m_width, m_height);
-		delete temp;
+		setScene(std::make_unique<Box>(m_currentScene, m_width, m_height));
 	}
 }
 

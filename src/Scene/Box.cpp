@@ -1,6 +1,6 @@
 #include "Box.h"
 
-Box::Box(Scene*& scene, unsigned int width, unsigned int height)
+Box::Box(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height)
     : Scene(scene, width, height), m_shadowFBO(4096, 4096)
 {
     updateWidthHeight(width, height);
@@ -283,9 +283,7 @@ void Box::onRenderImGui()
 {
     // back button
     if (ImGui::Button("Back")) {
-        Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
-        delete temp;
+        setScene(std::make_unique<SceneMenu>(m_currentScene, m_width, m_height));
         return;
     }
 

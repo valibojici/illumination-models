@@ -52,7 +52,7 @@ App::App() {
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    m_scene = new SceneMenu(m_scene, m_windowWidth, m_windowHeight);
+    m_scene = std::make_unique<SceneMenu>(m_scene, m_windowWidth, m_windowHeight);
 }
 
 void App::run()

@@ -19,7 +19,7 @@ private:
 	bool m_showImguiWindow = true;
 	bool m_setImguiWindowPos = false;
 
-	Scene* m_scene; // current scene to render
+	std::unique_ptr<Scene> m_scene;
 
 	/// <summary>
 	/// Handles events (sets window height/width)

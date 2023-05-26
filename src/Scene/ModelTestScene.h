@@ -77,7 +77,7 @@ private:
 	
 	std::vector<Model> m_models;
 public:
-	ModelTestScene(Scene*& scene, unsigned int width, unsigned int height);
+	ModelTestScene(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height);
 	~ModelTestScene();
 	void onRender() override;
 	void onRenderImGui() override;

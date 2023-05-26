@@ -1,6 +1,6 @@
 #include "ModelTestScene.h"
 
-ModelTestScene::ModelTestScene(Scene*& scene, unsigned int width, unsigned int height)
+ModelTestScene::ModelTestScene(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height)
     : Scene(scene, width, height), m_shadowFBO(2048, 2048)
 {
     updateWidthHeight(width, height);
@@ -267,9 +267,7 @@ void ModelTestScene::onRenderImGui()
 {
     // back button
     if (ImGui::Button("Back")) {
-        Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
-        delete temp;
+        setScene(std::make_unique<SceneMenu>(m_currentScene, m_width, m_height));
         return;
     }
 

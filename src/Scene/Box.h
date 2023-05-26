@@ -75,7 +75,7 @@ private:
 	// enable/disable wireframes, for debug
 	bool m_wireframeEnabled = false;
 public:
-	Box(Scene*& scene, unsigned int width, unsigned int height);
+	Box(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height);
 	~Box();
 	void onRender() override;
 	void onRenderImGui() override;

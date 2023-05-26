@@ -1,6 +1,6 @@
 #include "TextureScene.h"
 
-TextureScene::TextureScene(Scene*& scene,unsigned int width, unsigned int height) : 
+TextureScene::TextureScene(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height) :
     Scene(scene, width, height)
 {
     updateWidthHeight(width, height);
@@ -188,9 +188,7 @@ void TextureScene::onRenderImGui()
 {
     // back button
     if (ImGui::Button("Back")) {
-        Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
-        delete temp;
+        setScene(std::make_unique<SceneMenu>(m_currentScene, m_width, m_height));
         return;
     }
 

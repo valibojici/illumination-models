@@ -69,7 +69,7 @@ private:
 
 	// 
 public:
-	TextureScene(Scene*& scene, unsigned int width, unsigned int height);
+	TextureScene(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height);
 	~TextureScene();
 	void onRender() override;
 	void onRenderImGui() override;
