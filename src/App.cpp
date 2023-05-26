@@ -75,7 +75,7 @@ void App::run()
                 m_setImguiWindowPos = true;
                 ImGui::SetNextWindowPos(ImGui::GetMousePos());
             }
-            ImGui::Begin("Window", &m_showImguiWindow);
+            ImGui::Begin("Menu", &m_showImguiWindow);
             m_scene->onRenderImGui();
             ImGui::End();
         }
