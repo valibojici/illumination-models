@@ -37,7 +37,7 @@ TextureScene::TextureScene(std::unique_ptr<Scene>& scene, unsigned int width, un
 
     // load meshes
     m_meshes.push_back(std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 4.0f)));
-    m_meshes.push_back(std::unique_ptr<Mesh>(Mesh::getSphere(1.4f, 6)));
+    m_meshes.push_back(std::unique_ptr<Mesh>(Mesh::getSphere(1.4f, 5)));
 
     // load textures
     m_textures.push_back({}); // no textures
@@ -187,9 +187,8 @@ void TextureScene::onRender()
 void TextureScene::onRenderImGui()
 {
     // back button
-    if (ImGui::Button("Back")) {
-        setScene(std::make_unique<SceneMenu>(m_currentScene, m_width, m_height));
-        return;
+    if (renderImGuiBackButton()) {
+        return; // exit if button is clicked
     }
 
     // render UI for every light

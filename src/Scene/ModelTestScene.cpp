@@ -266,9 +266,8 @@ void ModelTestScene::onRender()
 void ModelTestScene::onRenderImGui()
 {
     // back button
-    if (ImGui::Button("Back")) {
-        setScene(std::make_unique<SceneMenu>(m_currentScene, m_width, m_height));
-        return;
+    if (renderImGuiBackButton()) {
+        return; // exit if button is clicked
     }
 
     // render UI for every light
