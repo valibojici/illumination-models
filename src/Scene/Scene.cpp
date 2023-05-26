@@ -12,7 +12,7 @@ bool Scene::renderImGuiBackButton()
     }
     ImGui::PopStyleColor();
     // add some spacing
-    ImGui::Dummy(ImVec2(0.0f, 20.0f));
+    ImGui::NewLine();
     return false;
 }
 
