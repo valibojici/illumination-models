@@ -13,7 +13,6 @@ protected:
 public:
 	Scene(Scene*& scene, unsigned int width, unsigned int height) : m_currentScene(scene), m_width(width), m_height(height) {}
 	virtual void onRender() {}
-	// TODO: add back button rendering here
 	virtual void onRenderImGui() {}
 	virtual void updateWidthHeight(unsigned int width, unsigned int height) {}
 	virtual ~Scene() {}
