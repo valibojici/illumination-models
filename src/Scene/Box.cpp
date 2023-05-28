@@ -84,7 +84,7 @@ Box::Box(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height)
     };
     Mesh* tempMeshes[] = {
         Mesh::getSphere(0.75f, 5),
-        Mesh::getCone(0.75, 2.0f, 60),
+        Mesh::getCone(0.75, 2.0f, 60, 10),
         Mesh::getCube(1.5f, 1.5f, 1.5f)
     };
     const glm::vec3 meshColors[] = {
