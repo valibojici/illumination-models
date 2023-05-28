@@ -26,7 +26,8 @@ private:
 	struct MaterialMesh {
 		std::vector<std::unique_ptr<Material>> materials;
 		glm::mat4 modelMatrix;
-		int meshIndex = 0; // index of mesh (plane or sphere)
+		std::unique_ptr<Mesh> mesh;
+		int currentMesh = 0; // 0 = plane | 1 = sphere
 		std::string name; // name of this material mesh
 		int textureIndex = 0; // index of texture array to use
 		float textureScaleX = 1.0f;

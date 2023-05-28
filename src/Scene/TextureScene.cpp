@@ -35,10 +35,6 @@ TextureScene::TextureScene(std::unique_ptr<Scene>& scene, unsigned int width, un
         }
     }
 
-    // load meshes
-    m_meshes.push_back(std::unique_ptr<Mesh>(Mesh::getPlane(4.0f, 4.0f)));
-    m_meshes.push_back(std::unique_ptr<Mesh>(Mesh::getSphere(1.4f, 5)));
-
     // load textures
     m_textures.push_back({}); // no textures
 
@@ -85,27 +81,29 @@ TextureScene::TextureScene(std::unique_ptr<Scene>& scene, unsigned int width, un
         TextureManager::get().getTexture("textures/grass/metallic.png", Texture::Type::METALLIC),
         });
     
-    MaterialMesh floor;
-    floor.modelMatrix = glm::translate(glm::vec3(-5.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
-    floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
-    floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    floor.name = "Object 1";
-    floor.textureScaleX = 2.0f;
-    floor.textureScaleY = 2.0f;
-    floor.textureIndex = 1;
-    m_materialMeshes.push_back(std::move(floor));
+    MaterialMesh object;
+    object.modelMatrix = glm::translate(glm::vec3(-5.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    object.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+    object.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    object.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    object.name = "Object 1";
+    object.textureScaleX = 2.0f;
+    object.textureScaleY = 2.0f;
+    object.textureIndex = 1;
+    object.mesh = std::move(std::unique_ptr<Mesh>(Mesh::getPlane(4, 4)));
+    m_materialMeshes.push_back(std::move(object));
 
-    floor = MaterialMesh();
-    floor.modelMatrix = glm::rotate(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    floor.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
-    floor.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
-    floor.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    floor.name = "Object 2";
-    floor.textureScaleX = 2.0f;
-    floor.textureScaleY = 2.0f;
-    floor.textureIndex = 2;
-    m_materialMeshes.push_back(std::move(floor));
+    object = MaterialMesh();
+    object.modelMatrix = glm::rotate(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    object.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+    object.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+    object.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+    object.name = "Object 2";
+    object.textureScaleX = 2.0f;
+    object.textureScaleY = 2.0f;
+    object.textureIndex = 2;
+    object.mesh = std::move(std::unique_ptr<Mesh>(Mesh::getPlane(4, 4)));
+    m_materialMeshes.push_back(std::move(object));
 
     
 }
@@ -155,7 +153,8 @@ void TextureScene::onRender()
         Shader& shader = m_shaders[mesh.modelIndex];
         mesh.materials[mesh.modelIndex]->setUniforms(shader);
         shader.setMat4("u_modelMatrix", mesh.modelMatrix);
-        if (mesh.meshIndex == 1) {
+        if (mesh.currentMesh == 1) {
+            // if sphere scale X axis by PI
             shader.setFloat("u_textureScaleX", glm::pi<float>() * mesh.textureScaleX);
             shader.setFloat("u_textureScaleY", mesh.textureScaleY);
         }
@@ -163,8 +162,8 @@ void TextureScene::onRender()
             shader.setFloat("u_textureScaleX", mesh.textureScaleX);
             shader.setFloat("u_textureScaleY", mesh.textureScaleY);
         }
-        m_meshes[mesh.meshIndex]->setTextures(m_textures[mesh.textureIndex]);
-        m_meshes[mesh.meshIndex]->draw(shader);
+        mesh.mesh->setTextures(m_textures[mesh.textureIndex]);
+        mesh.mesh->draw(shader);
     }
 
     if (m_wireframeEnabled) {
@@ -223,7 +222,9 @@ void TextureScene::onRenderImGui()
     ImGui::NewLine();
 
     // render UI for materials
-    for (auto& mesh : m_materialMeshes) {
+    static int subdivisions[2] = { 5, 5 };
+    for (size_t i = 0; i < m_materialMeshes.size(); ++i) {
+        auto& mesh = m_materialMeshes[i];
         ImGui::PushID(mesh.materials[mesh.modelIndex].get());
         if (ImGui::CollapsingHeader(mesh.name.c_str())) {
             // render combo box for texture types
@@ -234,9 +235,20 @@ void TextureScene::onRenderImGui()
                     if (mesh.textureIndex != 0) material->defaultParameters(); // if texture => use default parameters
                 }
             }
-            ImGui::Combo("Mesh", &mesh.meshIndex, "Plane\0Sphere\0\0");
+            if (ImGui::Combo("Mesh", &mesh.currentMesh, "Plane\0Sphere\0\0")) {
+                mesh.mesh = mesh.currentMesh == 0 ?
+                    std::move(std::unique_ptr<Mesh>(Mesh::getPlane(4, 4))) :
+                    std::move(std::unique_ptr<Mesh>(Mesh::getSphere(2, subdivisions[i])));
+            }
             ImGui::NewLine();
             ImGui::Combo("Lighting model", &mesh.modelIndex, "Phong\0Blinn-Phong\0Cook-Torrance\0\0");
+            // render sphere subdivisons UI
+            if (mesh.currentMesh == 1) {    // if mesh is sphere
+                if (ImGui::SliderInt("Subdivisions", &subdivisions[i], 0, 8)) {
+                    mesh.mesh = std::move(std::unique_ptr<Mesh>(Mesh::getSphere(2, subdivisions[i])));
+                }
+            }
+             
             mesh.materials[mesh.modelIndex]->imGuiRender();
         }
         ImGui::NewLine();
