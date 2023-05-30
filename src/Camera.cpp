@@ -108,8 +108,8 @@ void Camera::changeOrientation()
 		m_direction = pitchRotateMatrix * m_direction;
 	}
 
-	// yaw (left/right), rotate along camera real up vector
-	glm::mat3 yawRotateMatrix = glm::rotate(-glm::radians(deltaX), m_cameraUp);
+	// yaw (left/right), rotate along UP vector
+	glm::mat3 yawRotateMatrix = glm::rotate(-glm::radians(deltaX), m_UP);
 	m_direction = yawRotateMatrix * m_direction;
 	
 	// recalculate camera axis based on new look direction
