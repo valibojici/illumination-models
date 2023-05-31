@@ -138,7 +138,7 @@ Box::Box(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height)
     
     m_shadowFBO.create(); // create the shadow framebuffer
 
-    m_lights[1]->setViewProjectionParameters(Light::ViewProjectionParameters().directional(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 12.0f, 2.8f));
+    m_lights[1]->setViewProjectionParameters(Light::ViewProjectionParameters().directional(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 12.0f, 2.8f, {0.0f, 0.0f, 1.0f}));
 }
 
 Box::~Box()
@@ -265,6 +265,9 @@ void Box::onRender()
     m_outputFBO.bind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
+    if (m_shadowMapToDisplay != -1) {
+        m_screenQuadRenderer.render(m_shadowFBO.getDepthAttachment(m_shadowMapToDisplay), m_textureDisplayShader);
+    } else
     if (m_modelIndex != 3) {
         m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
     }
@@ -276,12 +279,7 @@ void Box::onRender()
     m_outputFBO.unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    if (m_shadowMapToDisplay == -1) {
-        m_screenQuadRenderer.render(m_outputFBO.getColorAttachment(0), m_textureDisplayShader);
-    }
-    else {
-        m_screenQuadRenderer.render(m_shadowFBO.getDepthAttachment(m_shadowMapToDisplay), m_textureDisplayShader);
-    }
+    m_screenQuadRenderer.render(m_outputFBO.getColorAttachment(0), m_textureDisplayShader);
 }
 
 void Box::onRenderImGui()
