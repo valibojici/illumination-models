@@ -26,8 +26,8 @@ public:
 		float far_plane = 5.0f;
 		float directionalLightScale = 2.5f;
 		glm::vec3 UP = { 0.0f, 0.0f, 1.0f };
-		ViewProjectionParameters& directional(float minx_ = -4, float maxx_ = 4, float miny_ = -4, float maxy_ = 4, float near_plane_ = 0.1f, float far_plane_ = 12.0f, float scale_ = 2.5f, glm::vec3 UP_ = { 0.0f, 0.0f, 1.0f });
-		ViewProjectionParameters& spotlight(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f, glm::vec3 UP_ = { 0.0f, 0.0f, 1.0f });
+		ViewProjectionParameters& directional(float minx_ = -4, float maxx_ = 4, float miny_ = -4, float maxy_ = 4, float near_plane_ = 0.1f, float far_plane_ = 12.0f, float scale_ = 2.5f, glm::vec3 UP_ = { 0.0f, 1.0f, 0.0f });
+		ViewProjectionParameters& spotlight(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f, glm::vec3 UP_ = { 0.0f, 1.0f, 0.0f });
 		ViewProjectionParameters& point(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f);
 	};
 

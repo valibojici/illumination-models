@@ -20,8 +20,8 @@ void DirectionalLight::imGuiRender()
 	Light::imGuiRender();
 
 	if (ImGui::DragFloat3("Direction", &m_position.x, 0.01f)) {
-		// set UP vector to positive Y if light is on Z axis
-		m_parameters.UP = (m_position.x == 0.0f && m_position.y == 0.0f) ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.0f);
+		// set UP vector to positive Z if light is on Y axis
+		m_parameters.UP = (m_position.z == 0.0f && m_position.x == 0.0f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
 		calculateLightSpaceMatrix();
 		m_shadowNeedsRender = true;
 	}
