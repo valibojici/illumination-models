@@ -66,14 +66,15 @@ private:
 	Shader m_shadowShader;
 	Shader m_textureDisplayShader; // simple shader that displays texture
 	
-	std::vector<glm::mat4> m_modelMatrix;
-	glm::mat4 m_viewMatrix = glm::mat4(1.0f);
-	glm::mat4 m_projMatrix = glm::mat4(1.0f);
+	std::vector<glm::mat4> m_projMatrices;
 
 	PostprocessUI m_postProcessUI;
 
 	// enable/disable wireframes, for debug
 	bool m_wireframeEnabled = false;
+
+	int m_shadowMapToDisplay = -1; // index of shadowmap to display
+	int m_projMatrixIndex = 0; // index of active projection matrix
 public:
 	Box(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height);
 	~Box();

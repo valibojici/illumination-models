@@ -233,7 +233,7 @@ void Box::onRender()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_shaders[m_modelIndex].bind();
     
-    m_shaders[m_modelIndex].setMat4("u_projMatrix", m_projMatrix);
+    m_shaders[m_modelIndex].setMat4("u_projMatrix", m_projMatrices[m_projMatrixIndex]);
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
@@ -276,7 +276,12 @@ void Box::onRender()
     m_outputFBO.unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_outputFBO.getColorAttachment(0), m_textureDisplayShader);
+    if (m_shadowMapToDisplay == -1) {
+        m_screenQuadRenderer.render(m_outputFBO.getColorAttachment(0), m_textureDisplayShader);
+    }
+    else {
+        m_screenQuadRenderer.render(m_shadowFBO.getDepthAttachment(m_shadowMapToDisplay), m_textureDisplayShader);
+    }
 }
 
 void Box::onRenderImGui()
@@ -355,6 +360,8 @@ void Box::onRenderImGui()
 
     // enable/disable wireframes, for debug
     ImGui::Checkbox("Show wireframe", &m_wireframeEnabled);
+    ImGui::SliderInt("Shadowmap display", &m_shadowMapToDisplay, -1, 2);
+    ImGui::SliderInt("Projection matrix", &m_projMatrixIndex, 0, 1);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
@@ -373,7 +380,11 @@ void Box::updateWidthHeight(unsigned width, unsigned height)
     m_outputFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB);
     m_outputFBO.create();
 
-    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
+    float ratio = 1.0f * m_width / m_height;
+    m_projMatrices = {
+        glm::infinitePerspective(glm::radians(60.0f), ratio, 0.1f),
+        glm::ortho(-3.0f * ratio, 3.0f * ratio, -3.0f, 3.0f, -3.0f, 10.0f)
+    };
     // set new width/height in toon post process shader
     m_toonPostProcessShader.setFloat("u_textureWidth", m_width);
     m_toonPostProcessShader.setFloat("u_textureHeight", m_height);
