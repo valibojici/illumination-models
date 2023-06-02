@@ -1,0 +1,11 @@
+Model Information:
+* title:	Old Metal Table (Low Poly)
+* source:	https://sketchfab.com/3d-models/old-metal-table-low-poly-92a14c8d231b4812bc7b97d03da6ddd9
+* author:	Berk Gedik (https://sketchfab.com/berkgedik)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Old Metal Table (Low Poly)" (https://sketchfab.com/3d-models/old-metal-table-low-poly-92a14c8d231b4812bc7b97d03da6ddd9) by Berk Gedik (https://sketchfab.com/berkgedik) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

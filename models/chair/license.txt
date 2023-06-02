@@ -1,0 +1,11 @@
+Model Information:
+* title:	Meeting Room Office Chair
+* source:	https://sketchfab.com/3d-models/meeting-room-office-chair-c03b0873f39b4abb9673b229390cb5f4
+* author:	cedeon (https://sketchfab.com/cedeon)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Meeting Room Office Chair" (https://sketchfab.com/3d-models/meeting-room-office-chair-c03b0873f39b4abb9673b229390cb5f4) by cedeon (https://sketchfab.com/cedeon) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
