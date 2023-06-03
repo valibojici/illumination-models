@@ -6,7 +6,7 @@ Texture::Texture(const std::string& path, Type type, bool flipY)
 	m_name = path;
 	create();
 	if (m_type == Type::CUBEMAP) {
-		loadCubemapFromFile(path, flipY);
+		loadCubemapFromFile(path, flipY); // if cubemap load each face from directory
 	} else{
 		loadFromFile(path, flipY);
 	}
@@ -29,6 +29,7 @@ void Texture::create()
 
 void Texture::loadFromFile(const std::string& filepath, bool flipY)
 {
+	// flip vertically
 	if (flipY) {
 		stbi_set_flip_vertically_on_load(true);
 	}
@@ -59,10 +60,12 @@ void Texture::loadFromFile(const std::string& filepath, bool flipY)
 	{
 	case 3:
 		format = GL_RGB;
+		// gamma correct diffuse & emmisive from srgb to linear
 		internalFormat = (m_type == Type::DIFFUSE || m_type == Type::EMISSIVE) ? GL_SRGB : GL_RGB;
 		break;
 	case 4:
 		format = GL_RGBA;
+		// gamma correct diffuse & emmisive from srgb to linear
 		internalFormat = (m_type == Type::DIFFUSE || m_type == Type::EMISSIVE) ? GL_SRGB_ALPHA : GL_RGBA;
 		break;
 	default:

@@ -5,14 +5,16 @@
 #include "Texture.h"
 #include <cmath>
 
+/// <summary>
+/// Abstraction for different meshes drawable with one opengl call
+/// </summary>
 class Mesh
 {
 private:
 	VAO *m_vao = nullptr;
 	VBO *m_vbo = nullptr;
 	EBO *m_ebo = nullptr;
-	std::vector<Vertex> m_vertices;
-	std::vector<unsigned int> m_indices;
+	unsigned int m_indicesCount = 0;
 	
 	std::vector<std::shared_ptr<Texture> > m_textures;
 public:

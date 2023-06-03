@@ -111,13 +111,16 @@
     <ClCompile Include="src\Scene\Box.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Floor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Materials\ToonMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vendor\STB_IMAGE\stb_image_write.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\TextureScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Materials\BlinnMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -156,9 +159,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Buffer\VBO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\SceneMenu.h">
@@ -209,13 +209,16 @@
     <ClInclude Include="src\Scene\Box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\Floor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Materials\ToonMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vendor\STB_IMAGE\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\TextureScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -230,15 +233,10 @@
     <None Include="shaders\base_shader.vert" />
     <None Include="shaders\postprocess.frag" />
     <None Include="shaders\postprocess.vert" />
-    <None Include="shaders\shadowmap.vert" />
-    <None Include="shaders\shadowmap.frag" />
-    <None Include="shaders\shadowmap-view.frag" />
-    <None Include="shaders\shadowmap_v2.vert" />
-    <None Include="shaders\shadowmap_v2.frag" />
-    <None Include="shaders\skybox.vert" />
-    <None Include="shaders\skybox.frag" />
     <None Include="shaders\toon.frag" />
     <None Include="shaders\toon_postprocess.frag" />
     <None Include="shaders\texture_display.frag" />
+    <None Include="shaders\shadowmap.frag" />
+    <None Include="shaders\shadowmap.vert" />
   </ItemGroup>
 </Project>

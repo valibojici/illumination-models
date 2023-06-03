@@ -78,6 +78,7 @@ void Framebuffer::create()
 	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 
 	if (m_colorAttachments.size() == 0) {
+		// if no depth attachments => disable writing to depth buffer
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
@@ -101,18 +102,21 @@ void Framebuffer::create()
 			glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		}
 	}
+	// send opengl the color buffers that are used
 	glDrawBuffers(m_colorAttachments.size(), buffers.data());
 	
+	// if there are depth attachments, bind the first one to check the FBO is complete
 	if (m_depthAttachments.size() != 0) {
 		activateDepthAttachment(0, m_depthAttachments[0].type == GL_TEXTURE_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP_POSITIVE_X);
 	}
 	
+	// check if FBO is complete
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		printf("ERROR Framebuffer not complete.");
 		exit(0);
 	}
 	// bind default
-	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 Framebuffer::~Framebuffer()
@@ -185,6 +189,7 @@ void Framebuffer::saveColorAttachmentToPNG(int slot)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(m_colorAttachments[slot].type, m_colorAttachments[slot].id);
 
+	// get the number of channels
 	glGetTexLevelParameteriv(m_colorAttachments[slot].type, 0, GL_TEXTURE_INTERNAL_FORMAT, &channels);
 	channels = channels == GL_RGB ? 3 : 4;
 	// allocate space
@@ -192,7 +197,7 @@ void Framebuffer::saveColorAttachmentToPNG(int slot)
 	// get texture and write
 	glGetTexImage(GL_TEXTURE_2D, 0, channels == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
 	stbi_flip_vertically_on_write(true);
-	// save data to file
+	// save data to file with timestamp
 	std::stringstream ss;
 	ss << std::time(nullptr) << ".png";
 	stbi_write_png(ss.str().c_str(), m_width, m_height, 3, data, m_width * channels);

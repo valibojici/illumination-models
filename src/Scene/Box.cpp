@@ -1,6 +1,6 @@
 #include "Box.h"
 
-Box::Box(Scene*& scene, unsigned int width, unsigned int height)
+Box::Box(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height)
     : Scene(scene, width, height), m_shadowFBO(4096, 4096)
 {
     updateWidthHeight(width, height);
@@ -23,7 +23,7 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
     m_shaders[3].load("base_shader.vert", "toon.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
     m_toonPostProcessShader.load("postprocess.vert", "toon_postprocess.frag");
-    m_shadowShader.load("shadowmap_v2.vert", "shadowmap_v2.frag");
+    m_shadowShader.load("shadowmap.vert", "shadowmap.frag");
     m_textureDisplayShader.load("postprocess.vert", "texture_display.frag");
 
     m_postProcessUI.addShaders({ &m_shaders[0], &m_shaders[1], &m_shaders[2], &m_shaders[3], &m_postprocessShader, &m_toonPostProcessShader });
@@ -75,47 +75,40 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
         m_wallMeshes.push_back(std::move(m));
     }
 
-    MaterialMesh sphere;
-    sphere.modelMatrix = glm::translate(glm::vec3(0.75f, -1.25f, 0.75f));
-    sphere.mesh = std::unique_ptr<Mesh>(Mesh::getSphere(0.75f, 5));
-    sphere.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
-    sphere.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
-    sphere.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    sphere.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
-    for (auto& material : sphere.materials) {
-        material->setColor({ 1.0f, 0.0f, 0.0f });
-        material->setAmbient({ 1.0f, 0.0f, 0.0f });
-    }
-    sphere.name = "Sphere";
-    m_meshes.push_back(std::move(sphere));
+    const int numMeshes = 3;
+    const std::string meshNames[] = { "Sphere", "Cone", "Cube" };
+    const glm::mat4 meshTransfroms[] = {
+        glm::translate(glm::vec3(0.75f, -1.25f, 0.75f)),
+        glm::translate(glm::vec3(-0.75f, -0.5f, -0.75f)),
+        glm::translate(glm::vec3(-0.75f, -1.25f, -0.75f))* glm::rotate(glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f))
+    };
+    Mesh* tempMeshes[] = {
+        Mesh::getSphere(0.75f, 5),
+        Mesh::getCone(0.75, 2.0f, 60, 10),
+        Mesh::getCube(1.5f, 1.5f, 1.5f)
+    };
+    const glm::vec3 meshColors[] = {
+        { 1.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 1.0f, 1.0f, 0.0f },
+    };
 
-    MaterialMesh cone;
-    cone.modelMatrix = glm::translate(glm::vec3(-0.75f, -0.5f, -0.75f));
-    cone.mesh = std::unique_ptr<Mesh>(Mesh::getCone(0.75, 2.0f, 60));
-    cone.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
-    cone.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
-    cone.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    cone.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
-    for (auto& material : cone.materials) {
-        material->setColor({ 0.0f, 1.0f, 0.0f });
-        material->setAmbient({ 0.0f, 1.0f, 0.0f });
+    for (int i = 0; i < numMeshes; ++i) {
+        MaterialMesh m;
+        m.modelMatrix = meshTransfroms[i];
+        m.mesh = std::unique_ptr<Mesh>(tempMeshes[i]);
+        m.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
+        m.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
+        m.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
+        m.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
+        for (auto& material : m.materials) {
+            material->setColor(meshColors[i]);
+            material->setAmbient(meshColors[i]);
+            material->setShowPresetsUI(true);
+        }
+        m.name = meshNames[i];
+        m_meshes.push_back(std::move(m));
     }
-    cone.name = "Cone";
-    m_meshes.push_back(std::move(cone));
-
-    MaterialMesh cube;
-    cube.modelMatrix = glm::translate(glm::vec3(-0.75f, -1.25f, -0.75f)) * glm::rotate(glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    cube.mesh = std::unique_ptr<Mesh>(Mesh::getCube(1.5f, 1.5f, 1.5f));
-    cube.materials.push_back(std::move(std::make_unique<PhongMaterial>()));
-    cube.materials.push_back(std::move(std::make_unique<BlinnMaterial>()));
-    cube.materials.push_back(std::move(std::make_unique<CookTorranceMaterial>()));
-    cube.materials.push_back(std::move(std::make_unique<ToonMaterial>()));
-    for (auto& material : cube.materials) {
-        material->setColor({ 1.0f, 1.0f, 0.0f });
-        material->setAmbient({ 1.0f, 1.0f, 0.0f });
-    }
-    cube.name = "Cube";
-    m_meshes.push_back(std::move(cube));
 
     // set up HDR framebuffer
     
@@ -145,7 +138,7 @@ Box::Box(Scene*& scene, unsigned int width, unsigned int height)
     
     m_shadowFBO.create(); // create the shadow framebuffer
 
-    m_lights[1]->setViewProjectionParameters(Light::ViewProjectionParameters().directional(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 12.0f, 2.8f));
+    m_lights[1]->setViewProjectionParameters(Light::ViewProjectionParameters().directional(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 12.0f, 2.8f, {0.0f, 0.0f, 1.0f}));
 }
 
 Box::~Box()
@@ -231,7 +224,7 @@ void Box::onRender()
     * LIGHTING PASS
     ******************/
     glViewport(0, 0, m_width, m_height);
-    m_hdrFBO->bind();
+    m_hdrFBO.bind();
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
@@ -240,7 +233,7 @@ void Box::onRender()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_shaders[m_modelIndex].bind();
     
-    m_shaders[m_modelIndex].setMat4("u_projMatrix", m_projMatrix);
+    m_shaders[m_modelIndex].setMat4("u_projMatrix", m_projMatrices[m_projMatrixIndex]);
     if (m_wireframeEnabled) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
@@ -269,31 +262,31 @@ void Box::onRender()
     }
 
     // apply postprocessing and write to another FBO
-    m_outputFBO->bind();
+    m_outputFBO.bind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
+    if (m_shadowMapToDisplay != -1) {
+        m_screenQuadRenderer.render(m_shadowFBO.getDepthAttachment(m_shadowMapToDisplay), m_textureDisplayShader);
+    } else
     if (m_modelIndex != 3) {
-        m_screenQuadRenderer.render(m_hdrFBO->getColorAttachment(0), m_postprocessShader);
+        m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
     }
     else {
-        m_screenQuadRenderer.renderToon(m_hdrFBO->getColorAttachment(0), m_hdrFBO->getColorAttachment(1), m_toonPostProcessShader);
+        m_screenQuadRenderer.renderToon(m_hdrFBO.getColorAttachment(0), m_hdrFBO.getColorAttachment(1), m_toonPostProcessShader);
     }
 
     // bind default framebuffer
-    m_outputFBO->unbind();
+    m_outputFBO.unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_outputFBO->getColorAttachment(0), m_textureDisplayShader);
+    m_screenQuadRenderer.render(m_outputFBO.getColorAttachment(0), m_textureDisplayShader);
 }
 
 void Box::onRenderImGui()
 {
     // back button
-    if (ImGui::Button("Back")) {
-        Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
-        delete temp;
-        return;
+    if (renderImGuiBackButton()) {
+        return; // exit if button is clicked
     }
 
     // render UI for every light
@@ -358,13 +351,15 @@ void Box::onRenderImGui()
     }
 
     if (ImGui::Button("Screenshot")) {
-        m_outputFBO->saveColorAttachmentToPNG(0);
+        m_outputFBO.saveColorAttachmentToPNG(0);
     }
 
     m_postProcessUI.onRenderImGui();
 
     // enable/disable wireframes, for debug
     ImGui::Checkbox("Show wireframe", &m_wireframeEnabled);
+    ImGui::SliderInt("Shadowmap display", &m_shadowMapToDisplay, -1, 2);
+    ImGui::SliderInt("Projection matrix", &m_projMatrixIndex, 0, 1);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
@@ -373,17 +368,22 @@ void Box::updateWidthHeight(unsigned width, unsigned height)
 {
     m_width = width;
     m_height = height;
-    m_hdrFBO = std::make_unique<Framebuffer>(width, height);
-    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
-    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
-    m_hdrFBO->addDepthAttachment(GL_RENDERBUFFER);
-    m_hdrFBO->create();
+    m_hdrFBO = Framebuffer(width, height);
+    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
+    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
+    m_hdrFBO.addDepthAttachment(GL_RENDERBUFFER);
+    m_hdrFBO.create();
     // setup output FBO (after postprocessing)
-    m_outputFBO = std::make_unique<Framebuffer>(width, height);
-    m_outputFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB);
-    m_outputFBO->create();
+    m_outputFBO = Framebuffer(width, height);
+    m_outputFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB);
+    m_outputFBO.create();
 
-    m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);
+    float ratio = 1.0f * m_width / m_height;
+    m_projMatrices = {
+        glm::infinitePerspective(glm::radians(60.0f), ratio, 0.1f),
+        glm::ortho(-3.0f * ratio, 3.0f * ratio, -3.0f, 3.0f, -3.0f, 10.0f)
+    };
+    // set new width/height in toon post process shader
     m_toonPostProcessShader.setFloat("u_textureWidth", m_width);
     m_toonPostProcessShader.setFloat("u_textureHeight", m_height);
 }

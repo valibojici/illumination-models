@@ -38,9 +38,9 @@ void Light::draw(Shader& shader)
 
 void Light::imGuiRender()
 {
-	ImGui::Checkbox("Draw light", &m_draw);
+	ImGui::Checkbox("Draw light", &m_draw); // draw cube or not
 	ImGui::SameLine();
-	ImGui::Checkbox("Enable", &m_enabled);
+	ImGui::Checkbox("Enable", &m_enabled); // enable/disable
 	ImGui::SameLine();
 	ImGui::Checkbox("Shadows", &m_shadow);
 	ImGui::ColorEdit3("Light Color", &m_color.x, ImGuiColorEditFlags_Float);

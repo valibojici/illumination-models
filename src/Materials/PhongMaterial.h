@@ -48,5 +48,7 @@ public:
 	/// Sets all material uniforms in shader
 	/// </summary>
 	virtual void setUniforms(Shader& shader) override;
+
+	virtual void defaultParameters() override;
 };
 

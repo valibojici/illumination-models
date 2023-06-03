@@ -124,7 +124,7 @@ std::unique_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 				);
 			}
 			catch (std::exception& e) {
-				printf("[ERROR] %s\n", e.what());
+				printf("%s\n", e.what());
 			}
 		}
 	}
@@ -133,26 +133,30 @@ std::unique_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mes
 
 void Model::load(const std::string& path)
 {
-	m_path = path;
+	m_path = path; // path to model file
+
+	// create assimp importer and set up import flags
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path,
-		aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_GenNormals |
-		aiProcess_CalcTangentSpace |
-		aiProcess_FlipUVs
+		aiProcess_Triangulate |				// triangulate meshes if not already
+		aiProcess_JoinIdenticalVertices |	// if multiple vertices are the same, use only 1 and index them
+		aiProcess_GenNormals |				// generate normals if they are missing
+		aiProcess_CalcTangentSpace |		// generate tangents and bitangents
+		aiProcess_FlipUVs					// flip textures coordinates
 	);
 
+	// check if model has been succesfully loaded
 	if (scene == nullptr) {
 		printf("Assimp import error: %s", importer.GetErrorString());
 		exit(0);
 	}
-
+	// process the nodes recursively
 	processNode(scene, scene->mRootNode);
 }
 
 void Model::draw(Shader& shader) const
 {
+	// draw every mesh
 	for (auto& mesh : m_meshes) {
 		mesh->draw(shader);
 	}

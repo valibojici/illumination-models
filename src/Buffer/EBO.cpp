@@ -32,7 +32,7 @@ void EBO::bind() const
 {
 	if (s_currentBoundEBO != m_id) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);	
-		s_currentBoundEBO = m_id;
+		s_currentBoundEBO = m_id; // set currentEBO to this id
 	}
 }
 
@@ -46,8 +46,8 @@ void EBO::unbind() const
 
 void EBO::bufferData(void* data, unsigned int size)
 {
-	create();
-	bind();
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	create(); // create ID
+	bind(); // bind
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // load data
 }
 

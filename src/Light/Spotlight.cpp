@@ -22,8 +22,8 @@ void Spotlight::imGuiRender()
 	Light::imGuiRender();
 
 	if (ImGui::DragFloat3("Position", &m_position.x, 0.01f)) {
-		// set UP vector to positive Y if light is on Z axis
-		m_parameters.UP = (m_position.x == 0.0f && m_position.y == 0.0f) ? glm::vec3(0.0f, 1.0f, 0.0f) : glm::vec3(0.0f, 0.0f, 1.0f);
+		// set UP vector to positive Z if light is on Y axis
+		m_parameters.UP = (m_position.z == 0.0f && m_position.x == 0.0f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
 		calculateLightSpaceMatrix();
 		m_shadowNeedsRender = true;
 	}
@@ -33,8 +33,7 @@ void Spotlight::imGuiRender()
 		m_shadowNeedsRender = true;
 	}
 	/*
-	* the cut off and outer cut off are stored in degrees
-	* but the shader expects cos values
+	* the cut off and outer cut off are stored in degrees (shader expects cos values)
 	*/
 	if (ImGui::DragFloat("Cut off", &m_cutOff, 0.1f, 0.1f, 90.0f, "%.1f deg")) {
 		m_outerCutOff = std::max(m_outerCutOff, m_cutOff);
@@ -87,6 +86,7 @@ void Spotlight::setUniforms(Shader& shader)
 
 void Spotlight::calculateLightSpaceMatrix()
 {
+	// use a perspective matrix
 	m_lightSpaceMatrix[0] = glm::perspective(
 		glm::radians(2.0f * m_outerCutOff),
 		m_parameters.aspect,

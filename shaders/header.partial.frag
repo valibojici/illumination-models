@@ -14,20 +14,20 @@ in VERTEX_TO_FRAGMENT{
 }fs_in;
 
 struct Light{
-   int type; // 0 == directional | 1 == spotlight | 2 == pointlight
-   vec4 position;       // w == 0 for directional
-   float intensity;     // 0 to 1
+   int type;        // 0 == directional | 1 == spotlight | 2 == pointlight
+   vec4 position;   // light position in world space    
+   float intensity; // 0 = no light
    vec3 color;
-   bool enabled;
-   vec3 attenuation;    // constant, linear, quadratic
-   vec3 target;         // for spotlight
-   float cutOff;        // cos value ---> 1 if not spotlight
-   float outerCutOff;   // cos value
-   bool shadow;         // if casting shadow
-   mat4 lightSpaceMatrix;
-   float farPlane;
-   sampler2D shadowMap;
-   samplerCube shadowMapCube;
+   bool enabled;        // flag if light is active
+   vec3 attenuation;    // distance attenuation: constant, linear, quadratic
+   vec3 target;         // spotlight target in world space
+   float cutOff;        // cos value of spotlight inner cut off angle
+   float outerCutOff;   // cos value of spotlight outer cut off angle, inner < outer
+   bool shadow;         // enable/disable using shadows
+   mat4 lightSpaceMatrix; // used to transform fragment from world space to light space
+   float farPlane;        // used for shadows
+   sampler2D shadowMap;   // shadow map texture for directional / spotlight
+   samplerCube shadowMapCube; // shadow map texture for point light
 };
 
 uniform vec3 u_viewPos;                 // viewer position in world space
@@ -52,12 +52,9 @@ uniform sampler2D u_MetallicTex;
 uniform sampler2D u_EmissiveTex;
 uniform sampler2D u_OpacityTex;
 
-uniform bool u_useReflections = false;
-uniform samplerCube u_reflectionMap;
+uniform vec3 u_emission; // emission color
 
-uniform vec3 u_emission;         // emission
-
-uniform int u_outputOnlyBRDF = 0;
+uniform int u_outputOnlyBRDF = 0; // flag to output only the BRDF
 
 vec3 BRDF(float geometryTerm, vec3 lightDir, vec3 normal, vec3 viewDir);
 

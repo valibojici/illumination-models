@@ -7,11 +7,14 @@
 #include "Mesh.h"
 
 /// <summary>
-/// Base class for lights. Must implement *setUniforms* and *setShaderPosition*
+/// Base class for lights. Must implement *setUniforms* and *calculateLightSpaceMatrix*
 /// </summary>
 class Light
 {
 public:
+	/// <summary>
+	/// Parameters used for projection matrix
+	/// </summary>
 	struct ViewProjectionParameters {
 		float minx = -4;
 		float miny = 4;
@@ -23,8 +26,8 @@ public:
 		float far_plane = 5.0f;
 		float directionalLightScale = 2.5f;
 		glm::vec3 UP = { 0.0f, 0.0f, 1.0f };
-		ViewProjectionParameters& directional(float minx_ = -4, float maxx_ = 4, float miny_ = -4, float maxy_ = 4, float near_plane_ = 0.1f, float far_plane_ = 12.0f, float scale_ = 2.5f, glm::vec3 UP_ = { 0.0f, 0.0f, 1.0f });
-		ViewProjectionParameters& spotlight(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f, glm::vec3 UP_ = { 0.0f, 0.0f, 1.0f });
+		ViewProjectionParameters& directional(float minx_ = -4, float maxx_ = 4, float miny_ = -4, float maxy_ = 4, float near_plane_ = 0.1f, float far_plane_ = 12.0f, float scale_ = 2.5f, glm::vec3 UP_ = { 0.0f, 1.0f, 0.0f });
+		ViewProjectionParameters& spotlight(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f, glm::vec3 UP_ = { 0.0f, 1.0f, 0.0f });
 		ViewProjectionParameters& point(float aspect_ = 1.0f, float near_plane_ = 0.1f, float far_plane_ = 12.0f);
 	};
 
@@ -154,14 +157,18 @@ public:
 	/// <summary>
 	/// Abstract method that sets all uniforms for this light (at m_index)
 	/// Must set the following uniforms: 
-	/// [vec4 position (w == 0 for directional light, see setShaderPosition)]
+	/// [int type] (0 = directional | 1 == spotlight | 2 == pointlight
+	/// [vec4 position (w == 0 for directional light)]
 	/// [float intensity]
 	/// [vec3 color]
 	/// [bool enabled]
-	/// [vec3 attenuation (constant, linear, quadratic)]
+	/// [vec3 attenuation (constant, linear, quadrastic)]
 	/// [vec3 target]
 	/// [float cutOff (cos value, 1 if NOT spotlight)]
 	/// [float outerCutOff (cos value)]
+	/// [bool shadow] (flag - if shadows are computed)
+	/// [mat4 lightSpaceMatrix] (matrix used for shadowmapping)
+	/// [float farPlane] (for shadowmapping - used to map distance to [0,1])
 	/// </summary>
 	virtual void setUniforms(Shader& shader) = 0;
 	

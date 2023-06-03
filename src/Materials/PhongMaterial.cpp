@@ -3,6 +3,34 @@
 
 void PhongMaterial::imGuiRender()
 {
+	if (m_showPresetsUI && ImGui::Combo("Material", &m_presetIndex, "Custom\0Gold\0Copper\0Iron\0\0")) {
+		switch (m_presetIndex)
+		{
+		case 1:
+			m_diffuseColor = { 0.7f, 0.45f, 0.0f };
+			m_kd = glm::vec3(0.02f);
+			m_ks = { 1.0f, 0.67f, 0.1f };
+			break;
+		case 2:
+			m_diffuseColor = { 0.45f, 0.24f, 0.21f };
+			m_kd = glm::vec3(0.05f);
+			m_ks = { 1.0f, 0.5f, 0.35f };
+			break;
+		case 3:
+			m_diffuseColor = glm::vec3(0.2f);
+			m_kd = glm::vec3(0.15f);
+			m_ks = glm::vec3(1.0f);
+			break;
+		default:
+			break;
+		}
+		if (m_presetIndex != 0) {
+			m_alpha = 68;
+			m_ka = 0.001f;
+			m_ia = m_diffuseColor;
+		}
+	}
+	if (m_presetIndex != 0)return;
     ImGui::ColorEdit3("Diffuse color", &m_diffuseColor.x, ImGuiColorEditFlags_Float);
 
     static bool setAllDiffuse = true;
@@ -36,4 +64,16 @@ void PhongMaterial::setUniforms(Shader& shader)
     shader.setFloat("u_material.ka", m_ka);
     shader.setVec3("u_material.ia", m_ia);
     shader.setBool("u_modifiedSpecular", m_modifiedSpecular);
+}
+
+void PhongMaterial::defaultParameters()
+{
+	m_presetIndex = 0;
+	m_diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_kd = glm::vec3(1.0f);
+	m_ks = glm::vec3(0.5f);
+	m_ka = 0.005f;
+	m_ia = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_alpha = 32.0f;
+	m_modifiedSpecular = false;
 }

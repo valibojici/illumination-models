@@ -3,26 +3,26 @@
 out vec4 outColor;
 in vec2 texCoords;
 
-uniform sampler2D u_texture;
+uniform sampler2D u_texture; // texture to display
 
-// flag if HDR is used:
-uniform bool u_hdr;
+uniform bool u_hdr; // flag enable/disable HDR
 
-// flag to enable/disable gamma correction
-uniform bool  u_gammaCorrect = false; 
+uniform bool  u_gammaCorrect = false; // flag to enable/disable gamma correction
 
-uniform float u_reinhardWhite = 4;
+// value for White in reinhard mapping (smallest luminance mapped to pure white)
+uniform float u_reinhardWhite = 4; 
 
 vec3 reinhard_tonemap(vec3 col){
-    // get luminance
-    float L = dot(vec3(0.2126, 0.7152, 0.0722), col);
-    // reinhard formula
-    float tonemap = L / (1 + L) * (1 + L / (u_reinhardWhite * u_reinhardWhite));
-    // scale the color 
-    return col * (tonemap / L);
+    // get luminance https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I!!PDF-E.pdf p. 4
+    float luminance = dot(vec3(0.2126, 0.7152, 0.0722), col);
+    // Reinhard formula from "Photographic Tone Reproduction for Digital Images"
+    float scaled_luminance = luminance / (1 + luminance) * (1 + luminance / (u_reinhardWhite * u_reinhardWhite));
+    // scale the color
+    return col * (scaled_luminance / luminance);
 }
 
 void main(){
+    // get color to output
 	vec3 color = texture(u_texture, texCoords).rgb;
 
     if(u_hdr){

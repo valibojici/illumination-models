@@ -4,7 +4,7 @@
 #include "imgui.h"
 
 /// <summary>
-/// Class for a Phong material
+/// Class for a Toon material
 /// </summary>
 class ToonMaterial : public Material
 {

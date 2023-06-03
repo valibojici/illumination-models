@@ -16,23 +16,23 @@ void VAO::addLayout(DataType dataType, unsigned int count, unsigned int attribDi
 	{
 	case VAO::DataType::FLOAT:
 		m_layout.push_back({ m_stride, count, GL_FLOAT, attribDivisor});
-		m_stride += sizeof(float) * count;
+		m_stride += sizeof(float) * count; // add to current stride
 		break;
 	case VAO::DataType::UNSIGNED_INT:
 		m_layout.push_back({ m_stride, count, GL_UNSIGNED_INT, attribDivisor});
-		m_stride += sizeof(unsigned int) * count;
+		m_stride += sizeof(unsigned int) * count; // add to current stride
 		break;
 	case VAO::DataType::VEC2:
 		m_layout.push_back({ m_stride, 2 * count, GL_FLOAT, attribDivisor});
-		m_stride += sizeof(float) * 2 * count;
+		m_stride += sizeof(float) * 2 * count; // add to current stride
 		break;
 	case VAO::DataType::VEC3:
 		m_layout.push_back({ m_stride, 3 * count, GL_FLOAT, attribDivisor});
-		m_stride += sizeof(float) * 3 * count;
+		m_stride += sizeof(float) * 3 * count; // add to current stride
 		break;
 	case VAO::DataType::VEC4:
 		m_layout.push_back({ m_stride, 4 * count, GL_FLOAT, attribDivisor});
-		m_stride += sizeof(float) * 4 * count;
+		m_stride += sizeof(float) * 4 * count; // add to current stride
 		break;
 	default:
 		break;
@@ -41,10 +41,12 @@ void VAO::addLayout(DataType dataType, unsigned int count, unsigned int attribDi
 
 void VAO::linkVBO(const VBO& vbo)
 {
+	// bind VBO and VAO
 	vbo.bind();
 	bind();
+	// for every data type 
 	for (unsigned int i = 0; i < m_layout.size(); ++i) {
-		glEnableVertexAttribArray(i);
+		glEnableVertexAttribArray(i); // enable vertex attribute
 		glVertexAttribPointer(
 			i, 
 			m_layout[i].count, 

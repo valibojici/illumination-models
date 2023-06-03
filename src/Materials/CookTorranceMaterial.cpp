@@ -2,7 +2,8 @@
 
 void CookTorranceMaterial::imGuiRender()
 {
-	if (ImGui::Combo("Material", &m_presetIndex, "Custom\0Gold\0Copper\0Iron\0\0")) {
+	// f0 values for presets taken from RealTime Rendering p. 323
+	if (m_showPresetsUI && ImGui::Combo("Material", &m_presetIndex, "Custom\0Gold\0Copper\0Iron\0\0")) {
 		switch (m_presetIndex)
 		{
 		case 1:
@@ -18,16 +19,13 @@ void CookTorranceMaterial::imGuiRender()
 			m_roughness = 0.3f;
 			break;
 		default:
-			m_customF0 = false;
-			m_roughness = 0.5f;
-			m_ratio = 0.2f;
 			break;
 		}
 		if (m_presetIndex != 0) {
 			m_customF0 = true;
 			m_ia = m_f0;
 			m_ka = 0.001f;
-			m_ratio = 0.9f;
+			m_metallic = 0.9f;
 			m_Dindex = 1;
 			m_Gindex = 4;
 			m_albedo = { 0.0f, 0.0f, 0.0f };
@@ -50,7 +48,7 @@ void CookTorranceMaterial::imGuiRender()
 	if (m_customF0) {
 		ImGui::ColorEdit3("f0", &m_f0[0], ImGuiColorEditFlags_Float);
 	}
-	ImGui::DragFloat("Diffuse/Specular ratio", &m_ratio, 0.001f, 0.0f, 1.0f);
+	ImGui::DragFloat("Metalness", &m_metallic, 0.001f, 0.0f, 1.0f);
 	ImGui::DragFloat("Ambient intensity", &m_ka, 0.00005f, 0.0f, 0.5f, "%.5f");
 	ImGui::ColorEdit3("Ambient color", &m_ia.x, ImGuiColorEditFlags_Float);
 }
@@ -60,7 +58,7 @@ void CookTorranceMaterial::setUniforms(Shader& shader)
 	shader.setVec3("u_material.albedo", m_albedo);
 	shader.setFloat("u_material.roughness", m_roughness);
 	shader.setVec3("u_material.f0", m_customF0 ? m_f0 : glm::vec3(0.0f));
-	shader.setFloat("u_material.ratio", m_ratio);
+	shader.setFloat("u_material.metallic", m_metallic);
 	shader.setFloat("u_material.ka", m_ka);
 	shader.setVec3("u_material.ia", m_ia);
 	shader.setInt("u_Gindex", m_Gindex);
@@ -71,4 +69,20 @@ void CookTorranceMaterial::setUniforms(Shader& shader)
 	shader.setInt("u_outputD", m_outputDFG_choice == 0 ? 1 : 0);
 	shader.setInt("u_outputF", m_outputDFG_choice == 1 ? 1 : 0);
 	shader.setInt("u_outputG", m_outputDFG_choice == 2 ? 1 : 0);
+}
+
+void CookTorranceMaterial::defaultParameters()
+{
+	m_presetIndex = 0;
+	m_albedo = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_roughness = 0.5f;
+	m_metallic = 0.2f;
+	m_f0 = glm::vec3(0.04f);
+	m_Gindex = 0;
+	m_Dindex = 0;
+	m_ia = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_ka = 0.005f;
+	m_customF0 = false;
+	m_outputDFG = false;
+	m_outputDFG_choice = 0;
 }

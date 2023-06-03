@@ -1,6 +1,6 @@
 #include "ModelTestScene.h"
 
-ModelTestScene::ModelTestScene(Scene*& scene, unsigned int width, unsigned int height)
+ModelTestScene::ModelTestScene(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height)
     : Scene(scene, width, height), m_shadowFBO(2048, 2048)
 {
     updateWidthHeight(width, height);
@@ -23,7 +23,7 @@ ModelTestScene::ModelTestScene(Scene*& scene, unsigned int width, unsigned int h
     // load shaders
     m_shader.load("base_shader.vert", "cook-torrance.frag");
     m_postprocessShader.load("postprocess.vert", "postprocess.frag");
-    m_shadowShader.load("shadowmap_v2.vert", "shadowmap_v2.frag");
+    m_shadowShader.load("shadowmap.vert", "shadowmap.frag");
     m_textureDisplayShader.load("postprocess.vert", "texture_display.frag");
 
     m_postProcessUI.addShaders({ &m_shader, &m_postprocessShader });
@@ -210,7 +210,7 @@ void ModelTestScene::onRender()
     * LIGHTING PASS
     ******************/
     glViewport(0, 0, m_width, m_height);
-    m_hdrFBO->bind();
+    m_hdrFBO.bind();
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
@@ -251,26 +251,23 @@ void ModelTestScene::onRender()
     }
 
     // apply postprocessing and write to another FBO
-    m_outputFBO->bind();
+    m_outputFBO.bind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_hdrFBO->getColorAttachment(0), m_postprocessShader);
+    m_screenQuadRenderer.render(m_hdrFBO.getColorAttachment(0), m_postprocessShader);
 
     // bind default framebuffer
-    m_outputFBO->unbind();
+    m_outputFBO.unbind();
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_screenQuadRenderer.render(m_outputFBO->getColorAttachment(0), m_textureDisplayShader);
+    m_screenQuadRenderer.render(m_outputFBO.getColorAttachment(0), m_textureDisplayShader);
 }
 
 void ModelTestScene::onRenderImGui()
 {
     // back button
-    if (ImGui::Button("Back")) {
-        Scene* temp = m_currentScene;
-        m_currentScene = new SceneMenu(m_currentScene, m_width, m_height);
-        delete temp;
-        return;
+    if (renderImGuiBackButton()) {
+        return; // exit if button is clicked
     }
 
     // render UI for every light
@@ -323,7 +320,7 @@ void ModelTestScene::onRenderImGui()
     }
 
     if (ImGui::Button("Screenshot")) {
-        m_outputFBO->saveColorAttachmentToPNG(0);
+        m_outputFBO.saveColorAttachmentToPNG(0);
     }
 
     m_postProcessUI.onRenderImGui();
@@ -338,14 +335,14 @@ void ModelTestScene::updateWidthHeight(unsigned int width, unsigned int height)
 {
     m_width = width;
     m_height = height;
-    m_hdrFBO = std::make_unique<Framebuffer>(width, height);
-    m_hdrFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
-    m_hdrFBO->addDepthAttachment(GL_RENDERBUFFER);
-    m_hdrFBO->create();
+    m_hdrFBO = Framebuffer(width, height);
+    m_hdrFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGBA16F);
+    m_hdrFBO.addDepthAttachment(GL_RENDERBUFFER);
+    m_hdrFBO.create();
     // setup output FBO (after postprocessing)
-    m_outputFBO = std::make_unique<Framebuffer>(width, height);
-    m_outputFBO->addColorAttachament(GL_TEXTURE_2D, GL_RGB);
-    m_outputFBO->create();
+    m_outputFBO = Framebuffer(width, height);
+    m_outputFBO.addColorAttachament(GL_TEXTURE_2D, GL_RGB);
+    m_outputFBO.create();
 
 
     m_projMatrix = glm::infinitePerspective(glm::radians(60.0f), 1.0f * m_width / m_height, 0.1f);

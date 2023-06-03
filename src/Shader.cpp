@@ -151,33 +151,33 @@ void Shader::setIntArray(const std::string& name, unsigned int count, int* data)
 	glUniform1iv(getLocation(name), count, data);
 }
 
-Position extract_name(const std::string& str, size_t offset) {
+Shader::TemplateInfo Shader::extractName(const std::string& str, size_t offset) {
 	size_t begin = offset;
-	while (str[begin] != '"') begin++;
-	size_t end = begin + 1;
-	while (str[end] != '"') end++;
-	return { begin + 1, end - 1 };
+	while (str[begin] != '"') begin++; // find "
+	size_t end = begin + 1; // go one past "
+	while (str[end] != '"') end++; // find end "
+	return { begin + 1, end - 1 }; // go back one
 }
 
-std::string readFile(const std::string& path) {
+std::string Shader::readFile(const std::string& path) {
 	std::stringstream p;
 	p << "shaders/" << path;
 	std::ifstream file(p.str());
 	if (!file) {
 		printf("Error file '%s' not loaded", p.str().c_str());
-		exit(0);
+		exit(0); 
 	}
 	std::stringstream buffer;
 	buffer << file.rdbuf(); // read whole file in buffer
 	return buffer.str();
 }
 
-std::string processExtends(std::string shader) {
+std::string Shader::processExtends(std::string shader) {
 	size_t begin = shader.find("@extends");
 	if (begin == std::string::npos) return shader;
 
 	// extract the <file> from @extends "<file>"
-	Position file_pos = extract_name(shader, 0);
+	TemplateInfo file_pos = extractName(shader, 0);
 	std::string file = shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);
 	// load base template shader
 	std::string base_shader = readFile(file);
@@ -187,7 +187,7 @@ std::string processExtends(std::string shader) {
 	size_t section_pos = shader.find("@section");
 	while (section_pos != std::string::npos) {
 		// extract name of section
-		file_pos = extract_name(shader, section_pos);
+		file_pos = extractName(shader, section_pos);
 		std::string section_name = shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);
 		size_t section_start = file_pos.end + 2; // skip end quote
 		size_t section_end = shader.find("@endsection", section_start) - 1;
@@ -201,7 +201,7 @@ std::string processExtends(std::string shader) {
 	size_t has_pos = base_shader.find("@has");
 	while (has_pos != std::string::npos) {
 		// get the section name
-		file_pos = extract_name(base_shader, has_pos);
+		file_pos = extractName(base_shader, has_pos);
 		std::string section_name = base_shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);
 
 		// replace this placeholder with the section from the shader
@@ -211,10 +211,10 @@ std::string processExtends(std::string shader) {
 	return base_shader;
 }
 
-std::string processInclude(std::string shader) {
+std::string Shader::processInclude(std::string shader) {
 	size_t pos = shader.find("@include");       // find the index where @include starts
 	while (pos != std::string::npos) {            // while there are includes
-		Position file_pos = extract_name(shader, pos);
+		TemplateInfo file_pos = extractName(shader, pos);
 
 		// extract the <file> from @include "<file>"
 		std::string file = shader.substr(file_pos.start, file_pos.end - file_pos.start + 1);

@@ -2,20 +2,17 @@
 
 void SceneMenu::onRenderImGui()
 {
-	if (ImGui::Button("Model test scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new ModelTestScene(m_currentScene, m_width, m_height);
-		delete temp;
+	ImGui::Text("Select a scene from below:");
+	if (ImGui::Button("Box room scene", ImVec2(ImGui::GetWindowSize().x * 0.5f, 30.0f))) {
+		setScene(std::make_unique<Box>(m_currentScene, m_width, m_height));
 	}
-	if (ImGui::Button("Floor scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new Floor(m_currentScene, m_width, m_height);
-		delete temp;
+	ImGui::Spacing();
+	if (ImGui::Button("Texture test scene", ImVec2(ImGui::GetWindowSize().x * 0.5f, 30.0f))) {
+		setScene(std::make_unique<TextureScene>(m_currentScene, m_width, m_height));
 	}
-	if (ImGui::Button("Box room scene")) {
-		Scene* temp = m_currentScene;
-		m_currentScene = new Box(m_currentScene, m_width, m_height);
-		delete temp;
+	ImGui::Spacing();
+	if (ImGui::Button("Model test scene", ImVec2(ImGui::GetWindowSize().x * 0.5f, 30.0f))) {
+		setScene(std::make_unique<ModelTestScene>(m_currentScene, m_width, m_height));
 	}
 }
 

@@ -42,7 +42,7 @@ void PointLight::calculateLightSpaceMatrix()
 	};
 	
 	m_lightSpaceMatrix.clear();
-	// go through every face
+	// go through every face and calculate a perspective matrix
 	for (int i = 0; i < 6; ++i) {
 		m_lightSpaceMatrix.push_back(
 			glm::perspective(

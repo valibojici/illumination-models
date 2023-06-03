@@ -19,8 +19,8 @@ public:
 
 private:
 	unsigned int m_id = 0;
-	unsigned int m_width;
-	unsigned int m_height;
+	unsigned int m_width = 0;
+	unsigned int m_height = 0;
 
 	// flag if fbo is created
 	bool m_created = false;
@@ -28,6 +28,7 @@ private:
 	std::vector<Attachment> m_colorAttachments;
 	std::vector<Attachment> m_depthAttachments;
 public:
+	Framebuffer() = default;
 	Framebuffer(unsigned int width, unsigned int height) : m_width(width), m_height(height) {}
 	
 	/// <summary>

@@ -52,7 +52,7 @@ App::App() {
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    m_scene = new SceneMenu(m_scene, m_windowWidth, m_windowHeight);
+    m_scene = std::make_unique<SceneMenu>(m_scene, m_windowWidth, m_windowHeight);
 }
 
 void App::run()
@@ -75,7 +75,7 @@ void App::run()
                 m_setImguiWindowPos = true;
                 ImGui::SetNextWindowPos(ImGui::GetMousePos());
             }
-            ImGui::Begin("Window", &m_showImguiWindow);
+            ImGui::Begin("Menu", &m_showImguiWindow);
             m_scene->onRenderImGui();
             ImGui::End();
         }
@@ -116,15 +116,20 @@ void App::handleEvent(const Event& e)
     case Event::Type::WINDOW_RESIZE:
         m_windowWidth = (unsigned int)e.window.width;
         m_windowHeight = (unsigned int)e.window.height;
-        m_scene->updateWidthHeight(m_windowWidth, m_windowHeight);
-        printf("%d %d\n", m_windowWidth, m_windowHeight);
+        m_scene->updateWidthHeight(m_windowWidth, m_windowHeight); // update FBOs 
         break;
     case Event::Type::MOUSE_BUTTON_PRESS:
         if (e.mouse.keyCode == GLFW_MOUSE_BUTTON_2) {
-            m_showImguiWindow = !m_showImguiWindow;
-            if (m_showImguiWindow) {
+            m_showImguiWindow = !m_showImguiWindow; // toggle flag to show/hide window
+            if (m_showImguiWindow) { // if window will be shown set the flag to set-window-position-to-mouse to true
                 m_setImguiWindowPos = false;
             }
         }
+        break;
     };
+}
+
+void App::glfw_error_callback(int error, const char* description)
+{
+	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }

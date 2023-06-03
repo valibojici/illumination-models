@@ -6,14 +6,15 @@
 class Scene
 {
 protected:
-	Scene*& m_currentScene;
+	std::unique_ptr<Scene>& m_currentScene;
 
 	unsigned int m_width = 0;
 	unsigned int m_height = 0;
+	void setScene(std::unique_ptr<Scene> newScene) { m_currentScene = std::move(newScene); }
+	bool renderImGuiBackButton();
 public:
-	Scene(Scene*& scene, unsigned int width, unsigned int height) : m_currentScene(scene), m_width(width), m_height(height) {}
+	Scene(std::unique_ptr<Scene>& scene, unsigned int width, unsigned int height) : m_currentScene(scene), m_width(width), m_height(height) {}
 	virtual void onRender() {}
-	// TODO: add back button rendering here
 	virtual void onRenderImGui() {}
 	virtual void updateWidthHeight(unsigned int width, unsigned int height) {}
 	virtual ~Scene() {}
