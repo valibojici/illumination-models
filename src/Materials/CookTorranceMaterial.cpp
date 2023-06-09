@@ -4,18 +4,19 @@ void CookTorranceMaterial::imGuiRender()
 {
 	// f0 values for presets taken from RealTime Rendering p. 323
 	if (m_showPresetsUI && ImGui::Combo("Material", &m_presetIndex, "Custom\0Gold\0Copper\0Iron\0\0")) {
+		auto toFloat = [](const glm::vec3 & col) { return col / 255.0f; };
 		switch (m_presetIndex)
 		{
 		case 1:
-			m_f0 = { 1.0f, 0.782f, 0.344f };
+			m_f0 = toFloat({ 255.0f, 229.0f, 158.0f });
 			m_roughness = 0.25f;
 			break;
 		case 2:
-			m_f0 = { 0.955f, 0.638f, 0.538f };
+			m_f0 = toFloat({ 250.0f, 209.0f, 194.0f });
 			m_roughness = 0.2f;
 			break;
 		case 3:
-			m_f0 = { 0.562f, 0.565f, 0.578f };
+			m_f0 = toFloat({ 198.0f, 198.0f, 200.0f });
 			m_roughness = 0.3f;
 			break;
 		default:
@@ -57,7 +58,7 @@ void CookTorranceMaterial::setUniforms(Shader& shader)
 {
 	shader.setVec3("u_material.albedo", m_albedo);
 	shader.setFloat("u_material.roughness", m_roughness);
-	shader.setVec3("u_material.f0", m_customF0 ? m_f0 : glm::vec3(0.0f));
+	shader.setVec3("u_material.f0", m_customF0 ? glm::pow(m_f0, glm::vec3(2.2f)) : glm::vec3(0.0f));
 	shader.setFloat("u_material.metallic", m_metallic);
 	shader.setFloat("u_material.ka", m_ka);
 	shader.setVec3("u_material.ia", m_ia);
