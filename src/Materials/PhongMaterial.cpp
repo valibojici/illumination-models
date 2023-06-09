@@ -9,12 +9,12 @@ void PhongMaterial::imGuiRender()
 		case 1:
 			m_diffuseColor = { 0.7f, 0.45f, 0.0f };
 			m_kd = glm::vec3(0.02f);
-			m_ks = { 1.0f, 0.67f, 0.1f };
+			m_ks = { 1.0f, 0.853f, 0.451f };
 			break;
 		case 2:
 			m_diffuseColor = { 0.45f, 0.24f, 0.21f };
 			m_kd = glm::vec3(0.05f);
-			m_ks = { 1.0f, 0.5f, 0.35f };
+			m_ks = { 1.0f, 0.8f, 0.8f };
 			break;
 		case 3:
 			m_diffuseColor = glm::vec3(0.2f);
