@@ -20,14 +20,6 @@ private:
 	std::vector<std::unique_ptr<Mesh>> m_meshes;
 
 	/// <summary>
-	/// Recursive method to process assimp nodes. 
-	/// Calls processMesh on every mesh in a node
-	/// </summary>
-	/// <param name="scene">Root node which has meshes and textures</param>
-	/// <param name="node">Current node</param>
-	void processNode(const aiScene* scene, const aiNode* node);
-
-	/// <summary>
 	/// Process an assimp mesh and create a mesh using vertices, indices and textures
 	/// </summary>
 	/// <param name="scene">Root node which has meshes and textures</param>

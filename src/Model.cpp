@@ -1,24 +1,6 @@
 #include "Model.h"
 
 /// <summary>
-/// Process each aiNode recursively. Each node has a list of aiNode children.
-/// Each node has a list of indices for meshes stored in aiScene
-/// </summary>
-void Model::processNode(const aiScene* scene, const aiNode* node)
-{
-	// process this node's meshes
-	for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		m_meshes.push_back(processMesh(scene, mesh));
-	}
-
-	// process the children
-	for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-		processNode(scene, node->mChildren[i]);
-	}
-}
-
-/// <summary>
 /// This methods creates a mesh (vertex attributes, indices, textures)
 /// </summary>
 std::unique_ptr<Mesh> Model::processMesh(const aiScene* scene, const aiMesh* mesh)
@@ -150,8 +132,27 @@ void Model::load(const std::string& path)
 		printf("Assimp import error: %s", importer.GetErrorString());
 		exit(0);
 	}
-	// process the nodes recursively
-	processNode(scene, scene->mRootNode);
+
+	// get all nodes with BFS
+	size_t index = 0;
+	std::vector<aiNode*> nodes = { scene->mRootNode };
+
+	while (index < nodes.size()) {
+		aiNode* node = nodes[index];
+		
+		// each node has a list of indices for meshes stored in aiScene
+		for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
+			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			// process this node's meshes
+			m_meshes.push_back(processMesh(scene, mesh));
+		}
+
+		// each node has a list of aiNode children.
+		for (unsigned int i = 0; i < node->mNumChildren; ++i) {
+			nodes.push_back(node->mChildren[i]);
+		}
+		index++;
+	}
 }
 
 void Model::draw(Shader& shader) const
