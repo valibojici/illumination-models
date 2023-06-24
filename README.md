@@ -3,8 +3,8 @@
 ## Description
 This project explores the implementation of the following illumination models: Phong, Blinn-Phong, and Cook-Torrance, using C++ and OpenGL. It showcases several interesting features and techniques.
 
-<img src="https://github.com/valibojici/licenta/assets/68808448/9b8c226c-4f85-42fa-8b9f-de508ba68905" width=30%>
-<img src="https://github.com/valibojici/licenta/assets/68808448/83981675-8399-4e31-af7e-04b1e4e89af2" width=60%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/fae5b52f-7586-41b3-a500-97aaf43bb558" width=30%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/95f46b7b-12ad-4dcd-b2e2-4cffffd1836e" width=60%>
 
 
 ## Cool stuff I learned to do
@@ -12,7 +12,7 @@ This project explores the implementation of the following illumination models: P
 
 The project includes a method for generating an sphere from an [icosahedron](https://en.wikipedia.org/wiki/Icosahedron). It subdivides each triangle into four smaller triangles. This approach ensures better vertex distribution compared to a UV sphere. This approach ensures better vertex distribution compared to a UV sphere (where more vertices are at poles). 
 
-<img src="https://github.com/valibojici/licenta/assets/68808448/4fdc3e8b-b71a-4bf7-89d2-75048431df39" width=50%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/58ff4c91-c658-4024-98ac-d3393a309a54" width=50%>
 
 Based on: *OpenGL programming guide: the official guide to learning OpenGL, versions 3.0 and 3.1 (p. 118)*
 
@@ -115,7 +115,7 @@ return texture;
 ### 🎨 ImGui Integration 
 [ImGui](https://github.com/ocornut/imgui), a popular GUI library, is used providing an interface for tweaking parameters and interacting with the application in real-time.
 
-<img src="https://github.com/valibojici/licenta/assets/68808448/c1faa7ba-23dc-49dd-ae13-3a59bd1bd7c5" width=20%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/3eeaf452-50d6-4fbc-bd2e-0ddb3eecdb08" width=50%>
 
 
 ### ✏️ Post-processing
@@ -123,9 +123,10 @@ Some [post-processing](https://en.wikipedia.org/wiki/Image_editing) is done on t
 #### Edge Detection with Sobel Operator
 [Sobel operator](https://en.wikipedia.org/wiki/Sobel_operator) is used for toon shading to draw the outlines. The scene is rendered to a texture using normals instead of colors then the sobel filter is used to detect edges.
 
-<img src="https://github.com/valibojici/licenta/assets/68808448/5d182a18-0483-46f6-a83d-3edd9b2244f8" width=33%>
-<img src="https://github.com/valibojici/licenta/assets/68808448/1a04e5cb-c0bc-4f87-a5ab-c7e8ffd40dd8" width=33%>
-<img src="https://github.com/valibojici/licenta/assets/68808448/5ca65fdb-eeb3-42a9-b43e-e0856daa070b" width=33%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/1bcab7c8-151c-4456-8b9c-150497e91b42" width=25%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/82199e55-7761-4fc9-9f6f-cb234e85d75a" width=25%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/5a554898-5f51-4192-9495-0da94d30e333" width=25%>
+
 
 #### Gamma correction
 [Gamma correction](https://learnopengl.com/Advanced-Lighting/Gamma-Correction) is used so the lighting calculations are done in linear space and resulting colors are displayed correctly.
