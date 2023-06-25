@@ -123,9 +123,10 @@ Some [post-processing](https://en.wikipedia.org/wiki/Image_editing) is done on t
 #### Edge Detection with Sobel Operator
 [Sobel operator](https://en.wikipedia.org/wiki/Sobel_operator) is used for toon shading to draw the outlines. The scene is rendered to a texture using normals instead of colors then the sobel filter is used to detect edges.
 
-<img src="https://github.com/valibojici/illumination-models/assets/68808448/1bcab7c8-151c-4456-8b9c-150497e91b42" width=25%>
-<img src="https://github.com/valibojici/illumination-models/assets/68808448/82199e55-7761-4fc9-9f6f-cb234e85d75a" width=25%>
-<img src="https://github.com/valibojici/illumination-models/assets/68808448/5a554898-5f51-4192-9495-0da94d30e333" width=25%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/1bcab7c8-151c-4456-8b9c-150497e91b42" width=20%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/82199e55-7761-4fc9-9f6f-cb234e85d75a" width=20%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/5a554898-5f51-4192-9495-0da94d30e333" width=20%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/fa1ece4b-8139-457f-84f1-2e7c43d4fa4d" width=20%>
 
 
 #### Gamma correction
