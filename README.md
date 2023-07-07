@@ -3,9 +3,11 @@
 ## Description
 This project explores the implementation of the following illumination models: Phong, Blinn-Phong, and Cook-Torrance, using C++ and OpenGL. It showcases several interesting features and techniques.
 
-<img src="https://github.com/valibojici/illumination-models/assets/68808448/fae5b52f-7586-41b3-a500-97aaf43bb558" width=30%>
+<img src="https://github.com/valibojici/illumination-models/assets/68808448/a18d1fe2-06ab-4cc6-b2e5-307dd8753358" width=30%>
 <img src="https://github.com/valibojici/illumination-models/assets/68808448/95f46b7b-12ad-4dcd-b2e2-4cffffd1836e" width=60%>
 
+## Thesis
+[Here](Simularea%20Efectelor%20de%20Iluminare%20in%20Grafica%20pe%20Calculator.pdf)
 
 ## Cool stuff I learned to do
 ### 🌐 Generating a sphere from an icosahedron
@@ -53,35 +55,6 @@ for (int k = 0; k < subdivisions; ++k) {
   }
 ```
 
-### 🗒️ Template Shaders
-
-A very basic templating system has been developed, resembling Blade syntax, to simplify the creation and customization of shaders. This is done by some simple string manipulation.
-
-1. `@include "path" `
-
-If a file contains this, then the content of that file is pasted there, replacing the command
-
-2. `@extends "path"` 
-If a file contains this at the start then it uses the file at 'path' as a template. For example file_1 has:
-```c++
-int x = 1;
-@has "important_section" 
-x += 1;
-```
-and file_2 has:
-```c++
-@extends "path_to_file_1"
-// this line wont be included <----
-@section "important_section" 
-x = 10;
-@endsection
-```
-Then after processing file_2 the final result is:
-```c++
-int x = 1;
-x = 10;
-x += 1;
-```
 ### 📆 EventManager
 I implemented an EventManager class based on the observer pattern (the class has a list of objects which are interested to process events). 
 
@@ -128,7 +101,7 @@ Some [post-processing](https://en.wikipedia.org/wiki/Image_editing) is done on t
 <img src="https://github.com/valibojici/illumination-models/assets/68808448/5a554898-5f51-4192-9495-0da94d30e333" width=20%>
 <img src="https://github.com/valibojici/illumination-models/assets/68808448/fa1ece4b-8139-457f-84f1-2e7c43d4fa4d" width=20%>
 
-
+ 
 #### Gamma correction
 [Gamma correction](https://learnopengl.com/Advanced-Lighting/Gamma-Correction) is used so the lighting calculations are done in linear space and resulting colors are displayed correctly.
 
@@ -137,3 +110,33 @@ Some [post-processing](https://en.wikipedia.org/wiki/Image_editing) is done on t
 
 ### 🎥 FPS Camera
 The user can fly around the scene using a [camera](https://ogldev.org/www/tutorial13/tutorial13.html) controlled by keyboard and mouse. The camera calculates the view matrix manually from the basis vectors.
+
+### 🗒️ Template Shaders
+
+A very basic templating system has been developed, resembling Blade syntax, to simplify the creation and customization of shaders. This is done by some simple string manipulation.
+
+1. `@include "path" `
+
+If a file contains this, then the content of that file is pasted there, replacing the command
+
+2. `@extends "path"` 
+If a file contains this at the start then it uses the file at 'path' as a template. For example file_1 has:
+```c++
+int x = 1;
+@has "important_section" 
+x += 1;
+```
+and file_2 has:
+```c++
+@extends "path_to_file_1"
+// this line wont be included <----
+@section "important_section" 
+x = 10;
+@endsection
+```
+Then after processing file_2 the final result is:
+```c++
+int x = 1;
+x = 10;
+x += 1;
+```
